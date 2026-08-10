@@ -1,0 +1,39 @@
+# SMRITI LANDING PAGE - DESIGN BLUEPRINT
+Inspiration: Anthropic "Meet Claude" Landing Page (Modern Editorial, Premium B2B)
+Color Palette: Off-white/cream background (#faf9f6), Deep Charcoal text, Warm Terracotta/Beige accents.
+Typography: Elegant Serif (e.g., Playfair Display) for Headings, Clean Sans-Serif (e.g., Inter) for Body.
+
+## 1. Top Navbar (Header)
+- **Extremely Minimalist ("Clean asf")**
+- Absolutely NO buttons, NO navigation links, and NO text.
+- Only the **Smriti Logo** aligned to the far left.
+
+## 2. Hero Section
+- **Heading:** "Meet Smriti" (Large Serif font)
+- **Subtext:** "Smriti is AI for your sales team. Whether you're a single founder or an enterprise with thousands of reps, Smriti is here to automate your meeting intelligence."
+- **Buttons (Left-aligned under text):**
+  - `[ Login ]` (Solid black button with white text)
+  - `[ Register Organisation ]` (Outlined, transparent background with black border)
+- **Visual (Right side):** A minimal, abstract illustration/graphic using warm terracotta tones.
+
+## 3. Capabilities Section (4-Column Grid)
+- Minimalist line-art icon above each capability.
+1. **Email Automation:** "Meeting reports sent directly to your clients' mailboxes."
+2. **Global Memory:** "Query and chat with all your past meetings instantly."
+3. **Automated Action Items:** "Instantly extract next steps and commitments from every call."
+4. **Enterprise Security:** "Multi-tenant architecture ensuring your data is completely isolated and secure."
+
+## 4. "Why Smriti?" Section (Bento Box Layout)
+- Asymmetrical grid of soft cream and terracotta colored boxes with subtle rounded corners.
+- **Box 1 (Large, Cream) - Secure:** "With accessibility via robust JWT authentication and row-level multi-tenancy, Smriti adheres to the security practices your enterprise demands."
+- **Box 2 (Square, Beige) - Trustworthy:** "Backed by state-of-the-art Hybrid Vector Search to ensure zero hallucinations in your meeting reports."
+- **Box 3 (Square, Terracotta) - Reliable:** "Never miss a detail again. Smriti joins your calls automatically and captures everything."
+
+## 5. Footer Section
+- **Design:** Massive, taking up significant vertical space. Deep charcoal/black background with white/gray text.
+- **Left Column:** Bold, minimal SMRITI logo in white.
+- **Links Columns (Clean typography):**
+  - Product: Features, Pricing
+  - Company: About, Careers
+  - Legal: Privacy Policy, Terms of Service
+- **Bottom:** © 2026 Smriti Inc.

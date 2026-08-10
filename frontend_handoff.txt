@@ -1,0 +1,71 @@
+# FRONTEND HANDOFF DOCUMENT - B2B Meeting Intelligence SaaS
+
+## 1. Product Overview
+This is a B2B SaaS application that allows sales teams to record meetings, generate AI-driven HTML reports, edit those reports, and email them to clients. It features a ChatGPT-style interface for querying past meeting transcripts.
+The backend is completely finished, robust, and features row-level multi-tenancy. Company A can never see Company B's data.
+
+## 2. Backend Architecture & Security
+- **Framework:** Django + Django Ninja (REST API)
+- **Database:** PostgreSQL + pgvector (for RAG/Hybrid Search)
+- **AI/LLM:** LangGraph + Llama3 (Orchestration & Summarization)
+- **Authentication:** Stateless PyJWT. 
+  - Every API request MUST include `Authorization: Bearer <token>`.
+  - The backend dynamically identifies the `User` and their `Organisation` from the token.
+- **Bot Infrastructure:** Recall.ai (Webhooks receive transcripts -> backend runs LangGraph).
+
+## 3. Frontend UX/UI Requirements (Next.js)
+The MVP requires a modern, premium B2B aesthetic.
+
+### Pages & Flow:
+1. **Landing Page (`/`)**: Hero section, value proposition, `[Login]` and `[Register Organisation]` buttons.
+2. **Auth Pages (`/login`, `/register`)**: Standard JWT login flow.
+3. **Admin Dashboard (`/dashboard/team`)**: Admins can register new salespersons to their org.
+4. **Dashboard Layout (Persistent on all `/dashboard/*` routes)**:
+   - **Sidebar**: Navigation links (Customers, Chat).
+   - **Top Navbar (Quick Action)**: A persistent input box `[Paste Zoom Link]` + `[🚀 Send Bot]` button. This allows deploying Recall.ai from anywhere. It requires selecting a Customer from a dropdown before sending.
+5. **Customers Page (`/dashboard/customers`)**:
+   - Grid/List of Customers (e.g., Netflix, Stripe).
+   - Button to create a new customer.
+6. **Customer Details (`/dashboard/customers/[id]`)**:
+   - Lists all past meetings for this specific customer.
+7. **Meeting Report View (`/dashboard/meeting/[id]`)**:
+   - Renders the generated `html_report`.
+   - The user must be able to **edit** this HTML (using a rich text editor like React Quill).
+   - A `[Send to Client]` button to email the report.
+8. **Chatbot Interface (`/dashboard/chat`)**:
+   - Sidebar: Lists past Chat Sessions (Title is the first question asked).
+   - Main Window: Chat bubbles (User/AI). `[New Chat]` button to start a fresh session.
+
+## 4. Complete API Endpoint Reference (Base: `http://localhost:8000/api_v1`)
+
+### Authentication (`/auth`)
+- `POST /auth/register-org` - Register new company & admin (Returns JWT).
+- `POST /auth/register-salesperson` - Admin adds a rep (Returns User info).
+- `POST /auth/login` - Login (Returns `access` and `refresh` tokens).
+- `POST /auth/refresh` - Refresh expired access token.
+- `GET /auth/me` - Get logged-in user profile (Name, Role, Org ID). CRITICAL for page refreshes.
+
+### Customers (`/customers`)
+- `POST /customers/create` - Body: `customer_name`, `industry`, `website`.
+- `GET /customers/list` - Returns all customers for the logged-in org.
+
+### Recall AI Bot (`/bot`)
+- `POST /bot/deploy` - Body: `meeting_url`, `customer_id`. (Triggers Recall bot).
+- `POST /bot/webhook` - (Internal) Recall hits this when meeting ends.
+
+### Meetings & Reports (`/analyse`)
+- `GET /analyse/customer/{customer_id}` - Get list of meetings for a customer.
+- `GET /analyse/{meeting_id}/report` - Get the `html_report` string.
+- `POST /analyse/{meeting_id}/report` - Body: `html_report`. Saves the edited HTML back to DB.
+- `POST /analyse/{meeting_id}/send-email` - Body: `recipient_email`. Emails the HTML report via Brevo.
+- `POST /audio/analyse` - Manual audio upload (Multipart form, requires `customer_id`).
+
+### Chatbot (`/chat`)
+- `POST /chat/ask` - Ask a question. Requires `session_id` (UUID), `customer_name`, `query`.
+- `GET /chat/sessions` - Returns a list of past sessions (id, title, date).
+- `GET /chat/history/{session_id}` - Returns all past chat bubbles (query, answer) for a session.
+
+## 5. Developer Implementation Notes
+1. **F5 Refresh Problem**: Store the JWT in `localStorage` or `cookies`. On app mount, ALWAYS call `GET /auth/me` to restore React state.
+2. **Editing HTML**: The backend returns raw HTML. Use a WYSIWYG editor component in React so the salesperson can edit action items cleanly before hitting save.
+3. **Routing**: Protect all `/dashboard` routes. If `GET /auth/me` fails, redirect to `/login`.

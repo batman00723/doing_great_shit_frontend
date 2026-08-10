@@ -1,0 +1,147 @@
+Redesign ONLY the "Why Smriti?" section shown in the current implementation.
+
+The current design direction is good: warm off-white background, editorial serif typography, asymmetric layout, minimal aesthetic, and muted accent colors.
+
+Do NOT redesign the entire website and do NOT change the overall visual identity.
+
+The problem with the current section is that the large "Secure" card contains too much empty space, while the three value propositions feel somewhat disconnected. Make the section feel more intentional, premium, and narrative-driven.
+
+DESIGN GOAL:
+
+"Why Smriti?" should communicate three clear reasons to trust the product:
+
+1. Secure — your data is isolated and protected.
+2. Reliable — Smriti captures every important part of the conversation.
+3. Trustworthy — answers and reports are grounded in actual meeting data.
+
+LAYOUT:
+
+Keep the current asymmetric composition:
+
+- Large feature card on the left.
+- Two smaller stacked cards on the right.
+- Large "Why Smriti?" heading centered above.
+
+However, improve the composition so the left card does not feel 60–70% empty.
+
+For the large Secure card, introduce a subtle visual element in the empty area.
+
+Possible direction:
+- A minimal abstract security/data-isolation visualization.
+- Several small connected nodes representing meeting data.
+- A central protected/locked data layer.
+- Very subtle linework.
+- Monochrome or extremely muted.
+- No futuristic neon effects.
+- No generic AI brain graphics.
+
+The visual should communicate:
+"Customer data stays isolated and protected."
+
+Keep it understated and editorial.
+
+TYPOGRAPHY:
+
+Keep the existing serif typography.
+
+Main heading:
+"Why Smriti?"
+
+Keep it large and elegant.
+
+Card headings:
+"Secure"
+"Reliable"
+"Trustworthy"
+
+Use strong typographic hierarchy but avoid making everything oversized.
+
+COPY:
+
+Secure:
+
+"Your meeting data stays isolated and protected."
+
+Supporting text:
+
+"With robust JWT authentication and row-level multi-tenancy, Smriti keeps each customer's data securely separated."
+
+IMPORTANT:
+Do NOT claim "zero hallucinations." Avoid absolute guarantees that cannot be technically proven.
+
+Trustworthy:
+
+"Grounded in your meeting data."
+
+Supporting text:
+
+"Smriti connects answers and reports to the conversations and context your team already has."
+
+Reliable:
+
+"Never miss a detail again."
+
+Supporting text:
+
+"Smriti joins your calls automatically and captures the important moments, decisions, and commitments."
+
+VISUAL STYLE:
+
+- Warm off-white page background.
+- Off-white/cream large card.
+- Muted cream accent for Trustworthy.
+- Replace the current highly saturated orange with a more sophisticated muted terracotta/coral.
+- Black/dark charcoal typography.
+- Very subtle borders if needed.
+- No gradients.
+- No glassmorphism.
+- No heavy shadows.
+- No excessive rounded corners.
+- No generic SaaS card styling.
+
+The colors should feel like an editorial print publication rather than a typical technology startup.
+
+SPACING:
+
+Reduce unnecessary empty space inside the Secure card.
+
+Use the large card's vertical space intentionally:
+- Heading near the top.
+- Subtle security visualization in the middle/right.
+- Supporting copy anchored toward the bottom.
+
+The right cards should remain compact and visually balanced.
+
+IMPORTANT DESIGN PRINCIPLE:
+
+Do not make everything symmetrical.
+
+The asymmetry of the current design is one of its strongest qualities. Preserve it.
+
+The final section should feel like a carefully art-directed editorial layout rather than a standard three-card feature section.
+
+RESPONSIVE:
+
+Desktop:
+- Preserve the asymmetric large-left / stacked-right composition.
+
+Tablet:
+- Maintain visual hierarchy while allowing the cards to resize naturally.
+
+Mobile:
+- Stack the cards vertically.
+- Ensure the security visualization does not dominate.
+- Maintain generous but controlled spacing.
+- No horizontal overflow.
+
+IMPLEMENTATION:
+
+Before modifying anything, inspect the existing component and styling system.
+
+Reuse existing fonts, variables, components, and icon/illustration libraries where possible.
+
+Do not add unnecessary dependencies.
+
+Do not modify unrelated sections.
+
+After implementation, inspect the section at desktop, tablet, and mobile widths and refine spacing, typography, and alignment.
