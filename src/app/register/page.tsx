@@ -8,9 +8,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     organisation_name: "",
-    industry: "",
-    website: "",
-    full_name: "",
+    admin_name: "",
     email: "",
     password: "",
   });
@@ -119,57 +117,24 @@ export default function RegisterPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            {/* Organisation Details */}
             <div>
               <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.12em] text-slate-dark/40 mb-4">
                 Organisation
               </p>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="organisation_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
-                    Company name
-                  </label>
-                  <input
-                    id="organisation_name"
-                    name="organisation_name"
-                    type="text"
-                    required
-                    placeholder="Acme Corp"
-                    value={formData.organisation_name}
-                    onChange={handleChange}
-                    className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="industry" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
-                      Industry
-                    </label>
-                    <input
-                      id="industry"
-                      name="industry"
-                      type="text"
-                      placeholder="SaaS"
-                      value={formData.industry}
-                      onChange={handleChange}
-                      className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label htmlFor="website" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
-                      Website
-                    </label>
-                    <input
-                      id="website"
-                      name="website"
-                      type="text"
-                      placeholder="acme.com"
-                      value={formData.website}
-                      onChange={handleChange}
-                      className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
-                    />
-                  </div>
-                </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="organisation_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+                  Company name
+                </label>
+                <input
+                  id="organisation_name"
+                  name="organisation_name"
+                  type="text"
+                  required
+                  placeholder="Acme Corp"
+                  value={formData.organisation_name}
+                  onChange={handleChange}
+                  className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                />
               </div>
             </div>
 
@@ -183,16 +148,16 @@ export default function RegisterPage() {
               </p>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="full_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+                  <label htmlFor="admin_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
                     Full name
                   </label>
                   <input
-                    id="full_name"
-                    name="full_name"
+                    id="admin_name"
+                    name="admin_name"
                     type="text"
                     required
                     placeholder="Jane Smith"
-                    value={formData.full_name}
+                    value={formData.admin_name}
                     onChange={handleChange}
                     className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
                   />
