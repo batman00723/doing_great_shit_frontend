@@ -23,7 +23,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api_v1/auth/login", {
+      const res = await fetch("https://doing-great-shit.onrender.com/api_v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -36,10 +36,10 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem("access_token", data.access);
-      if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
+      localStorage.setItem("access_token", data.access_token);
+      if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
 
-      router.push("/dashboard/customers");
+      router.push("/dashboard");
     } catch {
       setError("Unable to reach the server. Please check your connection.");
     } finally {

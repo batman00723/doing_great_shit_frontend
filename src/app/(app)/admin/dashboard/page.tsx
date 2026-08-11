@@ -23,7 +23,7 @@ export default function TeamPage() {
       const token = localStorage.getItem("access_token");
 
       try {
-        const res = await fetch("http://localhost:8000/api_v1/auth/me", {
+        const res = await fetch("https://doing-great-shit.onrender.com/api_v1/auth/me", {
           headers: { Authorization: `Bearer ${token || "dev"}` },
         });
         
@@ -60,8 +60,14 @@ export default function TeamPage() {
 
     const token = localStorage.getItem("access_token");
 
+    if (!token) {
+      setError("You are not logged in. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch("http://localhost:8000/api_v1/auth/register-salesperson", {
+      const res = await fetch("https://doing-great-shit.onrender.com/api_v1/auth/register-salesperson", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,17 +77,27 @@ export default function TeamPage() {
       });
 
       const data = await res.json();
+      console.log("API response:", res.status, data);
 
       if (!res.ok) {
-        setError(data?.detail || data?.message || "Something went wrong.");
+        if (typeof data?.detail === "string") {
+          setError(data.detail);
+        } else if (Array.isArray(data?.detail)) {
+          setError(data.detail.map((e: { msg: string }) => e.msg).join(", "));
+        } else if (data?.message) {
+          setError(data.message);
+        } else {
+          setError(`Error ${res.status}: ${JSON.stringify(data)}`);
+        }
         return;
       }
 
       setSuccess(`${form.salesperson_name} has been added to ${user?.organisation}.`);
       setForm({ salesperson_name: "", email: "", password: "" });
       setShowForm(false);
-    } catch {
+    } catch (err) {
       setError("Unable to reach the server.");
+      console.error(err);
     } finally {
       setLoading(false);
     }

@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api_v1/auth/register-org", {
+      const res = await fetch("https://doing-great-shit.onrender.com/api_v1/auth/register-org", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -39,10 +39,10 @@ export default function RegisterPage() {
       }
 
       // Store the JWT token
-      localStorage.setItem("access_token", data.access);
-      if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
+      localStorage.setItem("access_token", data.access_token);
+      if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
 
-      router.push("/dashboard/team");
+      router.push("/admin/dashboard");
     } catch {
       setError("Unable to reach the server. Please check your connection.");
     } finally {
