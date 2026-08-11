@@ -58,10 +58,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [botLoading, setBotLoading] = useState(false);
   const [botMessage, setBotMessage] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   useEffect(() => {
+    setMounted(true);
     // Restore user from /auth/me on mount
     const restore = async () => {
       const stored = localStorage.getItem("access_token");
@@ -163,9 +165,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             Smriti
           </Link>
 
-          <nav className="flex flex-col gap-1">
-            {NAV_LINKS.map((link) => {
-              const isActive = pathname.startsWith(link.href);
+          <nav className="flex flex-col gap-1" suppressHydrationWarning>
+            {NAV_LINKS.filter(link => {
+              if (link.href === "/admin/dashboard") return mounted && user?.role === "Admin";
+              return true;
+            }).map((link) => {
+              const isActive = mounted && pathname?.startsWith(link.href);
               return (
                 <Link
                   key={link.href}
@@ -175,6 +180,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       ? "bg-white/10 text-white"
                       : "text-white/50 hover:text-white hover:bg-white/5"
                   }`}
+                  suppressHydrationWarning
                 >
                   {link.icon}
                   {link.label}
