@@ -32,9 +32,18 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
+      console.log("Register response:", res.status, data);
 
       if (!res.ok) {
-        setError(data?.detail || data?.message || "Something went wrong. Please try again.");
+        if (typeof data?.detail === "string") {
+          setError(data.detail);
+        } else if (Array.isArray(data?.detail)) {
+          setError(data.detail.map((e: { msg: string }) => e.msg).join(", "));
+        } else if (data?.message) {
+          setError(data.message);
+        } else {
+          setError(`Error ${res.status}: ${JSON.stringify(data)}`);
+        }
         return;
       }
 
@@ -43,7 +52,8 @@ export default function RegisterPage() {
       if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
 
       router.push("/admin/dashboard");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Unable to reach the server. Please check your connection.");
     } finally {
       setLoading(false);
