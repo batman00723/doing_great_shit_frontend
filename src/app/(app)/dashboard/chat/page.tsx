@@ -23,6 +23,11 @@ interface ChatBubble {
   pending?: boolean;
 }
 
+interface Customer {
+  id: number;
+  customer_name: string;
+}
+
 function getToken() {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("access_token");
@@ -35,18 +40,34 @@ function formatDate(iso: string) {
 
 export default function ChatPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [activeSession, setActiveSession] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatBubble[]>([]);
   const [query, setQuery] = useState("");
   const [sending, setSending] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(true);
+
+  // Filters
+  const [showFilters, setShowFilters] = useState(false);
+  const [customerId, setCustomerId] = useState<string>("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [specificDate, setSpecificDate] = useState("");
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load sessions on mount
+  // Derived: how many filters are active
+  const activeFilterCount = [
+    customerId,
+    specificDate || startDate || endDate ? "date" : "",
+  ].filter(Boolean).length;
+
+  // Load sessions + customers on mount
   useEffect(() => {
+    const token = getToken();
+
     const fetchSessions = async () => {
-      const token = getToken();
       try {
         const res = await fetch(`${BASE}/chat/sessions`, {
           headers: { Authorization: `Bearer ${token || "dev"}` },
@@ -55,10 +76,21 @@ export default function ChatPage() {
       } catch { /* silent */ }
       finally { setSessionsLoading(false); }
     };
+
+    const fetchCustomers = async () => {
+      try {
+        const res = await fetch(`${BASE}/customers/list`, {
+          headers: { Authorization: `Bearer ${token || "dev"}` },
+        });
+        if (res.ok) setCustomers(await res.json());
+      } catch { /* silent */ }
+    };
+
     fetchSessions();
+    fetchCustomers();
   }, []);
 
-  // Scroll to bottom whenever messages change
+  // Scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -97,13 +129,19 @@ export default function ChatPage() {
     setQuery("");
   };
 
+  const clearFilters = () => {
+    setCustomerId("");
+    setStartDate("");
+    setEndDate("");
+    setSpecificDate("");
+  };
+
   const handleSend = async () => {
     if (!query.trim() || sending) return;
     const userQuery = query.trim();
     setQuery("");
     setSending(true);
 
-    // Optimistically add user bubble + pending AI bubble
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userQuery },
@@ -111,6 +149,15 @@ export default function ChatPage() {
     ]);
 
     const token = getToken();
+
+    // Build filter payload — specific_date overrides range per API spec
+    const filterPayload = {
+      customer_id: customerId ? parseInt(customerId) : null,
+      specific_date: specificDate || null,
+      start_date: specificDate ? null : (startDate || null),
+      end_date: specificDate ? null : (endDate || null),
+    };
+
     try {
       const res = await fetch(`${BASE}/chat/ask`, {
         method: "POST",
@@ -118,22 +165,18 @@ export default function ChatPage() {
         body: JSON.stringify({
           query: userQuery,
           session_id: activeSession,
-          start_date: null,
-          end_date: null,
-          specific_date: null,
+          ...filterPayload,
         }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // Replace pending bubble with real answer
         setMessages((prev) => [
           ...prev.slice(0, -1),
           { role: "ai", content: data.answer },
         ]);
 
-        // If new session, prepend to sessions list
         if (!activeSession && data.session_id) {
           setActiveSession(data.session_id);
           setSessions((prev) => [
@@ -169,7 +212,6 @@ export default function ChatPage() {
 
       {/* ── SESSIONS SIDEBAR ── */}
       <aside className="w-[260px] shrink-0 bg-ivory-light border-r border-stone/50 flex flex-col">
-        {/* New Chat */}
         <div className="p-4 border-b border-stone/50">
           <button
             onClick={startNewChat}
@@ -182,7 +224,6 @@ export default function ChatPage() {
           </button>
         </div>
 
-        {/* Sessions List */}
         <div className="flex-1 overflow-y-auto py-2">
           {sessionsLoading ? (
             <div className="flex flex-col gap-2 p-4">
@@ -202,7 +243,7 @@ export default function ChatPage() {
                 <button
                   key={s.id}
                   onClick={() => loadHistory(s.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all group ${
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
                     activeSession === s.id
                       ? "bg-oat-warm text-slate-dark"
                       : "hover:bg-ivory-medium text-slate-dark/70 hover:text-slate-dark"
@@ -244,7 +285,6 @@ export default function ChatPage() {
             <div className="max-w-[720px] mx-auto flex flex-col gap-6">
               {messages.map((m, i) => (
                 <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  {/* Avatar */}
                   <div className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-[11px] font-anthropic-sans font-bold mt-0.5 ${
                     m.role === "user"
                       ? "bg-slate-dark text-white"
@@ -252,8 +292,6 @@ export default function ChatPage() {
                   }`}>
                     {m.role === "user" ? "Y" : "S"}
                   </div>
-
-                  {/* Bubble */}
                   <div className={`max-w-[80%] rounded-[16px] px-5 py-3.5 ${
                     m.role === "user"
                       ? "bg-slate-dark text-white rounded-tr-[4px]"
@@ -280,9 +318,128 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* Input area */}
-        <div className="border-t border-stone/40 bg-ivory-light px-6 py-4">
-          <div className="max-w-[720px] mx-auto flex gap-3 items-end">
+        {/* ── INPUT + FILTERS AREA ── */}
+        <div className="border-t border-stone/40 px-6 py-4">
+
+          {/* Active filter pills */}
+          {(customerId || startDate || endDate || specificDate) && (
+            <div className="max-w-[720px] mx-auto flex flex-wrap gap-2 mb-3">
+              {customerId && (
+                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
+                  {customers.find(c => c.id === parseInt(customerId))?.customer_name || "Customer"}
+                  <button onClick={() => setCustomerId("")} className="hover:text-clay transition-colors">×</button>
+                </span>
+              )}
+              {specificDate && (
+                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
+                  Date: {specificDate}
+                  <button onClick={() => setSpecificDate("")} className="hover:text-clay transition-colors">×</button>
+                </span>
+              )}
+              {!specificDate && (startDate || endDate) && (
+                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
+                  {startDate && endDate ? `${startDate} → ${endDate}` : startDate ? `From ${startDate}` : `Until ${endDate}`}
+                  <button onClick={() => { setStartDate(""); setEndDate(""); }} className="hover:text-clay transition-colors">×</button>
+                </span>
+              )}
+              <button onClick={clearFilters} className="font-anthropic-sans text-[11px] text-cloud-medium hover:text-clay transition-colors">
+                Clear all
+              </button>
+            </div>
+          )}
+
+          {/* Collapsible filter panel */}
+          {showFilters && (
+            <div className="max-w-[720px] mx-auto mb-4 bg-ivory-medium border border-stone/60 rounded-xl p-4 flex flex-col gap-4">
+              <p className="font-anthropic-sans text-[11px] uppercase tracking-widest text-slate-dark/40">Filters</p>
+
+              {/* Customer filter */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">Customer</label>
+                <select
+                  value={customerId}
+                  onChange={(e) => setCustomerId(e.target.value)}
+                  className="font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors"
+                >
+                  <option value="">All customers</option>
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>{c.customer_name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="border-t border-stone/50" />
+
+              {/* Specific date */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">
+                  Specific date
+                  <span className="font-normal text-cloud-medium ml-1">(overrides date range if set)</span>
+                </label>
+                <input
+                  type="date"
+                  value={specificDate}
+                  onChange={(e) => { setSpecificDate(e.target.value); if (e.target.value) { setStartDate(""); setEndDate(""); } }}
+                  className="font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors"
+                />
+              </div>
+
+              {/* Date range */}
+              <div className="flex flex-col gap-1.5">
+                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">
+                  Date window
+                  {specificDate && <span className="font-normal text-cloud-medium ml-1">(disabled — specific date is set)</span>}
+                </label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="date"
+                    value={startDate}
+                    disabled={!!specificDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
+                  <span className="font-anthropic-sans text-[12px] text-cloud-medium shrink-0">to</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    disabled={!!specificDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowFilters(false)}
+                className="font-anthropic-sans text-[12px] text-cloud-medium hover:text-slate-dark transition-colors self-end"
+              >
+                Done
+              </button>
+            </div>
+          )}
+
+          {/* Textarea + send + filter toggle */}
+          <div className="max-w-[720px] mx-auto flex gap-2 items-end">
+            {/* Filter toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`shrink-0 h-10 px-3 rounded-xl border flex items-center gap-1.5 transition-all ${
+                showFilters || activeFilterCount > 0
+                  ? "bg-slate-dark border-slate-dark text-white"
+                  : "bg-ivory-medium border-stone text-cloud-medium hover:border-slate-dark hover:text-slate-dark"
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+              </svg>
+              <span className="font-anthropic-sans font-semibold text-[12px]">Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 bg-clay rounded-full font-anthropic-sans text-[9px] text-white flex items-center justify-center font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
             <textarea
               ref={textareaRef}
               rows={1}
@@ -296,15 +453,18 @@ export default function ChatPage() {
             <button
               onClick={handleSend}
               disabled={!query.trim() || sending}
-              className="shrink-0 bg-slate-dark text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 bg-slate-dark text-white h-10 px-4 rounded-xl flex items-center gap-1.5 hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
               </svg>
+              <span className="font-anthropic-sans font-semibold text-[12px]">{sending ? "Sending…" : "Send"}</span>
             </button>
           </div>
+
           <p className="max-w-[720px] mx-auto mt-2 font-anthropic-sans text-[11px] text-cloud-medium">
             Smriti searches across all your recorded meetings and transcripts.
+            {activeFilterCount > 0 && <span className="text-clay ml-1">· {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active</span>}
           </p>
         </div>
       </div>
