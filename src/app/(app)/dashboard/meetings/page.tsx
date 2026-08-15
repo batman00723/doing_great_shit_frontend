@@ -101,10 +101,10 @@ export default function AllMeetingsPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {meetings.map((m) => (
-            <Link
+            <div
               key={m.meeting_id}
-              href={`/dashboard/meeting/${m.meeting_id}`}
-              className="group bg-ivory-light border border-stone/50 rounded-[16px] p-5 hover:border-slate-dark/30 hover:bg-[#f5f4ef] transition-all flex items-center justify-between"
+              onClick={() => router.push(`/dashboard/meeting/${m.meeting_id}`)}
+              className="group bg-ivory-light border border-stone/50 rounded-[16px] p-5 hover:border-slate-dark/30 hover:bg-[#f5f4ef] transition-all flex items-center justify-between cursor-pointer"
             >
               <div className="flex items-center gap-5 min-w-0">
                 {/* Status dot */}
@@ -154,7 +154,7 @@ export default function AllMeetingsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
