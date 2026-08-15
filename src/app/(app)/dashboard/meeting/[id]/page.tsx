@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { use, useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
@@ -11,10 +11,13 @@ function getToken() {
   return localStorage.getItem("access_token");
 }
 
-export default function MeetingReportPage() {
-  const params = useParams();
+export default function MeetingReportPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: meetingId } = use(params);
   const router = useRouter();
-  const meetingId = params.id as string;
 
   const [initialHtml, setInitialHtml] = useState<string>("");
   const [loading, setLoading] = useState(true);

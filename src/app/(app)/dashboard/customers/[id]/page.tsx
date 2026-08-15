@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
@@ -32,10 +32,13 @@ function formatDate(iso: string) {
   return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default function CustomerMeetingsPage() {
-  const params = useParams();
+export default function CustomerMeetingsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: customerId } = use(params);
   const router = useRouter();
-  const customerId = params.id as string;
 
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
