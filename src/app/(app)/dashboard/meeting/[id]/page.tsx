@@ -27,6 +27,8 @@ export default function MeetingReportPage({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Feedback
@@ -70,9 +72,27 @@ export default function MeetingReportPage({
     setTimeout(() => setToast(null), 4000);
   };
 
+  const clearHighlights = () => {
+    if (!editorRef.current) return;
+    const marks = editorRef.current.querySelectorAll('mark.find-highlight');
+    marks.forEach(mark => {
+      const parent = mark.parentNode;
+      if (!parent) return;
+      while (mark.firstChild) {
+        parent.insertBefore(mark.firstChild, mark);
+      }
+      parent.removeChild(mark);
+    });
+    // Merge text nodes back together
+    editorRef.current.normalize();
+  };
+
   const handleSave = async () => {
     if (!editorRef.current) return;
     setIsSaving(true);
+    
+    // Clear highlights before saving to DB
+    clearHighlights();
     const updatedHtml = editorRef.current.innerHTML;
 
     const token = getToken();
@@ -98,6 +118,94 @@ export default function MeetingReportPage({
       showToast("Network error. Could not save.", "error");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleFindAll = () => {
+    if (!findText || !editorRef.current) return;
+    
+    // 1. Clear any old highlights first
+    clearHighlights();
+    
+    // 2. Escape search text for RegExp
+    const escapedFind = findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedFind})`, 'gi');
+    let totalFound = 0;
+    
+    // 3. TreeWalker to find all Text Nodes
+    const walker = document.createTreeWalker(editorRef.current, NodeFilter.SHOW_TEXT, null);
+    let node;
+    const textNodes = [];
+    while ((node = walker.nextNode())) {
+      // Don't search inside existing marks or scripts
+      if (node.parentElement && node.parentElement.tagName === 'MARK') continue;
+      textNodes.push(node);
+    }
+    
+    // 4. Wrap matches in <mark> tags
+    textNodes.forEach(textNode => {
+      const match = textNode.nodeValue?.match(regex);
+      if (match && textNode.parentNode) {
+        totalFound += match.length;
+        
+        // We split the text node and insert <mark> tags
+        const fragment = document.createDocumentFragment();
+        const parts = textNode.nodeValue!.split(regex);
+        
+        parts.forEach(part => {
+          if (part.toLowerCase() === findText.toLowerCase()) {
+            const mark = document.createElement('mark');
+            mark.className = 'find-highlight bg-manilla text-slate-dark rounded-[2px] px-[2px]';
+            mark.textContent = part;
+            fragment.appendChild(mark);
+          } else if (part.length > 0) {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        });
+        
+        textNode.parentNode.replaceChild(fragment, textNode);
+      }
+    });
+    
+    if (totalFound > 0) {
+      showToast(`Found ${totalFound} occurrence${totalFound > 1 ? 's' : ''}.`, "success");
+    } else {
+      showToast(`No matches found for "${findText}".`, "error");
+    }
+  };
+
+  const handleReplaceAll = () => {
+    if (!findText || !editorRef.current) return;
+    
+    // Replace inside text nodes
+    const walker = document.createTreeWalker(editorRef.current, NodeFilter.SHOW_TEXT, null);
+    let node;
+    
+    const escapedFind = findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedFind, 'gi');
+    let totalReplaced = 0;
+    
+    const nodes = [];
+    while ((node = walker.nextNode())) {
+      nodes.push(node);
+    }
+    
+    nodes.forEach(n => {
+      if (n.nodeValue && n.nodeValue.match(regex)) {
+        const matches = n.nodeValue.match(regex);
+        if (matches) {
+          totalReplaced += matches.length;
+        }
+        n.nodeValue = n.nodeValue.replace(regex, replaceText);
+      }
+    });
+    
+    if (totalReplaced > 0) {
+      // Clear highlights just in case they were left
+      clearHighlights();
+      showToast(`Replaced ${totalReplaced} occurrence${totalReplaced > 1 ? 's' : ''}.`, "success");
+    } else {
+      showToast(`No matches found for "${findText}".`, "error");
     }
   };
 
@@ -206,22 +314,72 @@ export default function MeetingReportPage({
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                {isSending ? "Sending..." : "Send via Email"}
+                {isSending ? "Sending..." : "Mail to Customer"}
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Editor Note */}
+      {/* Editor Note & Find/Replace Toolbar */}
       {isEditing && (
-        <div className="bg-manilla/40 border border-clay/20 rounded-xl px-5 py-3 mb-6 flex items-center gap-3">
-          <svg className="w-4 h-4 text-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="font-anthropic-sans text-[13px] text-clay-deep">
-            You are in edit mode. Click anywhere on the text below to type and make changes.
-          </p>
+        <div className="bg-manilla/40 border border-clay/20 rounded-xl px-5 py-4 mb-6 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <svg className="w-4 h-4 text-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="font-anthropic-sans text-[13px] text-clay-deep">
+              You are in edit mode. Click anywhere on the text below to type and make changes.
+            </p>
+          </div>
+          
+          <div className="flex flex-col gap-3 pt-3 border-t border-clay/10">
+            {/* Find Row */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 flex items-center gap-2 bg-white/60 border border-clay/20 rounded-lg px-3 py-2 focus-within:border-clay/50 transition-colors">
+                <svg className="w-4 h-4 text-clay-deep/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Find word..." 
+                  value={findText}
+                  onChange={(e) => setFindText(e.target.value)}
+                  className="bg-transparent border-none outline-none text-[14px] font-anthropic-sans text-slate-dark placeholder:text-slate-dark/30 w-full" 
+                />
+              </div>
+              <button
+                onClick={handleFindAll}
+                disabled={!findText}
+                className="shrink-0 font-anthropic-sans text-[13px] font-semibold bg-ivory-light border border-clay/30 text-clay-deep px-4 py-2 rounded-lg hover:bg-clay/10 transition-all disabled:opacity-50"
+              >
+                Search
+              </button>
+            </div>
+            
+            {/* Replace Row */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 flex items-center gap-2 bg-white/60 border border-clay/20 rounded-lg px-3 py-2 focus-within:border-clay/50 transition-colors">
+                <svg className="w-4 h-4 text-clay/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Replace with..." 
+                  value={replaceText}
+                  onChange={(e) => setReplaceText(e.target.value)}
+                  className="bg-transparent border-none outline-none text-[14px] font-anthropic-sans text-slate-dark placeholder:text-slate-dark/30 w-full" 
+                />
+              </div>
+              <button
+                onClick={handleReplaceAll}
+                disabled={!findText}
+                className="shrink-0 font-anthropic-sans text-[13px] font-semibold bg-clay text-white px-4 py-2 rounded-lg hover:bg-clay-deep transition-all disabled:opacity-50"
+              >
+                Replace All
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
