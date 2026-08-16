@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const [statsLoading, setStatsLoading] = useState(true);
 
   // Add Customer form
-  const [custForm, setCustForm] = useState({ customer_name: "", industry: "", website: "", status: "Lead" });
+  const [custForm, setCustForm] = useState({ customer_name: "", email: "", industry: "", website: "", status: "Lead" });
   const [custLoading, setCustLoading] = useState(false);
   const [custSuccess, setCustSuccess] = useState("");
   const [custError, setCustError] = useState("");
@@ -151,7 +151,7 @@ export default function DashboardPage() {
         return;
       }
       setCustSuccess(`${custForm.customer_name} added successfully!`);
-      setCustForm({ customer_name: "", industry: "", website: "", status: "Lead" });
+      setCustForm({ customer_name: "", email: "", industry: "", website: "", status: "Lead" });
       setCustomers((prev) => [...prev, data]);
     } catch (err) {
       console.error("Add customer error:", err);
@@ -296,6 +296,10 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-1.5">
               <label className="font-anthropic-sans text-[13px] font-medium text-slate-dark">Customer name *</label>
               <input required placeholder="Netflix" value={custForm.customer_name} onChange={e => setCustForm({ ...custForm, customer_name: e.target.value })} className={inputCls} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-anthropic-sans text-[13px] font-medium text-slate-dark">Email *</label>
+              <input required type="email" placeholder="contact@netflix.com" value={custForm.email} onChange={e => setCustForm({ ...custForm, email: e.target.value })} className={inputCls} />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="font-anthropic-sans text-[13px] font-medium text-slate-dark">Industry</label>

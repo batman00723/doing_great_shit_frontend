@@ -26,13 +26,9 @@ export default function MeetingReportPage({
   // Edit state
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Email state
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [email, setEmail] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  
   // Feedback
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
@@ -105,10 +101,7 @@ export default function MeetingReportPage({
     }
   };
 
-  const handleSendEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
+  const handleSendEmail = async () => {
     setIsSending(true);
     const token = getToken();
     try {
@@ -118,15 +111,12 @@ export default function MeetingReportPage({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ recipient_email: email }),
       });
 
       const data = await res.json();
       
       if (res.ok) {
-        setShowEmailModal(false);
-        setEmail("");
-        showToast(`Email successfully sent to ${email}!`, "success");
+        showToast(`Email successfully sent to customer!`, "success");
       } else {
         showToast(data?.detail || data?.message || "Failed to send email.", "error");
       }
@@ -207,14 +197,15 @@ export default function MeetingReportPage({
                 Edit Report
               </button>
               <button
-                onClick={() => setShowEmailModal(true)}
-                className="font-anthropic-sans font-semibold text-[13px] bg-clay text-white px-5 py-2.5 rounded-[8px] hover:bg-clay-deep transition-all flex items-center gap-2"
+                onClick={handleSendEmail}
+                disabled={isSending}
+                className="font-anthropic-sans font-semibold text-[13px] bg-clay text-white px-5 py-2.5 rounded-[8px] hover:bg-clay-deep transition-all flex items-center gap-2 disabled:opacity-50"
                 style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px', borderBottomLeftRadius: '8px', borderBottomRightRadius: '8px' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Send via Email
+                {isSending ? "Sending..." : "Send via Email"}
               </button>
             </>
           )}
@@ -264,61 +255,6 @@ export default function MeetingReportPage({
         />
       </div>
 
-      {/* Send Email Modal */}
-      {showEmailModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-dark/20 backdrop-blur-sm p-4">
-          <div className="bg-ivory-light border border-stone/50 rounded-[24px] w-full max-w-md p-8 shadow-xl">
-            <h3 className="font-anthropic-sans text-[20px] font-semibold text-slate-dark mb-2">
-              Send Meeting Report
-            </h3>
-            <p className="font-anthropic-serif text-[15px] text-cloud-medium mb-6">
-              This will send the formatted HTML report directly to the customer.
-            </p>
-            
-            <form onSubmit={handleSendEmail} className="flex flex-col gap-5">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
-                  Customer Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="alex@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-ivory-medium border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-2.5 rounded-lg outline-none focus:border-slate-dark transition-colors"
-                />
-              </div>
-              
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowEmailModal(false)}
-                  className="font-anthropic-sans text-[13px] text-slate-dark/60 hover:text-slate-dark transition-colors px-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSending || !email}
-                  className="flex-1 font-anthropic-sans font-semibold text-[13px] bg-clay text-white px-5 py-2.5 rounded-lg hover:bg-clay-deep transition-all disabled:opacity-50 text-center flex justify-center items-center gap-2"
-                >
-                  {isSending ? (
-                    "Sending…"
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
-                      Send Email
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
