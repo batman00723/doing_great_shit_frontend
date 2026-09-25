@@ -3,6 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeInUp,
+  fadeInDown,
+  slideInRight,
+  staggerContainer,
+  staggerContainerSlow,
+  springCalm,
+  easeSoft,
+  hoverScale,
+  tapScale,
+} from "@/lib/animations";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -61,11 +73,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ivory-medium flex">
+    <div className="min-h-screen bg-[#fdfaf6] flex">
       {/* Left Panel — Brand */}
-      <div className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden"
+      >
         {/* Topographic background texture */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
           <svg viewBox="0 0 600 800" className="w-full h-full" fill="none" stroke="white" strokeWidth="1">
             <path d="M 600 0 C 500 100 400 150 300 100 C 200 50 100 100 0 150" />
             <path d="M 600 40 C 510 130 410 180 310 130 C 210 80 100 130 0 180" />
@@ -82,57 +99,73 @@ export default function RegisterPage() {
         </div>
 
         {/* Logo */}
-        <Link href="/" className="font-anthropic-sans font-bold text-[12px] uppercase tracking-wider text-white relative z-10">
+        <Link href="/" className="font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-white relative z-10">
           Smriti
         </Link>
 
         {/* Tagline */}
-        <div className="relative z-10">
-          <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-white/40 mb-6">
-            Join Smriti
-          </p>
-          <h2 className="font-anthropic-serif text-[48px] leading-[1.1] text-white mb-6">
-            Every meeting detail, always remembered.
-          </h2>
-          <p className="font-anthropic-serif text-[18px] leading-[1.5] text-white/60 max-w-[380px]">
+        <motion.div
+          variants={staggerContainerSlow}
+          initial="initial"
+          animate="animate"
+          className="relative z-10"
+        >
+          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-3 px-3 py-1.5 rounded-full border border-clay/30 bg-clay/10 mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-clay animate-pulse" />
+            <span className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-clay-deep">
+              Smriti Intelligence
+            </span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[56px] leading-[1.05] tracking-tight text-white mb-6">
+            Join <br/> <em className="italic font-normal text-clay">Smriti.</em>
+          </motion.h2>
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[20px] leading-[1.5] text-white/60 max-w-[380px]">
             Register your organisation and let Smriti capture, analyse, and report on every call — automatically.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Bottom quote */}
         <p className="font-anthropic-sans text-[12px] text-white/30 relative z-10">
           © 2026 Smriti Inc.
         </p>
-      </div>
+      </motion.div>
 
       {/* Right Panel — Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-28 xl:px-32 py-16">
+      <motion.div
+        variants={slideInRight}
+        initial="initial"
+        animate="animate"
+        transition={{ ...springCalm, delay: 0.15 }}
+        className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-28 xl:px-32 py-16 overflow-y-auto"
+      >
         {/* Mobile logo */}
-        <Link href="/" className="lg:hidden font-anthropic-sans font-bold text-[12px] uppercase tracking-wider text-slate-dark mb-12 block">
+        <Link href="/" className="lg:hidden font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-12 block">
           Smriti
         </Link>
 
-        <div className="max-w-[480px] w-full mx-auto lg:mx-0">
-          <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-slate-dark/40 mb-4">
-            Get started
-          </p>
-          <h1 className="font-anthropic-serif text-[40px] leading-[1.1] text-slate-dark mb-2">
-            Create your account
-          </h1>
-          <p className="font-anthropic-serif text-[16px] text-slate-dark/60 mb-10">
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+          className="max-w-[440px] w-full mx-auto lg:mx-0 py-8"
+        >
+          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[44px] leading-[1.1] tracking-tight text-slate-dark mb-2">
+            Create account
+          </motion.h1>
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[17px] text-slate-dark/60 mb-10">
             Already have an account?{" "}
-            <Link href="/login" className="text-slate-dark underline underline-offset-2 hover:text-black transition-colors">
+            <Link href="/login" className="text-clay underline underline-offset-4 hover:text-clay-deep transition-colors">
               Sign in
             </Link>
-          </p>
+          </motion.p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <motion.form variants={fadeInUp} transition={springCalm} onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div>
-              <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.12em] text-slate-dark/40 mb-4">
-                Organisation
+              <p className="font-anthropic-sans text-[10px] font-bold uppercase tracking-[0.15em] text-slate-dark/40 mb-4 border-b border-stone/60 pb-2">
+                01. Organisation
               </p>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="organisation_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="organisation_name" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
                   Company name
                 </label>
                 <input
@@ -143,22 +176,18 @@ export default function RegisterPage() {
                   placeholder="Acme Corp"
                   value={formData.organisation_name}
                   onChange={handleChange}
-                  className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                  className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
                 />
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-stone/50" />
-
-            {/* Admin Details */}
-            <div>
-              <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.12em] text-slate-dark/40 mb-4">
-                Your account
+            <div className="mt-2">
+              <p className="font-anthropic-sans text-[10px] font-bold uppercase tracking-[0.15em] text-slate-dark/40 mb-4 border-b border-stone/60 pb-2">
+                02. Your Details
               </p>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="admin_name" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="admin_name" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
                     Full name
                   </label>
                   <input
@@ -169,11 +198,11 @@ export default function RegisterPage() {
                     placeholder="Jane Smith"
                     value={formData.admin_name}
                     onChange={handleChange}
-                    className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                    className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="email" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
                     Work email
                   </label>
                   <input
@@ -184,11 +213,11 @@ export default function RegisterPage() {
                     placeholder="jane@acme.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                    className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="password" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
                     Password
                   </label>
                   <input
@@ -199,38 +228,49 @@ export default function RegisterPage() {
                     placeholder="Min. 8 characters"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                    className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
                   />
                 </div>
               </div>
             </div>
 
             {/* Error */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  variants={fadeInDown}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={easeSoft}
+                  className="bg-red-50 border border-red-200 rounded-xl px-4 py-3"
+                >
+                  <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Submit */}
-            <button
+            <motion.button
               id="register-submit"
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-dark text-white font-anthropic-sans font-semibold text-[14px] py-3.5 rounded-lg hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              whileHover={!loading ? hoverScale : undefined}
+              whileTap={!loading ? tapScale : undefined}
+              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-4 rounded-full hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
             >
               {loading ? "Creating your account…" : "Create account"}
-            </button>
+            </motion.button>
 
-            <p className="font-anthropic-sans text-[12px] text-slate-dark/40 text-center leading-relaxed">
+            <p className="font-anthropic-sans text-[12px] text-slate-dark/50 text-center leading-relaxed mt-2">
               By creating an account you agree to our{" "}
               <Link href="#" className="underline underline-offset-2 hover:text-slate-dark transition-colors">Terms of Service</Link>
               {" "}and{" "}
               <Link href="#" className="underline underline-offset-2 hover:text-slate-dark transition-colors">Privacy Policy</Link>.
             </p>
-          </form>
-        </div>
-      </div>
+          </motion.form>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

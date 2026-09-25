@@ -1,6 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeInUp,
+  staggerContainer,
+  springCalm,
+  easeSoft,
+  hoverScale,
+  tapScale,
+} from "@/lib/animations";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
 
@@ -150,7 +159,6 @@ export default function ChatPage() {
 
     const token = getToken();
 
-    // Build filter payload — specific_date overrides range per API spec
     const filterPayload = {
       customer_id: customerId ? parseInt(customerId) : null,
       specific_date: specificDate || null,
@@ -208,263 +216,299 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="-m-8 flex h-[calc(100vh-60px)]">
-
+    <div className="-m-8 md:-m-12 flex h-[calc(100vh-69px)] bg-white">
       {/* ── SESSIONS SIDEBAR ── */}
-      <aside className="w-[260px] shrink-0 bg-ivory-light border-r border-stone/50 flex flex-col">
-        <div className="p-4 border-b border-stone/50">
-          <button
+      <aside className="w-[280px] shrink-0 bg-[#fdfaf6] border-r border-stone/30 flex flex-col">
+        <div className="p-6 border-b border-stone/30">
+          <motion.button
+            whileHover={hoverScale}
+            whileTap={tapScale}
             onClick={startNewChat}
-            className="w-full flex items-center gap-2 font-anthropic-sans font-semibold text-[13px] text-slate-dark bg-ivory-medium border border-stone px-4 py-2.5 rounded-lg hover:bg-oat-warm transition-all"
+            className="w-full flex items-center justify-center gap-2 font-anthropic-sans font-medium text-[13px] text-slate-dark bg-white border border-stone/60 px-4 py-3 rounded-full hover:bg-stone/10 transition-colors shadow-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             </svg>
             New Chat
-          </button>
+          </motion.button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-2">
+        <div className="flex-1 overflow-y-auto py-4">
           {sessionsLoading ? (
             <div className="flex flex-col gap-2 p-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-10 bg-stone/30 rounded-lg animate-pulse" />
+                <div key={i} className="h-12 bg-stone/20 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="font-anthropic-serif text-[14px] text-cloud-medium leading-relaxed">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 text-center">
+              <p className="font-anthropic-serif text-[15px] text-slate-dark/50 leading-relaxed">
                 No chat sessions yet.<br />Ask your first question.
               </p>
-            </div>
+            </motion.div>
           ) : (
-            <div className="flex flex-col gap-0.5 px-2">
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="flex flex-col gap-1 px-3"
+            >
               {sessions.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => loadHistory(s.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
-                    activeSession === s.id
-                      ? "bg-oat-warm text-slate-dark"
-                      : "hover:bg-ivory-medium text-slate-dark/70 hover:text-slate-dark"
-                  }`}
-                >
-                  <p className="font-anthropic-sans text-[12px] font-medium truncate">
-                    {s.title || "Untitled session"}
-                  </p>
-                  <p className="font-anthropic-sans text-[11px] text-cloud-medium mt-0.5">
-                    {formatDate(s.created_at)}
-                  </p>
-                </button>
+                <motion.div key={s.id} variants={fadeInUp} transition={springCalm}>
+                  <button
+                    onClick={() => loadHistory(s.id)}
+                    className={`w-full text-left px-4 py-3 rounded-xl transition-colors ${
+                      activeSession === s.id
+                        ? "bg-white shadow-sm border border-stone/30 text-slate-dark"
+                        : "hover:bg-white/50 text-slate-dark/60 hover:text-slate-dark border border-transparent"
+                    }`}
+                  >
+                    <p className="font-anthropic-sans text-[13px] font-medium truncate">
+                      {s.title || "Untitled session"}
+                    </p>
+                    <p className="font-anthropic-sans text-[11px] text-slate-dark/40 mt-1 uppercase tracking-widest">
+                      {formatDate(s.created_at)}
+                    </p>
+                  </button>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </aside>
 
       {/* ── MAIN CHAT AREA ── */}
-      <div className="flex-1 flex flex-col bg-ivory-medium overflow-hidden">
-
+      <div className="flex-1 flex flex-col bg-white overflow-hidden">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-8">
+        <div className="flex-1 overflow-y-auto px-8 py-10 md:px-12">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center max-w-[480px] mx-auto">
-              <div className="w-12 h-12 rounded-full bg-ivory-light border border-stone/50 flex items-center justify-center mb-6">
-                <svg className="w-5 h-5 text-cloud-medium" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={springCalm} className="h-full flex flex-col items-center justify-center text-center max-w-[560px] mx-auto">
+              <div className="w-16 h-16 rounded-full bg-[#fdfaf6] border border-stone/40 flex items-center justify-center mb-8 shadow-sm">
+                <svg className="w-6 h-6 text-clay-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
-              <h2 className="font-anthropic-serif text-[28px] text-slate-dark mb-3 leading-tight">
-                Ask about your meetings
+              <h2 className="font-anthropic-serif text-[40px] tracking-tight text-slate-dark mb-4 leading-tight">
+                Ask about your <em className="italic font-normal text-clay-deep">meetings.</em>
               </h2>
-              <p className="font-anthropic-serif text-[16px] text-cloud-medium leading-relaxed">
+              <p className="font-anthropic-sans text-[15px] text-slate-dark/60 leading-relaxed max-w-[480px]">
                 Ask anything about your past calls — action items, customer sentiment, decisions made, or patterns across meetings.
               </p>
-            </div>
+            </motion.div>
           ) : (
-            <div className="max-w-[720px] mx-auto flex flex-col gap-6">
-              {messages.map((m, i) => (
-                <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <div className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-[11px] font-anthropic-sans font-bold mt-0.5 ${
-                    m.role === "user"
-                      ? "bg-slate-dark text-white"
-                      : "bg-ivory-light border border-stone/50 text-cloud-medium"
-                  }`}>
-                    {m.role === "user" ? "Y" : "S"}
-                  </div>
-                  <div className={`max-w-[80%] rounded-[16px] px-5 py-3.5 ${
-                    m.role === "user"
-                      ? "bg-slate-dark text-white rounded-tr-[4px]"
-                      : "bg-ivory-light border border-stone/50 text-slate-dark rounded-tl-[4px]"
-                  }`}>
-                    {m.pending ? (
-                      <div className="flex gap-1 items-center h-5">
-                        <span className="w-1.5 h-1.5 bg-cloud-medium rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-1.5 h-1.5 bg-cloud-medium rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-1.5 h-1.5 bg-cloud-medium rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
-                    ) : (
-                      <p className={`font-anthropic-serif text-[15px] leading-[1.65] whitespace-pre-wrap ${
-                        m.role === "user" ? "text-white" : "text-slate-dark"
-                      }`}>
-                        {m.content}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="max-w-[760px] mx-auto flex flex-col gap-8 pb-10">
+              <AnimatePresence initial={false}>
+                {messages.map((m, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={springCalm}
+                    className={`flex gap-4 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                  >
+                    <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-[12px] font-anthropic-sans font-bold mt-1 shadow-sm ${
+                      m.role === "user"
+                        ? "bg-slate-dark text-white"
+                        : "bg-[#fdfaf6] border border-stone/40 text-clay-deep"
+                    }`}>
+                      {m.role === "user" ? "Y" : "S"}
+                    </div>
+                    <div className={`max-w-[85%] rounded-[24px] px-6 py-4 ${
+                      m.role === "user"
+                        ? "bg-[#fdfaf6] border border-stone/30 text-slate-dark rounded-tr-[8px] shadow-sm"
+                        : "bg-white text-slate-dark border border-transparent"
+                    }`}>
+                      {m.pending ? (
+                        <div className="flex gap-1.5 items-center h-6">
+                          {[0, 1, 2].map((dot) => (
+                            <motion.span
+                              key={dot}
+                              animate={{ y: [0, -4, 0] }}
+                              transition={{ duration: 0.6, repeat: Infinity, delay: dot * 0.15, ease: "easeInOut" }}
+                              className="w-1.5 h-1.5 bg-clay/60 rounded-full"
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={`font-anthropic-serif text-[16px] leading-[1.7] whitespace-pre-wrap ${m.role === 'user' ? 'text-slate-dark' : 'text-slate-dark/90'}`}>
+                          {m.content}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
               <div ref={bottomRef} />
             </div>
           )}
         </div>
-
+ 
         {/* ── INPUT + FILTERS AREA ── */}
-        <div className="border-t border-stone/40 px-6 py-4">
-
+        <div className="px-6 py-6 md:px-12 bg-white/80 backdrop-blur-sm border-t border-stone/30">
           {/* Active filter pills */}
-          {(customerId || startDate || endDate || specificDate) && (
-            <div className="max-w-[720px] mx-auto flex flex-wrap gap-2 mb-3">
-              {customerId && (
-                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
-                  {customers.find(c => c.id === parseInt(customerId))?.customer_name || "Customer"}
-                  <button onClick={() => setCustomerId("")} className="hover:text-clay transition-colors">×</button>
-                </span>
-              )}
-              {specificDate && (
-                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
-                  Date: {specificDate}
-                  <button onClick={() => setSpecificDate("")} className="hover:text-clay transition-colors">×</button>
-                </span>
-              )}
-              {!specificDate && (startDate || endDate) && (
-                <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-slate-dark/10 text-slate-dark px-2.5 py-1 rounded-sm">
-                  {startDate && endDate ? `${startDate} → ${endDate}` : startDate ? `From ${startDate}` : `Until ${endDate}`}
-                  <button onClick={() => { setStartDate(""); setEndDate(""); }} className="hover:text-clay transition-colors">×</button>
-                </span>
-              )}
-              <button onClick={clearFilters} className="font-anthropic-sans text-[11px] text-cloud-medium hover:text-clay transition-colors">
-                Clear all
-              </button>
-            </div>
-          )}
-
-          {/* Collapsible filter panel */}
-          {showFilters && (
-            <div className="max-w-[720px] mx-auto mb-4 bg-ivory-medium border border-stone/60 rounded-xl p-4 flex flex-col gap-4">
-              <p className="font-anthropic-sans text-[11px] uppercase tracking-widest text-slate-dark/40">Filters</p>
-
-              {/* Customer filter */}
-              <div className="flex flex-col gap-1.5">
-                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">Customer</label>
-                <select
-                  value={customerId}
-                  onChange={(e) => setCustomerId(e.target.value)}
-                  className="font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors"
-                >
-                  <option value="">All customers</option>
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>{c.customer_name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="border-t border-stone/50" />
-
-              {/* Specific date */}
-              <div className="flex flex-col gap-1.5">
-                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">
-                  Specific date
-                  <span className="font-normal text-cloud-medium ml-1">(overrides date range if set)</span>
-                </label>
-                <input
-                  type="date"
-                  value={specificDate}
-                  onChange={(e) => { setSpecificDate(e.target.value); if (e.target.value) { setStartDate(""); setEndDate(""); } }}
-                  className="font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors"
-                />
-              </div>
-
-              {/* Date range */}
-              <div className="flex flex-col gap-1.5">
-                <label className="font-anthropic-sans text-[12px] font-medium text-slate-dark">
-                  Date window
-                  {specificDate && <span className="font-normal text-cloud-medium ml-1">(disabled — specific date is set)</span>}
-                </label>
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="date"
-                    value={startDate}
-                    disabled={!!specificDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  />
-                  <span className="font-anthropic-sans text-[12px] text-cloud-medium shrink-0">to</span>
-                  <input
-                    type="date"
-                    value={endDate}
-                    disabled={!!specificDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-ivory-light border border-stone rounded-lg px-3 py-2 outline-none focus:border-slate-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowFilters(false)}
-                className="font-anthropic-sans text-[12px] text-cloud-medium hover:text-slate-dark transition-colors self-end"
+          <AnimatePresence>
+            {(customerId || startDate || endDate || specificDate) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="max-w-[800px] mx-auto flex flex-wrap gap-2 mb-4"
               >
-                Done
-              </button>
-            </div>
-          )}
-
+                {customerId && (
+                  <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-clay/10 text-clay-deep px-3 py-1.5 rounded-full border border-clay/20">
+                    {customers.find(c => c.id === parseInt(customerId))?.customer_name || "Customer"}
+                    <button onClick={() => setCustomerId("")} className="hover:text-slate-dark transition-colors">×</button>
+                  </span>
+                )}
+                {specificDate && (
+                  <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-clay/10 text-clay-deep px-3 py-1.5 rounded-full border border-clay/20">
+                    Date: {specificDate}
+                    <button onClick={() => setSpecificDate("")} className="hover:text-slate-dark transition-colors">×</button>
+                  </span>
+                )}
+                {!specificDate && (startDate || endDate) && (
+                  <span className="inline-flex items-center gap-1.5 font-anthropic-sans text-[11px] font-semibold bg-clay/10 text-clay-deep px-3 py-1.5 rounded-full border border-clay/20">
+                    {startDate && endDate ? `${startDate} → ${endDate}` : startDate ? `From ${startDate}` : `Until ${endDate}`}
+                    <button onClick={() => { setStartDate(""); setEndDate(""); }} className="hover:text-slate-dark transition-colors">×</button>
+                  </span>
+                )}
+                <button onClick={clearFilters} className="font-anthropic-sans text-[11px] font-semibold text-slate-dark/40 hover:text-slate-dark transition-colors uppercase tracking-widest ml-2">
+                  Clear filters
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+ 
+          {/* Collapsible filter panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="max-w-[800px] mx-auto mb-6 bg-[#fdfaf6] border border-stone/40 rounded-[24px] p-6 flex flex-col gap-5 shadow-sm">
+                  <p className="font-anthropic-sans text-[11px] font-bold uppercase tracking-[0.2em] text-slate-dark/40">Query Filters</p>
+ 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Customer filter */}
+                    <div className="flex flex-col gap-2">
+                      <label className="font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Customer</label>
+                      <select
+                        value={customerId}
+                        onChange={(e) => setCustomerId(e.target.value)}
+                        className="font-anthropic-sans text-[13px] text-slate-dark bg-white border border-stone/60 rounded-xl px-4 py-2.5 outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors"
+                      >
+                        <option value="">All customers</option>
+                        {customers.map((c) => (
+                          <option key={c.id} value={c.id}>{c.customer_name}</option>
+                        ))}
+                      </select>
+                    </div>
+  
+                    {/* Specific date */}
+                    <div className="flex flex-col gap-2">
+                      <label className="font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70 flex items-center justify-between">
+                        Specific date
+                        <span className="font-normal text-[10px] text-slate-dark/40 tracking-normal">(Overrides range)</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={specificDate}
+                        onChange={(e) => { setSpecificDate(e.target.value); if (e.target.value) { setStartDate(""); setEndDate(""); } }}
+                        className="font-anthropic-sans text-[13px] text-slate-dark bg-white border border-stone/60 rounded-xl px-4 py-2.5 outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors"
+                      />
+                    </div>
+                  </div>
+ 
+                  {/* Date range */}
+                  <div className="flex flex-col gap-2 pt-2">
+                    <label className="font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70 flex items-center gap-2">
+                      Date window
+                      {specificDate && <span className="font-normal text-[10px] tracking-normal text-slate-dark/40">(Disabled)</span>}
+                    </label>
+                    <div className="flex gap-3 items-center">
+                      <input
+                        type="date"
+                        value={startDate}
+                        disabled={!!specificDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-white border border-stone/60 rounded-xl px-4 py-2.5 outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      />
+                      <span className="font-anthropic-sans text-[12px] font-medium text-slate-dark/40 shrink-0">to</span>
+                      <input
+                        type="date"
+                        value={endDate}
+                        disabled={!!specificDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="flex-1 font-anthropic-sans text-[13px] text-slate-dark bg-white border border-stone/60 rounded-xl px-4 py-2.5 outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
+ 
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="font-anthropic-sans text-[12px] font-semibold bg-slate-dark text-white px-6 py-2.5 rounded-full hover:bg-black transition-colors self-end mt-2"
+                  >
+                    Done
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+ 
           {/* Textarea + send + filter toggle */}
-          <div className="max-w-[720px] mx-auto flex gap-2 items-end">
+          <div className="max-w-[800px] mx-auto bg-[#fdfaf6] border border-stone/60 rounded-[28px] p-2 flex gap-2 items-end shadow-sm focus-within:border-clay/50 focus-within:ring-1 focus-within:ring-clay/20 transition-all">
             {/* Filter toggle */}
-            <button
+            <motion.button
+              whileHover={hoverScale}
+              whileTap={tapScale}
               onClick={() => setShowFilters(!showFilters)}
-              className={`shrink-0 h-10 px-3 rounded-xl border flex items-center gap-1.5 transition-all ${
+              className={`shrink-0 h-12 w-12 rounded-full flex items-center justify-center transition-colors ${
                 showFilters || activeFilterCount > 0
-                  ? "bg-slate-dark border-slate-dark text-white"
-                  : "bg-ivory-medium border-stone text-cloud-medium hover:border-slate-dark hover:text-slate-dark"
+                  ? "bg-slate-dark text-white"
+                  : "bg-white border border-stone/40 text-slate-dark/60 hover:text-slate-dark hover:bg-stone/10"
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-              </svg>
-              <span className="font-anthropic-sans font-semibold text-[12px]">Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="w-4 h-4 bg-clay rounded-full font-anthropic-sans text-[9px] text-white flex items-center justify-center font-bold">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-
+              <div className="relative">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-clay rounded-full border-2 border-[#fdfaf6]" />
+                )}
+              </div>
+            </motion.button>
+ 
             <textarea
               ref={textareaRef}
               rows={1}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about your meetings… (Enter to send, Shift+Enter for new line)"
+              placeholder="Ask Smriti about your meetings…"
               disabled={sending}
-              className="flex-1 bg-ivory-medium border border-stone text-slate-dark font-anthropic-serif text-[14px] leading-[1.6] px-4 py-3 rounded-xl outline-none focus:border-slate-dark transition-colors placeholder:text-cloud-medium resize-none max-h-[160px] disabled:opacity-50"
+              className="flex-1 bg-transparent border-none text-slate-dark font-anthropic-serif text-[16px] leading-[1.5] py-3.5 px-2 outline-none placeholder:text-slate-dark/40 resize-none max-h-[160px] disabled:opacity-50"
             />
-            <button
+            <motion.button
+              whileHover={hoverScale}
+              whileTap={tapScale}
               onClick={handleSend}
               disabled={!query.trim() || sending}
-              className="shrink-0 bg-slate-dark text-white h-10 px-4 rounded-xl flex items-center gap-1.5 hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="shrink-0 bg-clay text-white h-12 px-6 rounded-full flex items-center gap-2 hover:bg-clay-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-clay shadow-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-              <span className="font-anthropic-sans font-semibold text-[12px]">{sending ? "Sending…" : "Send"}</span>
-            </button>
+              <span className="font-anthropic-sans font-semibold text-[13px]">{sending ? "Thinking…" : "Send"}</span>
+            </motion.button>
           </div>
-
-          <p className="max-w-[720px] mx-auto mt-2 font-anthropic-sans text-[11px] text-cloud-medium">
+ 
+          <p className="max-w-[800px] mx-auto mt-4 text-center font-anthropic-sans text-[11px] text-slate-dark/40">
             Smriti searches across all your recorded meetings and transcripts.
-            {activeFilterCount > 0 && <span className="text-clay ml-1">· {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active</span>}
+            {activeFilterCount > 0 && <span className="text-clay-deep ml-1 font-semibold">· {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active</span>}
           </p>
         </div>
       </div>

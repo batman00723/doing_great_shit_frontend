@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeIn,
+  fadeInUp,
+  staggerContainer,
+  staggerContainerSlow,
+  springCalm,
+  hoverLift,
+} from "@/lib/animations";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
 
@@ -62,102 +71,133 @@ export default function AllMeetingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <motion.div variants={fadeIn} initial="initial" animate="animate" className="flex items-center justify-center h-64">
         <p className="font-anthropic-sans text-[13px] text-slate-dark/40">Loading meetings…</p>
-      </div>
+      </motion.div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg px-5 py-4 inline-block">
+      <motion.div variants={fadeInUp} initial="initial" animate="animate" className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 inline-block">
         <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="max-w-[900px] mx-auto">
+    <div className="max-w-[1280px] w-full mx-auto">
       {/* Header */}
-      <div className="mb-12">
-        <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-slate-dark/40 mb-3">
+      <motion.div
+        variants={staggerContainerSlow}
+        initial="initial"
+        animate="animate"
+        className="mb-16"
+      >
+        <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-dark/40 mb-4">
           Activity
-        </p>
-        <h1 className="font-anthropic-serif text-[52px] leading-[1.1] text-slate-dark">
-          All Meetings
-        </h1>
-        <p className="font-anthropic-serif text-[18px] text-slate-dark/60 mt-4 leading-relaxed">
+        </motion.p>
+        <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[64px] md:text-[88px] tracking-tight leading-[1.05] text-slate-dark">
+          <em className="italic font-normal text-clay-deep">All</em> <br/> meetings.
+        </motion.h1>
+        <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[20px] text-slate-dark/60 mt-6 leading-relaxed">
           {meetings.length} meeting{meetings.length !== 1 ? "s" : ""} across all customers, sorted by most recent.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* Meetings List */}
-      {meetings.length === 0 ? (
-        <div className="text-center py-20 bg-ivory-light border border-stone/50 rounded-[24px]">
-          <p className="font-anthropic-serif text-[18px] text-cloud-medium leading-relaxed">
-            No meetings recorded yet.<br />Deploy the bot or upload a transcript to get started.
-          </p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {meetings.map((m) => (
-            <div
-              key={m.meeting_id}
-              onClick={() => router.push(`/dashboard/meeting/${m.meeting_id}`)}
-              className="group bg-ivory-light border border-stone/50 rounded-[16px] p-5 hover:border-slate-dark/30 hover:bg-[#f5f4ef] transition-all flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-5 min-w-0">
-                {/* Status dot */}
-                <div className={`shrink-0 w-2.5 h-2.5 rounded-full mt-0.5 ${
-                  m.status === "completed" ? "bg-green-500" :
-                  m.status === "processing" ? "bg-clay animate-pulse" :
-                  m.status === "failed" ? "bg-red-400" :
-                  "bg-stone"
-                }`} />
+      <AnimatePresence mode="wait">
+        {meetings.length === 0 ? (
+          <motion.div
+            key="empty"
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={springCalm}
+            className="text-center py-24 bg-[#fdfaf6] border border-stone/40 rounded-[32px]"
+          >
+            <p className="font-anthropic-serif text-[20px] text-slate-dark/40 leading-relaxed">
+              No meetings recorded yet.<br />Deploy the bot or upload a transcript to get started.
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="list"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="flex flex-col gap-4"
+          >
+            {meetings.map((m) => (
+              <motion.div
+                variants={fadeInUp}
+                transition={springCalm}
+                whileHover={hoverLift}
+                key={m.meeting_id}
+                onClick={() => router.push(`/dashboard/meeting/${m.meeting_id}`)}
+                className="group bg-[#fdfaf6] border border-stone/40 rounded-[32px] p-6 px-8 hover:border-slate-dark/20 hover:bg-white hover:shadow-xl hover:shadow-stone/10 transition-all flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-6 min-w-0">
+                  {/* Status dot with Framer pulse for processing */}
+                  {m.status === "processing" ? (
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1], opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      className="shrink-0 w-2.5 h-2.5 rounded-full bg-clay"
+                    />
+                  ) : (
+                    <div className={`shrink-0 w-2.5 h-2.5 rounded-full ${
+                      m.status === "completed" ? "bg-green-500" :
+                      m.status === "failed" ? "bg-red-400" :
+                      "bg-stone"
+                    }`} />
+                  )}
 
-                <div className="min-w-0">
-                  <h3 className="font-anthropic-sans font-semibold text-[15px] text-slate-dark group-hover:text-clay transition-colors truncate mb-1">
-                    {m.title || "Untitled Meeting"}
-                  </h3>
-                  <div className="flex items-center gap-3 font-anthropic-serif text-[13px] text-cloud-medium">
-                    <Link
-                      href={`/dashboard/customers/${m.customer.id}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="hover:text-slate-dark hover:underline transition-colors"
-                    >
-                      {m.customer.customer_name}
-                    </Link>
-                    {m.customer.industry && (
-                      <>
-                        <span className="w-1 h-1 bg-stone rounded-full shrink-0" />
-                        <span>{m.customer.industry}</span>
-                      </>
-                    )}
-                    <span className="w-1 h-1 bg-stone rounded-full shrink-0" />
-                    <span>{formatDate(m.meeting_date)}</span>
+                  <div className="min-w-0">
+                    <h3 className="font-anthropic-serif text-[24px] tracking-tight text-slate-dark group-hover:text-clay-deep transition-colors truncate mb-1">
+                      {m.title || "Untitled Meeting"}
+                    </h3>
+                    <div className="flex items-center gap-3 font-anthropic-sans text-[14px] text-slate-dark/50">
+                      <Link
+                        href={`/dashboard/customers/${m.customer.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hover:text-slate-dark hover:underline transition-colors"
+                      >
+                        {m.customer.customer_name}
+                      </Link>
+                      {m.customer.industry && (
+                        <>
+                          <span className="w-1 h-1 bg-stone/60 rounded-full shrink-0" />
+                          <span>{m.customer.industry}</span>
+                        </>
+                      )}
+                      <span className="w-1 h-1 bg-stone/60 rounded-full shrink-0" />
+                      <span>{formatDate(m.meeting_date)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4 shrink-0 ml-4">
-                {/* Status label */}
-                <span className={`font-anthropic-sans text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-sm ${
-                  m.status === "completed" ? "bg-green-100 text-green-800" :
-                  m.status === "processing" ? "bg-manilla text-clay-deep" :
-                  m.status === "failed" ? "bg-red-100 text-red-700" :
-                  "bg-stone/40 text-slate-dark/60"
-                }`}>
-                  {m.status}
-                </span>
+                <div className="flex items-center gap-5 shrink-0 ml-4">
+                  {/* Status label */}
+                  <span className={`font-anthropic-sans text-[10px] font-bold uppercase tracking-[0.15em] ${
+                    m.status === "completed" ? "text-green-700" :
+                    m.status === "processing" ? "text-clay-deep" :
+                    m.status === "failed" ? "text-red-600" :
+                    "text-slate-dark/40"
+                  }`}>
+                    {m.status}
+                  </span>
 
-                <svg className="w-4 h-4 text-slate-dark/30 group-hover:text-clay transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                  <svg className="w-5 h-5 text-slate-dark/30 group-hover:text-clay-deep transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

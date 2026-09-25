@@ -3,6 +3,15 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeIn,
+  fadeInUp,
+  staggerContainer,
+  staggerContainerSlow,
+  springCalm,
+  hoverLift,
+} from "@/lib/animations";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
 
@@ -57,7 +66,6 @@ export default function CustomerMeetingsPage({
       }
 
       try {
-        // Fetch meetings and customers list in parallel
         const [meetingsRes, customersRes] = await Promise.all([
           fetch(`${BASE}/analyse/customer/${customerId}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -74,7 +82,6 @@ export default function CustomerMeetingsPage({
         const meetingsData = await meetingsRes.json();
         const customersData: Customer[] = await customersRes.json();
         
-        // Find the specific customer
         const foundCustomer = customersData.find(c => c.id === parseInt(customerId));
         if (foundCustomer) {
           setCustomer(foundCustomer);
@@ -93,42 +100,47 @@ export default function CustomerMeetingsPage({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <motion.div variants={fadeIn} initial="initial" animate="animate" className="flex items-center justify-center h-64">
         <p className="font-anthropic-sans text-[13px] text-slate-dark/40">Loading customer profile…</p>
-      </div>
+      </motion.div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg px-5 py-4 inline-block">
+      <motion.div variants={fadeInUp} initial="initial" animate="animate" className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 inline-block">
         <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto">
+    <div className="max-w-[1280px] w-full mx-auto">
       {/* Breadcrumb / Back */}
       <button 
         onClick={() => router.back()}
-        className="flex items-center gap-2 font-anthropic-sans text-[13px] text-slate-dark/50 hover:text-slate-dark transition-colors mb-8"
+        className="flex items-center gap-2 font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/40 hover:text-slate-dark transition-colors mb-12"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        Back to Customers
+        Back to Directory
       </button>
 
       {/* Header */}
-      <div className="mb-16 border-b border-stone/50 pb-12">
-        <div className="flex items-start justify-between">
+      <motion.div
+        variants={staggerContainerSlow}
+        initial="initial"
+        animate="animate"
+        className="mb-16 border-b border-stone/40 pb-12"
+      >
+        <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
-            <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-slate-dark/40 mb-3 flex items-center gap-2">
+            <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-dark/40 mb-4 flex items-center gap-2">
               Customer Profile
               {customer?.status && (
                 <>
-                  <span>·</span>
+                  <span className="text-stone/60">·</span>
                   <span className={`${
                     customer.status === "Active" ? "text-green-700" :
                     customer.status === "Closed" ? "text-slate-dark/50" :
@@ -138,14 +150,14 @@ export default function CustomerMeetingsPage({
                   </span>
                 </>
               )}
-            </p>
-            <h1 className="font-anthropic-serif text-[52px] leading-[1.1] text-slate-dark">
+            </motion.p>
+            <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[64px] leading-[1.05] tracking-tight text-slate-dark">
               {customer?.customer_name || "Unknown Customer"}
-            </h1>
+            </motion.h1>
             
-            <div className="font-anthropic-sans text-[14px] text-cloud-medium flex gap-4 mt-6">
+            <motion.div variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[15px] text-slate-dark/60 flex flex-wrap gap-6 mt-6">
               {customer?.industry && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -153,86 +165,112 @@ export default function CustomerMeetingsPage({
                 </div>
               )}
               {customer?.website && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
-                  <a href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`} target="_blank" rel="noreferrer" className="hover:underline">
+                  <a href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`} target="_blank" rel="noreferrer" className="hover:text-clay-deep transition-colors hover:underline">
                     {customer.website}
                   </a>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
           
-          <div className="text-right">
-            <div className="font-anthropic-sans text-[32px] font-medium text-slate-dark leading-none">
+          <motion.div variants={fadeInUp} transition={springCalm} className="md:text-right">
+            <div className="font-anthropic-serif text-[64px] tracking-tight leading-none text-slate-dark">
               {meetings.length}
             </div>
-            <div className="font-anthropic-serif text-[14px] text-cloud-medium mt-2">
+            <div className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-dark/40 mt-3">
               Total Meetings
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Meetings List */}
       <div>
-        <h2 className="font-anthropic-sans font-semibold text-[18px] text-slate-dark mb-6">
-          Meeting History
+        <h2 className="font-anthropic-serif text-[32px] tracking-tight text-slate-dark mb-8">
+          Meeting <em className="italic font-normal text-clay-deep">history.</em>
         </h2>
         
-        {meetings.length === 0 ? (
-          <div className="text-center py-20 bg-ivory-light border border-stone/50 rounded-[24px]">
-            <p className="font-anthropic-serif text-[18px] text-cloud-medium">
-              No meetings recorded yet.<br/>Deploy the bot or upload a transcript from the top navigation.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {meetings.map((m) => (
-              <Link
-                key={m.id}
-                href={`/dashboard/meeting/${m.id}`}
-                className="group flex items-center justify-between bg-ivory-light border border-stone/50 rounded-[16px] p-5 hover:border-slate-dark/30 hover:bg-[#f5f4ef] transition-all"
-              >
-                <div>
-                  <h3 className="font-anthropic-sans font-semibold text-[16px] text-slate-dark group-hover:text-clay transition-colors mb-1.5">
-                    {m.title || "Untitled Meeting"}
-                  </h3>
-                  <div className="flex items-center gap-3 font-anthropic-serif text-[14px] text-cloud-medium">
-                    <span>{formatDate(m.meeting_date)}</span>
-                    <span className="w-1 h-1 bg-stone rounded-full"></span>
-                    <span className="flex items-center gap-1.5">
-                      {m.status === "completed" || m.status === "Completed" ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                          Completed
-                        </>
-                      ) : m.status === "recording" ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                          Recording in progress…
-                        </>
-                      ) : (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-clay"></span>
-                          {m.status}
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="shrink-0 text-slate-dark/30 group-hover:text-clay transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {meetings.length === 0 ? (
+            <motion.div
+              key="empty"
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={springCalm}
+              className="text-center py-24 bg-[#fdfaf6] border border-stone/40 rounded-[32px]"
+            >
+              <p className="font-anthropic-serif text-[20px] text-slate-dark/40">
+                No meetings recorded yet.<br/>Deploy the bot or upload a transcript from the top navigation.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="flex flex-col gap-4"
+            >
+              {meetings.map((m) => (
+                <motion.div
+                  key={m.id}
+                  variants={fadeInUp}
+                  transition={springCalm}
+                  whileHover={hoverLift}
+                >
+                  <Link
+                    href={`/dashboard/meeting/${m.id}`}
+                    className="group flex items-center justify-between bg-[#fdfaf6] border border-stone/40 rounded-3xl p-6 hover:border-slate-dark/20 hover:bg-white hover:shadow-xl hover:shadow-stone/10 transition-all block"
+                  >
+                    <div>
+                      <h3 className="font-anthropic-serif text-[24px] tracking-tight text-slate-dark group-hover:text-clay-deep transition-colors mb-2">
+                        {m.title || "Untitled Meeting"}
+                      </h3>
+                      <div className="flex items-center gap-3 font-anthropic-sans text-[14px] text-slate-dark/50">
+                        <span>{formatDate(m.meeting_date)}</span>
+                        <span className="w-1 h-1 bg-stone/60 rounded-full"></span>
+                        <span className="flex items-center gap-2">
+                          {m.status === "completed" || m.status === "Completed" ? (
+                            <>
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                              Completed
+                            </>
+                          ) : m.status === "recording" || m.status === "processing" ? (
+                            <>
+                              <motion.span
+                                animate={{ scale: [1, 1.2, 1], opacity: [1, 0.5, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                className={`w-1.5 h-1.5 rounded-full ${m.status === "recording" ? "bg-red-500" : "bg-clay"}`}
+                              />
+                              {m.status === "recording" ? "Recording in progress…" : "Processing…"}
+                            </>
+                          ) : (
+                            <>
+                              <span className="w-1.5 h-1.5 rounded-full bg-stone"></span>
+                              {m.status}
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="shrink-0 text-slate-dark/30 group-hover:text-clay-deep transition-colors">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

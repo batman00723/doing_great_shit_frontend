@@ -3,6 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeInUp,
+  fadeInDown,
+  slideInRight,
+  staggerContainer,
+  staggerContainerSlow,
+  springCalm,
+  easeSoft,
+  hoverScale,
+  tapScale,
+} from "@/lib/animations";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,11 +60,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ivory-medium flex">
+    <div className="min-h-screen bg-[#fdfaf6] flex">
       {/* Left Panel — Brand */}
-      <div className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden"
+      >
         {/* Topographic background texture */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
           <svg viewBox="0 0 600 800" className="w-full h-full" fill="none" stroke="white" strokeWidth="1">
             <path d="M 600 0 C 500 100 400 150 300 100 C 200 50 100 100 0 150" />
             <path d="M 600 40 C 510 130 410 180 310 130 C 210 80 100 130 0 180" />
@@ -69,54 +86,70 @@ export default function LoginPage() {
         </div>
 
         {/* Logo */}
-        <Link href="/" className="font-anthropic-sans font-bold text-[12px] uppercase tracking-wider text-white relative z-10">
+        <Link href="/" className="font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-white relative z-10">
           Smriti
         </Link>
 
         {/* Tagline */}
-        <div className="relative z-10">
-          <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-white/40 mb-6">
-            Welcome back
-          </p>
-          <h2 className="font-anthropic-serif text-[48px] leading-[1.1] text-white mb-6">
-            Your meetings are waiting.
-          </h2>
-          <p className="font-anthropic-serif text-[18px] leading-[1.5] text-white/60 max-w-[380px]">
+        <motion.div
+          variants={staggerContainerSlow}
+          initial="initial"
+          animate="animate"
+          className="relative z-10"
+        >
+          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-3 px-3 py-1.5 rounded-full border border-clay/30 bg-clay/10 mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-clay animate-pulse" />
+            <span className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-clay-deep">
+              Smriti Intelligence
+            </span>
+          </motion.div>
+          <motion.h2 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[56px] leading-[1.05] tracking-tight text-white mb-6">
+            Welcome <br/> <em className="italic font-normal text-clay">back.</em>
+          </motion.h2>
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[20px] leading-[1.5] text-white/60 max-w-[380px]">
             Sign in to access your meeting intelligence, reports, and team insights.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Bottom */}
         <p className="font-anthropic-sans text-[12px] text-white/30 relative z-10">
           © 2026 Smriti Inc.
         </p>
-      </div>
+      </motion.div>
 
       {/* Right Panel — Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-28 xl:px-32 py-16">
+      <motion.div
+        variants={slideInRight}
+        initial="initial"
+        animate="animate"
+        transition={{ ...springCalm, delay: 0.15 }}
+        className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-28 xl:px-32 py-16"
+      >
         {/* Mobile logo */}
-        <Link href="/" className="lg:hidden font-anthropic-sans font-bold text-[12px] uppercase tracking-wider text-slate-dark mb-12 block">
+        <Link href="/" className="lg:hidden font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-12 block">
           Smriti
         </Link>
 
-        <div className="max-w-[480px] w-full mx-auto lg:mx-0">
-          <p className="font-anthropic-sans text-[11px] uppercase tracking-[0.15em] text-slate-dark/40 mb-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+          className="max-w-[440px] w-full mx-auto lg:mx-0"
+        >
+          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[44px] leading-[1.1] tracking-tight text-slate-dark mb-2">
             Sign in
-          </p>
-          <h1 className="font-anthropic-serif text-[40px] leading-[1.1] text-slate-dark mb-2">
-            Welcome back
-          </h1>
-          <p className="font-anthropic-serif text-[16px] text-slate-dark/60 mb-10">
+          </motion.h1>
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[17px] text-slate-dark/60 mb-10">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-slate-dark underline underline-offset-2 hover:text-black transition-colors">
+            <Link href="/register" className="text-clay underline underline-offset-4 hover:text-clay-deep transition-colors">
               Create one
             </Link>
-          </p>
+          </motion.p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
-                Email
+          <motion.form variants={fadeInUp} transition={springCalm} onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="email" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
+                Email Address
               </label>
               <input
                 id="email"
@@ -126,16 +159,16 @@ export default function LoginPage() {
                 placeholder="jane@acme.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="font-anthropic-sans text-[13px] font-medium text-slate-dark">
+                <label htmlFor="password" className="font-anthropic-sans text-[11px] uppercase tracking-[0.1em] font-semibold text-slate-dark/70">
                   Password
                 </label>
-                <Link href="#" className="font-anthropic-sans text-[12px] text-slate-dark/50 hover:text-slate-dark underline underline-offset-2 transition-colors">
+                <Link href="#" className="font-anthropic-sans text-[12px] text-slate-dark/50 hover:text-slate-dark underline underline-offset-4 transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -147,29 +180,40 @@ export default function LoginPage() {
                 placeholder="Your password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-white border border-stone text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-lg outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+                className="w-full bg-white/50 border border-stone/60 text-slate-dark font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30"
               />
             </div>
 
             {/* Error */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  variants={fadeInDown}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={easeSoft}
+                  className="bg-red-50 border border-red-200 rounded-xl px-4 py-3"
+                >
+                  <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Submit */}
-            <button
+            <motion.button
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-dark text-white font-anthropic-sans font-semibold text-[14px] py-3.5 rounded-lg hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              whileHover={!loading ? hoverScale : undefined}
+              whileTap={!loading ? tapScale : undefined}
+              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-4 rounded-full hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
             >
-              {loading ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
-        </div>
-      </div>
+              {loading ? "Signing in…" : "Sign in to workspace"}
+            </motion.button>
+          </motion.form>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

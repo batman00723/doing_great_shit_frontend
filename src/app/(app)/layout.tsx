@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  fadeIn,
+  fadeInUp,
+  springCalm,
+  easeSoft,
+} from "@/lib/animations";
 
 interface User {
   user_id: number;
@@ -173,35 +180,55 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push("/login");
   };
 
+  // Determine which nav link is active — exact match for /dashboard, startsWith for others
+  const isLinkActive = (href: string) => {
+    if (!mounted || !pathname) return false;
+    if (href === "/dashboard") return pathname === "/dashboard";
+    return pathname.startsWith(href);
+  };
+
   return (
-    <div className="min-h-screen bg-ivory-medium flex">
+    <div className="min-h-screen bg-[#fdfaf6] flex">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-[220px] shrink-0 bg-slate-dark flex-col justify-between py-8 px-6">
+      <motion.aside
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className="hidden md:flex w-[240px] shrink-0 bg-[#fdfaf6] border-r border-stone/30 flex-col justify-between py-8 px-6"
+      >
         {/* Top */}
         <div>
-          <Link href="/" className="font-anthropic-sans font-bold text-[12px] uppercase tracking-wider text-white mb-10 block">
+          <Link href="/" className="font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-10 block">
             Smriti
           </Link>
 
-          <nav className="flex flex-col gap-1" suppressHydrationWarning>
+          <nav className="flex flex-col gap-1.5" suppressHydrationWarning>
             {NAV_LINKS.filter(link => {
               if (link.href === "/admin/dashboard") return mounted && user?.role === "Admin";
               return true;
             }).map((link) => {
-              const isActive = mounted && pathname?.startsWith(link.href);
+              const isActive = isLinkActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-anthropic-sans text-[13px] transition-all ${
-                    isActive
-                      ? "bg-white/10 text-white"
-                      : "text-white/50 hover:text-white hover:bg-white/5"
-                  }`}
+                  className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-anthropic-sans text-[13px] transition-colors"
                   suppressHydrationWarning
                 >
-                  {link.icon}
-                  {link.label}
+                  {/* Shared layout active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active-indicator"
+                      className="absolute inset-0 bg-stone/10 rounded-xl"
+                      transition={springCalm}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-3 transition-colors font-medium ${
+                    isActive ? "text-slate-dark" : "text-slate-dark/50 hover:text-slate-dark"
+                  }`}>
+                    {link.icon}
+                    {link.label}
+                  </span>
                 </Link>
               );
             })}
@@ -209,36 +236,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Bottom — User + Logout */}
-        <div className="border-t border-white/10 pt-6">
-          {user && (
-            <div className="mb-4">
-              <p className="font-anthropic-sans text-[12px] text-white font-medium truncate">{user.salesperson_name}</p>
-              <p className="font-anthropic-sans text-[11px] text-white/40 truncate">{user.role} · {user.organisation}</p>
-            </div>
-          )}
+        <div className="border-t border-stone/30 pt-6">
+          <AnimatePresence>
+            {user && (
+              <motion.div
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                className="mb-4"
+              >
+                <p className="font-anthropic-sans text-[12px] text-slate-dark font-medium truncate">{user.salesperson_name}</p>
+                <p className="font-anthropic-sans text-[11px] text-slate-dark/50 truncate">{user.role} · {user.organisation}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <button
             onClick={handleLogout}
-            className="font-anthropic-sans text-[12px] text-white/40 hover:text-white transition-colors"
+            className="font-anthropic-sans text-[12px] text-slate-dark/40 hover:text-slate-dark transition-colors"
           >
             Sign out
           </button>
         </div>
-      </aside>
+      </motion.aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 bg-white">
         {/* Top Navbar — Quick Action */}
-        <header className="w-full bg-white border-b border-stone/40 px-6 py-3 flex items-center gap-4 sticky top-0 z-40">
+        <motion.header
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="w-full bg-white/90 backdrop-blur-sm border-b border-stone/30 px-6 py-4 flex items-center gap-4 sticky top-0 z-40"
+        >
           <div ref={dropdownRef} className="flex items-center gap-3 flex-1 max-w-[600px]">
             {/* Customer selector */}
             <select
               value={selectedCustomer}
               onChange={(e) => setSelectedCustomer(e.target.value)}
-              className="font-anthropic-sans text-[13px] text-slate-dark border border-stone rounded-lg px-3 py-2 bg-ivory-medium outline-none focus:border-slate-dark transition-colors min-w-[160px]"
+              className="font-anthropic-sans text-[13px] text-slate-dark border border-stone/40 rounded-xl px-4 py-2.5 bg-[#fdfaf6] outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors min-w-[160px]"
             >
               <option value="">Select customer…</option>
               {customers.map((c) => (
-                <option key={c.id} value={c.id}>{c.customer_name}</option>
+               <option key={c.id} value={c.id}>{c.customer_name}</option>
               ))}
             </select>
 
@@ -248,43 +287,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               placeholder="Paste Zoom / Meet link…"
               value={meetingUrl}
               onChange={(e) => setMeetingUrl(e.target.value)}
-              className="flex-1 font-anthropic-sans text-[13px] text-slate-dark border border-stone rounded-lg px-3 py-2 bg-white outline-none focus:border-slate-dark transition-colors placeholder:text-slate-dark/30"
+              className="flex-1 font-anthropic-sans text-[13px] text-slate-dark border border-stone/40 rounded-xl px-4 py-2.5 bg-[#fdfaf6] outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors placeholder:text-slate-dark/30"
             />
 
             {/* Deploy button */}
             <button
-              onClick={handleDeployBot}
-              disabled={botLoading}
-              className="font-anthropic-sans font-semibold text-[13px] bg-slate-dark text-white px-4 py-2 rounded-lg hover:bg-black transition-all disabled:opacity-50 whitespace-nowrap flex items-center gap-2"
+              type="button"
+              disabled
+              className="font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-5 py-2.5 rounded-full opacity-50 cursor-not-allowed whitespace-nowrap"
             >
-              {botLoading ? (
-                <span>Deploying…</span>
-              ) : (
-                <>
-                  <span>🚀</span>
-                  <span>Send Bot</span>
-                </>
-              )}
+              Coming Soon
             </button>
           </div>
 
           {/* Bot feedback */}
-          {botMessage && (
-            <p className="font-anthropic-sans text-[12px] text-slate-dark/60 ml-2">{botMessage}</p>
-          )}
+          <AnimatePresence>
+            {botMessage && (
+              <motion.p
+                variants={fadeInUp}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={easeSoft}
+                className="font-anthropic-sans text-[12px] text-slate-dark/60 ml-2"
+              >
+                {botMessage}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
           {/* Right side — user pill */}
-          {user && (
-            <div className="ml-auto font-anthropic-sans text-[12px] text-slate-dark/50">
-              {user.salesperson_name}
-            </div>
-          )}
-        </header>
+          <AnimatePresence>
+            {user && (
+              <motion.div
+                variants={fadeIn}
+                initial="initial"
+                animate="animate"
+                className="ml-auto font-anthropic-sans text-[12px] font-medium text-slate-dark/50 bg-[#fdfaf6] border border-stone/30 px-3 py-1.5 rounded-full"
+              >
+                {user.salesperson_name.charAt(0)}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.header>
 
-        {/* Page content */}
-        <main className="flex-1 p-8 overflow-auto">
+        {/* Page content — fade in on route change */}
+        <motion.main
+          key={pathname}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex-1 p-8 md:p-12 overflow-auto"
+        >
           {children}
-        </main>
+        </motion.main>
       </div>
     </div>
   );
