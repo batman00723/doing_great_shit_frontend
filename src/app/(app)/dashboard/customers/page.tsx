@@ -9,7 +9,8 @@ import {
   staggerContainer,
   staggerContainerSlow,
   springCalm,
-  hoverLiftCard,
+  hoverScale,
+  tapScale,
 } from "@/lib/animations";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
@@ -29,8 +30,12 @@ function getToken() {
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -49,6 +54,7 @@ export default function CustomersPage() {
         if (res.ok) {
           const data = await res.json();
           setCustomers(data);
+          setFilteredCustomers(data);
         } else {
           setError("Failed to load customers.");
         }
@@ -62,76 +68,149 @@ export default function CustomersPage() {
     fetchCustomers();
   }, []);
 
+  // Handle Search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCustomers(customers);
+    } else {
+      const q = searchQuery.toLowerCase();
+      setFilteredCustomers(
+        customers.filter(c => 
+          c.customer_name.toLowerCase().includes(q) || 
+          (c.industry && c.industry.toLowerCase().includes(q))
+        )
+      );
+    }
+  }, [searchQuery, customers]);
+
   if (loading) {
     return (
-      <motion.div variants={fadeIn} initial="initial" animate="animate" className="flex items-center justify-center h-64">
-        <p className="font-anthropic-sans text-[13px] text-slate-dark/40">Loading customers…</p>
+      <motion.div variants={fadeIn} initial="initial" animate="animate" className="flex items-center justify-center h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-6 h-6 border-2 border-slate-dark/20 border-t-slate-dark rounded-full animate-spin" />
+          <p className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/40 font-bold">Loading Directory</p>
+        </div>
       </motion.div>
     );
   }
 
   if (error) {
     return (
-      <motion.div variants={fadeInUp} initial="initial" animate="animate" className="bg-red-50 border border-red-200 rounded-lg px-5 py-4 inline-block">
-        <p className="font-anthropic-sans text-[13px] text-red-600">{error}</p>
+      <motion.div variants={fadeInUp} initial="initial" animate="animate" className="bg-[#fef4f4] border border-[#fbdcdc] rounded-2xl p-5 inline-flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full bg-[#fde8e8] flex items-center justify-center shrink-0">
+          <svg className="w-5 h-5 text-[#b93232]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        </div>
+        <div>
+          <p className="font-anthropic-sans font-semibold text-[14px] text-[#b93232]">Failed to load</p>
+          <p className="font-anthropic-sans text-[13px] text-[#cc4a4a] mt-0.5">{error}</p>
+        </div>
       </motion.div>
     );
   }
 
   return (
-    <div className="w-full max-w-[1080px] mx-auto pb-24">
+    <div className="w-full max-w-[1200px] mx-auto pb-24">
       {/* ── HEADER ── */}
       <motion.div
         variants={staggerContainerSlow}
         initial="initial"
         animate="animate"
-        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 mt-4"
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 mt-6"
       >
         <div>
-          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-black/[0.03] border border-black/[0.05] mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-dark animate-pulse" />
-            <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/70 font-bold">
-              Directory
-            </span>
-          </motion.div>
           <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[48px] md:text-[56px] tracking-tight leading-[1] text-slate-dark">
-            Customers
+            Customer <em className="italic font-normal text-slate-dark/40">Directory</em>
           </motion.h1>
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[15px] text-slate-dark/50 mt-5 max-w-[440px] leading-[1.75]">
+            Manage your accounts, track meeting history, and analyze revenue-driving insights across your entire customer base.
+          </motion.p>
         </div>
 
         <motion.div variants={fadeInUp} transition={springCalm} className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="group relative inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-white border border-black/10 text-slate-dark px-5 py-2.5 rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:bg-stone-50 transition-all overflow-hidden"
+            className="group relative inline-flex items-center justify-center font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-6 py-3 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-black transition-all overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
-              <svg className="w-5 h-5 text-slate-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-              Dashboard
+              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+              New Customer
             </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
           </Link>
         </motion.div>
       </motion.div>
 
+      {/* ── TOOLBAR (Search & View Toggle) ── */}
+      <motion.div 
+        variants={fadeInUp}
+        initial="initial"
+        animate="animate"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-[#f9f9f8] p-2 rounded-[20px] border border-black/[0.06]"
+      >
+        <div className="relative flex-1 max-w-[400px]">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input 
+            type="text" 
+            placeholder="Search by name or industry…" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-black/[0.06] rounded-xl pl-[44px] pr-4 py-3 font-anthropic-sans text-[15px] text-slate-dark outline-none focus:border-clay/40 focus:ring-2 focus:ring-clay/10 transition-all placeholder:text-slate-dark/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]"
+          />
+        </div>
+        
+        <div className="flex items-center gap-1 bg-white border border-black/[0.06] p-1.5 rounded-xl shadow-sm">
+          <button 
+            onClick={() => setViewMode("grid")}
+            className={`w-10 h-9 flex items-center justify-center rounded-[8px] transition-colors ${viewMode === 'grid' ? 'bg-[#f4f4f4] text-slate-dark shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]' : 'text-slate-dark/40 hover:text-slate-dark hover:bg-black/[0.03]'}`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+          </button>
+          <button 
+            onClick={() => setViewMode("list")}
+            className={`w-10 h-9 flex items-center justify-center rounded-[8px] transition-colors ${viewMode === 'list' ? 'bg-[#f4f4f4] text-slate-dark shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]' : 'text-slate-dark/40 hover:text-slate-dark hover:bg-black/[0.03]'}`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* ── CUSTOMERS CONTENT ── */}
       <AnimatePresence mode="wait">
         {customers.length === 0 ? (
+          /* EMPTY STATE */
           <motion.div
-            key="empty"
+            key="empty-no-data"
             variants={fadeInUp}
             initial="initial"
             animate="animate"
             exit="exit"
             transition={springCalm}
-            className="w-full flex flex-col items-center justify-center py-32 bg-white border border-black/[0.06] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
+            className="w-full flex flex-col items-center justify-center py-32 bg-white border border-black/[0.06] rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)]"
           >
-            <div className="w-16 h-16 bg-black/[0.03] border border-black/[0.05] rounded-2xl flex items-center justify-center mb-6">
-              <svg className="w-8 h-8 text-slate-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <div className="w-20 h-20 bg-[#f9f9f8] border border-black/[0.05] rounded-3xl flex items-center justify-center mb-8 shadow-sm">
+              <svg className="w-10 h-10 text-slate-dark/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             </div>
-            <h3 className="font-anthropic-serif text-[24px] text-slate-dark tracking-tight mb-2">No customers found</h3>
-            <p className="font-anthropic-sans text-[14px] text-slate-dark/50 max-w-[300px] text-center">
-              Add your first customer from the main dashboard to start analyzing meetings.
+            <h3 className="font-anthropic-serif text-[32px] text-slate-dark tracking-tight mb-3">No customers found</h3>
+            <p className="font-anthropic-sans text-[15px] text-slate-dark/50 max-w-[340px] text-center leading-[1.75]">
+              Add your first customer from the main dashboard to start tracking their meeting history.
             </p>
           </motion.div>
-        ) : (
+        ) : filteredCustomers.length === 0 ? (
+           /* EMPTY STATE (Search) */
+           <motion.div
+            key="empty-search"
+            variants={fadeIn}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full py-24 text-center"
+          >
+            <p className="font-anthropic-sans text-[16px] text-slate-dark/40">No customers match &quot;{searchQuery}&quot;</p>
+          </motion.div>
+        ) : viewMode === "grid" ? (
+          /* GRID VIEW */
           <motion.div
             key="grid"
             variants={staggerContainer}
@@ -139,34 +218,24 @@ export default function CustomersPage() {
             animate="animate"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
           >
-            {customers.map((c) => (
-              <motion.div
-                variants={fadeInUp}
-                transition={springCalm}
-                key={c.id}
-              >
+            {filteredCustomers.map((c) => (
+              <motion.div variants={fadeInUp} transition={springCalm} key={c.id}>
                 <Link 
                   href={`/dashboard/customers/${c.id}`}
-                  className="group relative block h-full bg-white border border-black/[0.06] rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-black/[0.12] transition-all overflow-hidden flex flex-col"
+                  className="group relative block h-full bg-white border border-black/[0.06] rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:border-black/[0.12] transition-all overflow-hidden flex flex-col"
                 >
-                  {/* Subtle top gradient based on status */}
-                  <div className={`absolute top-0 left-0 w-full h-1 ${
-                    c.status === "Active" ? "bg-green-500" :
-                    c.status === "Closed" ? "bg-slate-dark/20" :
-                    "bg-clay"
-                  }`} />
-
-                  <div className="flex items-start justify-between mb-6 mt-2">
-                    <div className="w-10 h-10 rounded-xl bg-black/[0.02] border border-black/[0.05] flex items-center justify-center shrink-0">
-                       <svg className="w-5 h-5 text-slate-dark/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                  <div className="flex items-start justify-between mb-8">
+                    <div className="w-12 h-12 rounded-[14px] bg-gradient-to-b from-[#fdfaf6] to-[#f4f0ec] border border-black/[0.06] flex items-center justify-center shrink-0 shadow-[inset_0_2px_4px_rgba(255,255,255,0.7)] group-hover:scale-105 transition-transform duration-500">
+                       <span className="font-anthropic-serif text-[20px] font-medium text-slate-dark">{c.customer_name.charAt(0)}</span>
                     </div>
-                    <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded bg-black/[0.03] ${
-                      c.status === "Active" ? "text-green-700" :
-                      c.status === "Closed" ? "text-slate-dark/50" :
-                      "text-clay-deep"
+                    
+                    <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1.5 rounded-md ${
+                      c.status === "Active" ? "bg-[#f2f8f4] text-[#2c7a4b] border border-[#d0ead9]" :
+                      c.status === "Closed" ? "bg-[#f4f4f4] text-slate-dark/50 border border-black/[0.05]" :
+                      "bg-clay/10 text-clay-deep border border-clay/20"
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${
-                        c.status === "Active" ? "bg-green-500" :
+                        c.status === "Active" ? "bg-[#429563]" :
                         c.status === "Closed" ? "bg-slate-dark/30" :
                         "bg-clay"
                       }`} />
@@ -174,26 +243,26 @@ export default function CustomersPage() {
                     </span>
                   </div>
                   
-                  <h2 className="font-anthropic-serif text-[24px] tracking-tight text-slate-dark leading-[1.1] mb-2 truncate group-hover:text-clay-deep transition-colors">
+                  <h2 className="font-anthropic-serif text-[26px] tracking-tight text-slate-dark leading-[1.2] mb-4 truncate group-hover:text-clay-deep transition-colors">
                     {c.customer_name}
                   </h2>
                   
-                  <div className="font-anthropic-sans text-[13px] text-slate-dark/60 flex flex-col gap-1.5 mb-10">
-                    <p className="flex items-center gap-2">
-                      <svg className="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  <div className="font-anthropic-sans text-[14px] text-slate-dark/50 flex flex-col gap-3.5 mb-12">
+                    <p className="flex items-center gap-3">
+                      <svg className="w-[18px] h-[18px] opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                       {c.industry || "No industry"}
                     </p>
                     {c.website && (
-                      <p className="flex items-center gap-2 truncate">
-                        <svg className="w-5 h-5 opacity-50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                      <p className="flex items-center gap-3 truncate">
+                        <svg className="w-[18px] h-[18px] opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
                         {c.website}
                       </p>
                     )}
                   </div>
 
-                  <div className="mt-auto pt-4 border-t border-black/[0.04] flex items-center justify-between text-slate-dark/40 group-hover:text-slate-dark transition-colors">
-                    <span className="font-anthropic-sans font-medium text-[12px]">
-                      View Profile
+                  <div className="mt-auto pt-4 border-t border-black/[0.04] flex items-center justify-between text-slate-dark/30 group-hover:text-slate-dark/80 transition-colors">
+                    <span className="font-anthropic-mono text-[10px] font-bold tracking-widest uppercase">
+                      Open Profile
                     </span>
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -202,6 +271,70 @@ export default function CustomersPage() {
                 </Link>
               </motion.div>
             ))}
+          </motion.div>
+        ) : (
+          /* LIST VIEW */
+          <motion.div
+            key="list"
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="bg-white border border-black/[0.06] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] overflow-hidden"
+          >
+            <div className="w-full text-left">
+              <div className="grid grid-cols-12 gap-4 px-6 py-5 border-b border-black/[0.04] bg-[#fafafa]">
+                <div className="col-span-5 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/40 font-bold">Customer Name</div>
+                <div className="col-span-3 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/40 font-bold">Industry</div>
+                <div className="col-span-3 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/40 font-bold">Status</div>
+                <div className="col-span-1 text-right font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/40 font-bold">Action</div>
+              </div>
+              
+              <div className="flex flex-col divide-y divide-black/[0.04]">
+                {filteredCustomers.map((c) => (
+                  <Link 
+                    key={c.id} 
+                    href={`/dashboard/customers/${c.id}`}
+                    className="grid grid-cols-12 gap-4 px-6 py-5 items-center hover:bg-[#fafafa] transition-colors group"
+                  >
+                    <div className="col-span-5 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-[10px] bg-gradient-to-b from-[#fdfaf6] to-[#f4f0ec] border border-black/[0.06] flex items-center justify-center shrink-0 shadow-[inset_0_2px_4px_rgba(255,255,255,0.7)] group-hover:scale-105 transition-transform duration-300">
+                         <span className="font-anthropic-serif text-[16px] font-medium text-slate-dark">{c.customer_name.charAt(0)}</span>
+                      </div>
+                      <span className="font-anthropic-sans text-[15px] font-semibold text-slate-dark leading-snug group-hover:text-clay-deep transition-colors">
+                        {c.customer_name}
+                      </span>
+                    </div>
+                    
+                    <div className="col-span-3 font-anthropic-sans text-[14px] text-slate-dark/60 truncate">
+                      {c.industry || "—"}
+                    </div>
+
+                    <div className="col-span-3">
+                      <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md ${
+                        c.status === "Active" ? "bg-[#f2f8f4] text-[#2c7a4b] border border-[#d0ead9]" :
+                        c.status === "Closed" ? "bg-[#f4f4f4] text-slate-dark/50 border border-black/[0.05]" :
+                        "bg-clay/10 text-clay-deep border border-clay/20"
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          c.status === "Active" ? "bg-[#429563]" :
+                          c.status === "Closed" ? "bg-slate-dark/30" :
+                          "bg-clay"
+                        }`} />
+                        {c.status || "Lead"}
+                      </span>
+                    </div>
+
+                    <div className="col-span-1 flex justify-end">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-slate-dark/20 group-hover:text-slate-dark group-hover:bg-black/[0.03] transition-all">
+                        <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

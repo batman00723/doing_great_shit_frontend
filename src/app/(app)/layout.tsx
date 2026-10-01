@@ -169,18 +169,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className={`absolute top-8 ${isSidebarCollapsed ? "right-1/2 translate-x-1/2" : "right-4"} z-10 w-8 h-8 rounded-lg bg-black/[0.03] border border-black/[0.05] flex items-center justify-center text-slate-dark/40 hover:text-slate-dark hover:bg-white transition-all`}
+          className={`absolute top-8 ${isSidebarCollapsed ? "right-1/2 translate-x-1/2" : "right-4"} z-10 w-9 h-9 rounded-[10px] bg-black/[0.03] border border-black/[0.05] flex items-center justify-center text-slate-dark/40 hover:text-slate-dark hover:bg-white transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)]`}
           suppressHydrationWarning
         >
           <motion.svg 
             animate={{ rotate: isSidebarCollapsed ? 180 : 0 }}
             transition={{ duration: 0.3 }}
-            className="w-4 h-4" 
+            className="w-5 h-5" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
           </motion.svg>
         </button>
 

@@ -2,11 +2,12 @@
 
 import { motion, useScroll, useTransform, MotionValue, useMotionValueEvent } from "motion/react";
 import React, { useRef, useState } from "react";
+import { Send, Database, CheckSquare, ShieldCheck } from "lucide-react";
 
 // ─── Mac Window Wrapper (Uncropped & Fully Rounded) ─────────────────────────
 
 const MacWindow = ({ children, title = "Smriti", dark = true }: { children: React.ReactNode, title?: string, dark?: boolean }) => (
-  <div className={`w-full h-full rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] flex flex-col overflow-hidden border ${dark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-stone-200'}`}>
+  <div className={`w-full h-full rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] flex flex-col overflow-hidden border ${dark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white dark:bg-[#1a1a1a] transition-colors duration-500 border-stone-200 dark:border-white/20 transition-colors duration-500'}`}>
     <div className={`h-[40px] flex items-center px-4 shrink-0 relative ${dark ? 'bg-[#252525] border-b border-[#111]' : 'bg-gradient-to-b from-stone-100 to-stone-200/50 border-b border-stone-300'}`}>
       <div className="flex gap-2 relative z-10">
         <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]" />
@@ -14,7 +15,7 @@ const MacWindow = ({ children, title = "Smriti", dark = true }: { children: Reac
         <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]" />
       </div>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className={`text-[12px] font-semibold font-sans tracking-wide ${dark ? 'text-white/50' : 'text-slate-600'}`}>{title}</span>
+        <span className={`text-[12px] font-semibold font-sans tracking-wide ${dark ? 'text-white/50' : 'text-slate-600 dark:text-white/70 transition-colors duration-500'}`}>{title}</span>
       </div>
     </div>
     <div className="flex-1 min-h-0 relative">
@@ -189,13 +190,13 @@ const ActionsVisual = () => (
             <span className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           </div>
           <span className="text-[11px] lg:text-[12px] font-semibold text-white/70">Live Transcript</span>
-          <span className="ml-auto text-[9px] lg:text-[10px] text-emerald-400 font-bold uppercase tracking-widest">● 14:32</span>
+          <span className="ml-auto text-[9px] lg:text-[10px] text-emerald-400 dark:text-emerald-300 transition-colors duration-500 font-bold uppercase tracking-widest">● 14:32</span>
         </div>
         <div className="flex-1 px-5 py-5 lg:px-6 lg:py-6 flex flex-col gap-4 lg:gap-6 overflow-hidden relative">
           {[
-            { speaker: "Alex (Client)", color: "bg-blue-500", text: "Yeah, if we can get the API docs by tomorrow that should unblock our entire engineering team for the Q4 sprint.", highlight: null, dim: false },
+            { speaker: "Alex (Client)", color: "bg-blue-50 dark:bg-blue-900/30 transition-colors duration-5000", text: "Yeah, if we can get the API docs by tomorrow that should unblock our entire engineering team for the Q4 sprint.", highlight: null, dim: false },
             { speaker: "Sarah (You)", color: "bg-clay", text: null, highlight: "I'll send the complete API documentation package over by EOD tomorrow, and I'll CC the tech lead.", dim: false },
-            { speaker: "Alex", color: "bg-blue-500", text: "Perfect. Also flagging — the Q3 security audit needs to happen before we can go to production.", highlight: null, dim: true },
+            { speaker: "Alex", color: "bg-blue-50 dark:bg-blue-900/30 transition-colors duration-5000", text: "Perfect. Also flagging — the Q3 security audit needs to happen before we can go to production.", highlight: null, dim: true },
           ].map((msg, i) => (
             <div key={i} className={`flex flex-col gap-1 lg:gap-1.5 ${msg.dim ? "opacity-40" : ""}`}>
               <div className="flex items-center gap-2">
@@ -296,30 +297,34 @@ const features = [
   {
     num: "01",
     title: "Email Automation",
-    desc: "Meeting reports sent directly to your clients' mailboxes the moment you hang up. Smriti handles the formatting, tone, and delivery automatically.",
+    desc: "We draft and send the recap email before you even take your headset off. You take the credit.",
     accent: "#c86450",
     visual: <EmailVisual />,
+    icon: Send,
   },
   {
     num: "02",
     title: "Global Memory",
-    desc: "Query and chat with all your past meetings instantly. Ask broad questions across your entire customer base or drill down into specific commitments.",
+    desc: "Chat with your past meetings like a really nerdy historian. Never forget a promise again.",
     accent: "#7c6af5",
     visual: <MemoryVisual />,
+    icon: Database,
   },
   {
     num: "03",
     title: "Action Items",
-    desc: "Instantly extract next steps and commitments from every call. Our models are fine-tuned to distinguish passing remarks from concrete promises.",
+    desc: "We catch the 'I'll send that over' mumbles and turn them into a ruthless to-do list.",
     accent: "#2da882",
     visual: <ActionsVisual />,
+    icon: CheckSquare,
   },
   {
     num: "04",
     title: "Enterprise Security",
-    desc: "Multi-tenant architecture ensuring your data is completely isolated. We never use your customer data to train our foundational models.",
+    desc: "Your secrets are locked in a digital vault. We don't train our AI on your gossip.",
     accent: "#6366f1",
     visual: <SecurityVisual />,
+    icon: ShieldCheck,
   },
 ];
 
@@ -327,36 +332,42 @@ const features = [
 
 function SidebarItem({ feature, isActive }: { feature: typeof features[0], isActive: boolean }) {
   return (
-    <div 
-      className={`flex flex-col p-5 rounded-2xl transition-all duration-500 ${
-        isActive 
-          ? 'bg-white border border-stone-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.04)] scale-100' 
-          : 'border border-transparent opacity-40 hover:opacity-70 scale-95 origin-left'
-      }`}
-    >
-      <div className="flex items-center gap-4">
-        <div 
-          className="w-1.5 h-6 rounded-full transition-colors duration-500" 
-          style={{ backgroundColor: isActive ? feature.accent : '#d6d3d1' }} 
+    <div className="relative pl-8 lg:pl-10 py-6 cursor-default group">
+      {/* Sleek Vertical Tracking Line */}
+      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-stone-200/50 dark:bg-white/5 rounded-full overflow-hidden">
+        <motion.div 
+          initial={false}
+          animate={{ height: isActive ? '100%' : '0%' }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full absolute top-0 left-0 rounded-full"
+          style={{ backgroundColor: feature.accent }}
         />
-        <h3 className={`font-serif text-[24px] lg:text-[28px] font-semibold transition-colors duration-500 ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>
-          {feature.title}
-        </h3>
       </div>
       
-      <motion.div
-        initial={false}
-        animate={{ 
-          height: isActive ? 'auto' : 0, 
-          opacity: isActive ? 1 : 0,
-          marginTop: isActive ? 12 : 0
-        }}
-        className="overflow-hidden"
-      >
-        <p className="text-[14px] lg:text-[15px] leading-[1.6] text-slate-500 max-w-[320px] pl-5 border-l border-stone-100 ml-[3px]">
-          {feature.desc}
-        </p>
-      </motion.div>
+      <div className={`flex flex-col gap-3 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isActive ? 'opacity-100 translate-x-2' : 'opacity-30 translate-x-0 hover:opacity-50'}`}>
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-[12px] font-bold tracking-widest text-slate-400 dark:text-white/40">
+            {feature.num}
+          </span>
+          <h3 className="font-serif text-[32px] lg:text-[42px] leading-[1.1] font-medium tracking-tight text-slate-900 dark:text-white transition-colors duration-500">
+            {feature.title}
+          </h3>
+        </div>
+        
+        <motion.div
+          initial={false}
+          animate={{ 
+            height: isActive ? 'auto' : 0, 
+            opacity: isActive ? 1 : 0
+          }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="overflow-hidden"
+        >
+          <p className="text-[15px] lg:text-[16px] leading-[1.6] text-slate-500 dark:text-white/60 max-w-[340px] pl-[36px] pb-2">
+            {feature.desc}
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -448,18 +459,18 @@ export function PremiumFeatures() {
   });
 
   return (
-    <section id="capabilities" className="w-full relative z-10 bg-white">
+    <section id="capabilities" className="w-full relative z-10">
       {/* Section Header */}
       <div className="w-full max-w-[1200px] mx-auto px-6 pt-[120px] pb-12 flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/60 backdrop-blur-xl mb-8 shadow-sm border border-stone-200/60"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-stone-100 dark:bg-white/5 border border-stone-200 dark:border-white/10 mb-8 w-fit transition-colors duration-500"
         >
-          <span className="w-2 h-2 rounded-full bg-clay animate-pulse shadow-[0_0_8px_rgba(200,100,80,0.6)]" />
-          <span className="font-sans text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">
-            Platform Capabilities
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white transition-colors duration-500" />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-white/60 transition-colors duration-500">
+            Sorcery Included
           </span>
         </motion.div>
 
@@ -468,7 +479,7 @@ export function PremiumFeatures() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="font-serif text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] tracking-tight text-slate-900"
+          className="font-serif text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] tracking-tight text-slate-900 dark:text-white transition-colors duration-500"
         >
           Intelligence that <br />
           <em className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-clay-deep via-orange-400 to-clay-deep animate-[shimmer_4s_infinite] bg-[length:200%_auto]">
@@ -481,7 +492,7 @@ export function PremiumFeatures() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="mt-6 text-[18px] md:text-[20px] text-slate-500 leading-relaxed max-w-[560px]"
+          className="mt-6 text-[18px] md:text-[20px] text-slate-500 dark:text-white/70 leading-relaxed max-w-[560px] transition-colors duration-500"
         >
           Four powerful capabilities working silently behind every call you take.
         </motion.p>

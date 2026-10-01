@@ -19,20 +19,20 @@ function TechnicalBentoCard({
   tagColor: string 
 }) {
   return (
-    <div className={`group relative bg-white border border-stone-200 rounded-[20px] overflow-hidden hover:border-stone-300 transition-colors duration-300 flex flex-col shadow-sm ${className}`}>
+    <div className={`group relative bg-white dark:bg-white/5 border border-stone-200 dark:border-white/10 rounded-[20px] overflow-hidden hover:border-stone-300 dark:hover:border-white/20 transition-colors duration-300 flex flex-col shadow-sm ${className}`}>
       {/* Visual Canvas */}
-      <div className="relative w-full h-[60%] min-h-[280px] bg-stone-50 border-b border-stone-100 overflow-hidden flex items-center justify-center">
+      <div className="relative w-full h-[60%] min-h-[280px] bg-stone-50 dark:bg-black/20 border-b border-stone-100 dark:border-white/10 overflow-hidden flex items-center justify-center transition-colors duration-300">
         {/* Technical dot grid background */}
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_20%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_20%,transparent_100%)] transition-colors duration-300" />
         <VisualComponent />
       </div>
 
       {/* Content Area */}
-      <div className="relative z-20 w-full px-8 pb-10 pt-8 flex flex-col justify-end bg-white flex-1">
+      <div className="relative z-20 w-full px-8 pb-10 pt-8 flex flex-col justify-end bg-white dark:bg-[#1a1a1a] transition-colors duration-500 flex-1">
         <div className="mb-4 flex">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-stone-100 border border-stone-200">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-stone-100 dark:bg-white/5 transition-colors duration-500 border border-stone-200 dark:border-white/20 transition-colors duration-500">
             <span className={`w-1.5 h-1.5 rounded-full ${tagColor}`} />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">{tagText}</span>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/60 transition-colors duration-500">{tagText}</span>
           </div>
         </div>
         {children}
@@ -59,10 +59,10 @@ const TechnicalSecurityVisual = () => (
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         className="absolute inset-6 border border-orange-200 rounded-full"
       />
-      <div className="absolute inset-12 border border-dashed border-stone-200 rounded-full" />
+      <div className="absolute inset-12 border border-dashed border-stone-200 dark:border-white/20 transition-colors duration-500 rounded-full" />
 
       {/* Center Shield Icon */}
-      <div className="relative z-10 flex flex-col items-center justify-center bg-white w-16 h-16 rounded-full border border-stone-200 shadow-sm">
+      <div className="relative z-10 flex flex-col items-center justify-center bg-white dark:bg-[#1a1a1a] transition-colors duration-500 w-16 h-16 rounded-full border border-stone-200 dark:border-white/20 transition-colors duration-500 shadow-sm">
          <svg className="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
            <path strokeLinecap="square" strokeLinejoin="miter" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
          </svg>
@@ -72,7 +72,7 @@ const TechnicalSecurityVisual = () => (
       <div className="absolute top-2 right-2 bg-orange-50 text-orange-600 font-mono text-[9px] px-2 py-0.5 border border-orange-100 tracking-widest uppercase rounded shadow-sm">
         ISOLATED
       </div>
-      <div className="absolute bottom-2 left-2 bg-white text-stone-500 font-mono text-[9px] px-2 py-0.5 border border-stone-200 tracking-widest uppercase rounded shadow-sm">
+      <div className="absolute bottom-2 left-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-500 text-stone-500 font-mono text-[9px] px-2 py-0.5 border border-stone-200 dark:border-white/20 transition-colors duration-500 tracking-widest uppercase rounded shadow-sm">
         AES-256-GCM
       </div>
     </div>
@@ -82,7 +82,7 @@ const TechnicalSecurityVisual = () => (
 const TechnicalTrustVisual = () => (
   <div className="absolute inset-0 flex items-center justify-center p-8">
     {/* Node Connection Graph */}
-    <div className="w-full max-w-[260px] h-[160px] relative border border-stone-200 bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="w-full max-w-[260px] h-[160px] relative border border-stone-200 dark:border-white/20 transition-colors duration-500 bg-white dark:bg-[#1a1a1a] transition-colors duration-500 rounded-lg shadow-sm overflow-hidden">
       <div className="absolute top-3 left-3 flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
         <span className="font-mono text-[9px] text-stone-400 uppercase tracking-widest">TRACE_NODE</span>
@@ -163,7 +163,7 @@ const TechnicalAudioVisual = () => (
          </svg>
        </div>
        
-       <div className="absolute top-6 left-6 font-mono text-[9px] text-purple-500 uppercase tracking-widest bg-white/80 px-2 py-0.5 rounded shadow-sm border border-purple-100">
+       <div className="absolute top-6 left-6 font-mono text-[9px] text-purple-500 uppercase tracking-widest bg-white/80 dark:bg-white/10 transition-colors duration-500 px-2 py-0.5 rounded shadow-sm border border-purple-100">
          FREQ_14.2kHz
        </div>
     </div>
@@ -174,7 +174,7 @@ const TechnicalAudioVisual = () => (
 
 export function PremiumBento() {
   return (
-    <section id="why" className="w-full relative z-10 bg-white border-t border-stone-200">
+    <section id="why" className="w-full relative z-10 bg-white dark:bg-[#0a0a0a] border-t border-stone-200 dark:border-white/10 transition-colors duration-500">
       
       <div className="w-full max-w-[1300px] mx-auto px-6 py-[120px] flex flex-col">
         {/* Section Header */}
@@ -183,11 +183,11 @@ export function PremiumBento() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-stone-100 border border-stone-200 mb-6 w-fit"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-stone-100 dark:bg-white/5 border border-stone-200 dark:border-white/10 mb-6 w-fit transition-colors duration-500"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600">
-              Technical Architecture
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white transition-colors duration-500" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-white/60 transition-colors duration-500">
+              Nerd Stuff
             </span>
           </motion.div>
           
@@ -196,7 +196,7 @@ export function PremiumBento() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-serif text-[56px] md:text-[76px] leading-[1.05] tracking-tight text-slate-900"
+            className="font-serif text-[56px] md:text-[76px] leading-[1.05] tracking-tight text-slate-900 dark:text-white transition-colors duration-500"
           >
             Engineered for <br />
             <em className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-clay-deep to-orange-400">
@@ -216,11 +216,11 @@ export function PremiumBento() {
               className="h-full min-h-[500px]"
               visual={TechnicalSecurityVisual}
             >
-              <h3 className="font-serif text-[32px] md:text-[36px] font-semibold text-slate-900 leading-tight mb-4">
+              <h3 className="font-serif text-[32px] md:text-[36px] font-semibold text-slate-900 dark:text-white transition-colors duration-500 leading-tight mb-4">
                 Fiercely protected isolation.
               </h3>
-              <p className="font-sans text-[16px] leading-[1.6] text-slate-500 max-w-[480px]">
-                Every byte of your conversational data is firewalled in a single-tenant architecture. We never train public models on your proprietary memory.
+              <p className="font-sans text-[16px] leading-[1.6] text-slate-500 dark:text-white/70 transition-colors duration-500 max-w-[480px]">
+                Your data lives in a digital fortress. We strictly use zero-retention APIs, meaning the AI immediately forgets your confidential gossip.
               </p>
             </TechnicalBentoCard>
           </div>
@@ -233,11 +233,11 @@ export function PremiumBento() {
               className="flex-1 min-h-[400px]"
               visual={TechnicalTrustVisual}
             >
-              <h3 className="font-serif text-[26px] md:text-[28px] font-semibold text-slate-900 leading-tight mb-3">
+              <h3 className="font-serif text-[26px] md:text-[28px] font-semibold text-slate-900 dark:text-white transition-colors duration-500 leading-tight mb-3">
                 Grounded in reality.
               </h3>
-              <p className="font-sans text-[15px] leading-[1.6] text-slate-500">
-                Citations link every insight directly back to the exact moment in the transcript. No hallucinations, just facts.
+              <p className="font-sans text-[15px] leading-[1.6] text-slate-500 dark:text-white/70 transition-colors duration-500">
+                AI hallucinations are for artists, not sales teams. We bring receipts for every single insight we generate.
               </p>
             </TechnicalBentoCard>
 
@@ -248,11 +248,11 @@ export function PremiumBento() {
               className="flex-1 min-h-[400px]"
               visual={TechnicalAudioVisual}
             >
-              <h3 className="font-serif text-[26px] md:text-[28px] font-semibold text-slate-900 leading-tight mb-3">
+              <h3 className="font-serif text-[26px] md:text-[28px] font-semibold text-slate-900 dark:text-white transition-colors duration-500 leading-tight mb-3">
                 Never miss a detail.
               </h3>
-              <p className="font-sans text-[15px] leading-[1.6] text-slate-500">
-                Our custom speech models catch whispers, cross-talk, and mumbled action items with superhuman precision.
+              <p className="font-sans text-[15px] leading-[1.6] text-slate-500 dark:text-white/70 transition-colors duration-500">
+                Interrupting clients? Terrible mic audio? Mumbling? Our speech engine hears it all perfectly anyway.
               </p>
             </TechnicalBentoCard>
           </div>

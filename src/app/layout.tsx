@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,12 +35,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body 
-        className="min-h-full flex flex-col font-anthropic-serif text-slate-dark bg-ivory-medium"
+        className="min-h-full flex flex-col font-anthropic-serif text-slate-dark dark:text-white bg-ivory-medium dark:bg-[#0a0a0a]"
         suppressHydrationWarning
       >
-        <SmoothScrollProvider>
-          {children}
-        </SmoothScrollProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
