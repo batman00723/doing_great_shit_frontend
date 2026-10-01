@@ -247,7 +247,7 @@ export default function MeetingReportPage({
   }
 
   return (
-    <div className="max-w-[800px] w-full mx-auto pb-24 relative">
+    <div className="w-full max-w-[800px] mx-auto pb-32 relative mt-4">
       {/* Toast Notification */}
       <AnimatePresence>
         {toast && (
@@ -256,11 +256,16 @@ export default function MeetingReportPage({
             initial="initial"
             animate="animate"
             exit="exit"
-            className={`fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-lg border font-anthropic-sans text-[13px] z-50 transition-all ${
+            className={`fixed bottom-8 right-8 px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] border font-anthropic-sans text-[13px] font-medium z-50 flex items-center gap-3 transition-all ${
               toast.type === "success" 
                 ? "bg-[#f4f8f4] border-[#d2e4d2] text-[#1c4d1c]" 
-                : "bg-[#fdf4f4] border-[#f0d4d4] text-[#8a2424]"
+                : "bg-white border-red-200 text-red-600"
             }`}>
+            {toast.type === "success" ? (
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            )}
             {toast.msg}
           </motion.div>
         )}
@@ -268,17 +273,17 @@ export default function MeetingReportPage({
 
       {/* Header Actions */}
       <div className="flex items-center justify-between mb-8">
-        <motion.button 
+        <button 
           onClick={() => router.back()}
-          whileHover={hoverScale}
-          whileTap={tapScale}
-          className="flex items-center gap-2 font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/40 hover:text-slate-dark transition-colors"
+          className="group flex items-center gap-2 font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-slate-dark/40 hover:text-slate-dark transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+          <div className="w-6 h-6 rounded-md bg-black/[0.03] border border-black/[0.05] flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
           Back
-        </motion.button>
+        </button>
 
         <div className="flex items-center gap-3">
           {isEditing ? (
@@ -287,7 +292,7 @@ export default function MeetingReportPage({
                 onClick={() => setIsEditing(false)}
                 whileHover={hoverScale}
                 whileTap={tapScale}
-                className="font-anthropic-sans text-[14px] font-medium text-slate-dark/60 hover:text-slate-dark px-4 py-2 transition-colors"
+                className="font-anthropic-sans text-[13px] font-medium text-slate-dark/60 hover:text-slate-dark px-4 py-2 transition-colors"
               >
                 Cancel
               </motion.button>
@@ -296,7 +301,7 @@ export default function MeetingReportPage({
                 disabled={isSaving}
                 whileHover={hoverScale}
                 whileTap={tapScale}
-                className="font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-6 py-3 rounded-full hover:bg-black transition-all disabled:opacity-50"
+                className="font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-5 py-2.5 rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-black transition-all disabled:opacity-50"
               >
                 {isSaving ? "Saving…" : "Save Changes"}
               </motion.button>
@@ -307,24 +312,24 @@ export default function MeetingReportPage({
                 onClick={() => setIsEditing(true)}
                 whileHover={hoverScale}
                 whileTap={tapScale}
-                className="font-anthropic-sans font-medium text-[14px] text-slate-dark bg-[#fdfaf6] border border-stone/60 px-6 py-3 rounded-full hover:bg-white transition-all flex items-center gap-2"
+                className="font-anthropic-sans font-medium text-[13px] text-slate-dark bg-white border border-black/10 px-5 py-2.5 rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:bg-stone-50 transition-all flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-slate-dark/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
-                Edit Report
+                Edit Document
               </motion.button>
               <motion.button
                 onClick={handleSendEmail}
                 disabled={isSending}
                 whileHover={hoverScale}
                 whileTap={tapScale}
-                className="font-anthropic-sans font-medium text-[14px] bg-clay text-white px-6 py-3 rounded-full hover:bg-clay-deep transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm"
+                className="font-anthropic-sans font-medium text-[13px] bg-clay text-white px-5 py-2.5 rounded-lg shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-clay-deep transition-all flex items-center gap-2 disabled:opacity-50"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                {isSending ? "Sending..." : "Mail to Customer"}
+                {isSending ? "Sending..." : "Email Customer"}
               </motion.button>
             </>
           )}
@@ -340,65 +345,48 @@ export default function MeetingReportPage({
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-[#fdfaf6] border border-stone/40 rounded-2xl p-6 mb-8 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <svg className="w-4 h-4 text-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="font-anthropic-sans text-[14px] text-slate-dark/70">
-                  You are in edit mode. Click anywhere on the text below to type and make changes.
-                </p>
+            <div className="bg-black/[0.02] border border-black/[0.06] rounded-xl p-5 mb-8 flex flex-col gap-4 shadow-sm">
+              <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
+                 <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-clay animate-pulse" />
+                   <span className="font-anthropic-mono text-[10px] font-bold uppercase tracking-widest text-slate-dark/60">
+                     Edit Mode Active
+                   </span>
+                 </div>
+                 <p className="font-anthropic-sans text-[12px] text-slate-dark/40">
+                   Click directly into the document to edit.
+                 </p>
               </div>
               
-              <div className="flex flex-col gap-3 pt-4 border-t border-stone/30">
-                {/* Find Row */}
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 flex items-center gap-2 bg-white border border-stone/60 rounded-xl px-4 py-2.5 focus-within:border-clay/50 transition-colors">
-                    <svg className="w-4 h-4 text-slate-dark/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input 
-                      type="text" 
-                      placeholder="Find word..." 
-                      value={findText}
-                      onChange={(e) => setFindText(e.target.value)}
-                      className="bg-transparent border-none outline-none text-[14px] font-anthropic-sans text-slate-dark placeholder:text-slate-dark/30 w-full" 
-                    />
-                  </div>
-                  <motion.button
-                    onClick={handleFindAll}
-                    disabled={!findText}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                    className="shrink-0 font-anthropic-sans text-[14px] font-medium bg-slate-dark/5 text-slate-dark px-6 py-2.5 rounded-full hover:bg-slate-dark/10 transition-all disabled:opacity-50"
-                  >
-                    Search
-                  </motion.button>
+              <div className="flex flex-col md:flex-row gap-3 pt-1">
+                {/* Find Input */}
+                <div className="flex-1 flex items-center gap-2 bg-white border border-black/[0.08] rounded-lg px-3 py-2 shadow-sm focus-within:border-clay/50 transition-colors">
+                  <svg className="w-5 h-5 text-slate-dark/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input 
+                    type="text" 
+                    placeholder="Find in document..." 
+                    value={findText}
+                    onChange={(e) => setFindText(e.target.value)}
+                    className="bg-transparent border-none outline-none font-anthropic-mono text-[13px] text-slate-dark placeholder:text-slate-dark/30 w-full" 
+                  />
+                  <button onClick={handleFindAll} disabled={!findText} className="font-anthropic-sans text-[11px] font-medium bg-black/[0.04] px-2 py-1 rounded text-slate-dark hover:bg-black/[0.08] transition-colors disabled:opacity-50">Find</button>
                 </div>
                 
-                {/* Replace Row */}
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 flex items-center gap-2 bg-white border border-stone/60 rounded-xl px-4 py-2.5 focus-within:border-clay/50 transition-colors">
-                    <svg className="w-4 h-4 text-slate-dark/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                    <input 
-                      type="text" 
-                      placeholder="Replace with..." 
-                      value={replaceText}
-                      onChange={(e) => setReplaceText(e.target.value)}
-                      className="bg-transparent border-none outline-none text-[14px] font-anthropic-sans text-slate-dark placeholder:text-slate-dark/30 w-full" 
-                    />
-                  </div>
-                  <motion.button
-                    onClick={handleReplaceAll}
-                    disabled={!findText}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                    className="shrink-0 font-anthropic-sans text-[14px] font-medium bg-slate-dark text-white px-6 py-2.5 rounded-full hover:bg-black transition-all disabled:opacity-50"
-                  >
-                    Replace All
-                  </motion.button>
+                {/* Replace Input */}
+                <div className="flex-1 flex items-center gap-2 bg-white border border-black/[0.08] rounded-lg px-3 py-2 shadow-sm focus-within:border-clay/50 transition-colors">
+                  <svg className="w-5 h-5 text-slate-dark/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                  <input 
+                    type="text" 
+                    placeholder="Replace with..." 
+                    value={replaceText}
+                    onChange={(e) => setReplaceText(e.target.value)}
+                    className="bg-transparent border-none outline-none font-anthropic-mono text-[13px] text-slate-dark placeholder:text-slate-dark/30 w-full" 
+                  />
+                  <button onClick={handleReplaceAll} disabled={!findText} className="font-anthropic-sans text-[11px] font-medium bg-slate-dark text-white px-2 py-1 rounded hover:bg-black transition-colors disabled:opacity-50">Replace</button>
                 </div>
               </div>
             </div>
@@ -411,8 +399,8 @@ export default function MeetingReportPage({
         variants={fadeInUp}
         initial="initial"
         animate="animate"
-        className={`bg-white rounded-[32px] p-10 md:p-16 min-h-[800px] shadow-xl shadow-stone/10 transition-all ${
-        isEditing ? "ring-2 ring-clay/30 outline-none" : "border border-stone/30"
+        className={`bg-white rounded-2xl p-10 md:p-14 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all ${
+        isEditing ? "ring-2 ring-clay/30 outline-none border border-clay/20" : "border border-black/[0.06]"
       }`}>
         <div
           ref={editorRef}
@@ -421,16 +409,16 @@ export default function MeetingReportPage({
           dangerouslySetInnerHTML={{ __html: initialHtml }}
           className={`
             outline-none
-            font-anthropic-serif text-[20px] text-slate-dark leading-[1.65]
+            font-anthropic-serif text-[18px] text-slate-dark leading-[1.7]
             
             /* Typography styling for the raw HTML returned by the backend */
-            [&>h1]:font-anthropic-serif [&>h1]:text-[48px] [&>h1]:tracking-tight [&>h1]:mb-10 [&>h1]:leading-[1.1]
-            [&>h2]:font-anthropic-sans [&>h2]:text-[28px] [&>h2]:font-semibold [&>h2]:tracking-tight [&>h2]:mt-12 [&>h2]:mb-6
-            [&>h3]:font-anthropic-sans [&>h3]:text-[20px] [&>h3]:font-semibold [&>h3]:mt-8 [&>h3]:mb-4
+            [&>h1]:font-anthropic-serif [&>h1]:text-[36px] [&>h1]:tracking-tight [&>h1]:mb-8 [&>h1]:leading-[1.1]
+            [&>h2]:font-anthropic-sans [&>h2]:text-[20px] [&>h2]:font-semibold [&>h2]:tracking-tight [&>h2]:mt-10 [&>h2]:mb-4 [&>h2]:border-b [&>h2]:border-black/[0.04] [&>h2]:pb-2
+            [&>h3]:font-anthropic-sans [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mt-6 [&>h3]:mb-3 [&>h3]:uppercase [&>h3]:tracking-wider [&>h3]:text-slate-dark/70
             
             [&>p]:mb-6 [&>p]:text-slate-dark/80
-            [&>ul]:mb-8 [&>ul]:list-disc [&>ul]:pl-6 [&>ul>li]:mb-3 [&>ul>li]:pl-2
-            [&>ol]:mb-8 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol>li]:mb-3
+            [&>ul]:mb-8 [&>ul]:list-disc [&>ul]:pl-6 [&>ul>li]:mb-2 [&>ul>li]:pl-1 [&>ul>li]:text-slate-dark/80
+            [&>ol]:mb-8 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol>li]:mb-2 [&>ol>li]:text-slate-dark/80
             
             [&>strong]:font-semibold [&>strong]:text-slate-dark
             [&>em]:italic

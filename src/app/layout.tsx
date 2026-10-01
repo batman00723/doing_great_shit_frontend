@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "Automate your meeting intelligence with Smriti.",
 };
 
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +36,9 @@ export default function RootLayout({
         className="min-h-full flex flex-col font-anthropic-serif text-slate-dark bg-ivory-medium"
         suppressHydrationWarning
       >
-        {children}
+        <SmoothScrollProvider>
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );

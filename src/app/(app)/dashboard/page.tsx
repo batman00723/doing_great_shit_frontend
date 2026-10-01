@@ -237,137 +237,225 @@ export default function DashboardPage() {
 
   const firstName = user?.salesperson_name?.split(" ")[0] || "";
 
-  const inputCls = "w-full bg-[#fdfaf6] border border-stone/60 text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30";
-  const selectCls = "w-full bg-[#fdfaf6] border border-stone/60 text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:border-clay/50 transition-colors";
+  // Ultra-premium input classes
+  const inputCls = "w-full bg-black/[0.02] border border-black/[0.06] text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-clay/50 focus:ring-4 focus:ring-clay/10 transition-all placeholder:text-slate-dark/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
+  const selectCls = "w-full bg-black/[0.02] border border-black/[0.06] text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-clay/50 focus:ring-4 focus:ring-clay/10 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
 
   return (
-    <div className="max-w-[860px] w-full">
-
-      {/* ── HERO GREETING ── */}
+    <div className="w-full max-w-[1080px] mx-auto pb-24">
+      
+      {/* ── HEADER & GREETING ── */}
       <motion.div
         variants={staggerContainerSlow}
         initial="initial"
         animate="animate"
-        className="mb-16"
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 mt-4"
       >
-        <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-dark/40 mb-4">
-          {user?.organisation} workspace
-        </motion.p>
-        <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[64px] md:text-[88px] tracking-tight leading-[1.05] text-slate-dark mb-10">
-          {getGreeting()},<br /><em className="italic font-normal text-clay-deep">{firstName}.</em>
-        </motion.h1>
-        <motion.div variants={fadeInUp} transition={springCalm} className="flex flex-wrap gap-4">
-          <motion.button
-            whileHover={hoverScale}
-            whileTap={tapScale}
-            onClick={() => { setShowMeetingModal(true); setBotMsg(""); setTranscriptMsg(""); setAudioMsg(""); }}
-            className="font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-6 py-3 rounded-full hover:bg-black transition-colors shadow-sm"
-          >
-            + Add Meeting
-          </motion.button>
+        <div>
+          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-clay/10 border border-clay/20 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-clay animate-pulse" />
+            <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-clay-deep font-bold">
+              {user?.organisation || "Workspace"}
+            </span>
+          </motion.div>
+          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[48px] md:text-[56px] tracking-tight leading-[1] text-slate-dark">
+            {getGreeting()},<br /><em className="italic font-normal text-slate-dark/50">{firstName}.</em>
+          </motion.h1>
+        </div>
+
+        <motion.div variants={fadeInUp} transition={springCalm} className="flex flex-wrap items-center gap-3">
           <Link
             href="/dashboard/chat"
-            className="font-anthropic-sans font-medium text-[14px] border border-stone/60 text-slate-dark px-6 py-3 rounded-full hover:bg-[#fdfaf6] transition-all"
+            className="font-anthropic-sans font-medium text-[13px] border border-black/10 bg-white text-slate-dark px-5 py-2.5 rounded-lg hover:bg-stone-50 transition-colors shadow-sm"
           >
-            Go to Chat
+            Ask AI
           </Link>
-          <Link
-            href="/dashboard/customers"
-            className="font-anthropic-sans font-medium text-[14px] border border-stone/60 text-slate-dark px-6 py-3 rounded-full hover:bg-[#fdfaf6] transition-all"
+          <button
+            onClick={() => { setShowMeetingModal(true); setBotMsg(""); setTranscriptMsg(""); setAudioMsg(""); }}
+            className="group relative inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-5 py-2.5 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-black transition-all overflow-hidden"
           >
-            View Customers
-          </Link>
-          <Link
-            href="/dashboard/meetings"
-            className="font-anthropic-sans font-medium text-[14px] border border-stone/60 text-slate-dark px-6 py-3 rounded-full hover:bg-[#fdfaf6] transition-all"
-          >
-            All Meetings
-          </Link>
+            <span className="relative z-10 flex items-center gap-2">
+              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+              New Meeting
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+          </button>
         </motion.div>
       </motion.div>
 
-      {/* ── STAT CARDS ── */}
+      {/* ── BENTO GRID ── */}
       <motion.div
         variants={staggerContainer}
         initial="initial"
         animate="animate"
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16"
+        className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5"
       >
-        <motion.div variants={fadeInUp} transition={springCalm} className="bg-[#fdfaf6] border border-stone/40 rounded-[32px] p-10 flex flex-col justify-between group hover:shadow-xl hover:shadow-stone/10 transition-shadow">
-          <p className="font-anthropic-sans font-semibold text-[11px] uppercase tracking-[0.2em] text-slate-dark/50 mb-12">Total Customers</p>
-          <p className="font-anthropic-serif text-[64px] leading-none tracking-tight text-slate-dark">
-            <AnimatedCounter value={customers.length} loading={statsLoading} />
-          </p>
+        {/* Stat Card 1 */}
+        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-white border border-black/[0.06] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] group">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(217,119,87,0.08),transparent_60%)] pointer-events-none" />
+          <div className="relative z-10 flex flex-col justify-between h-full">
+            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-slate-dark/50 mb-8 flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Total Customers
+            </p>
+            <div className="flex items-end gap-3">
+              <span className="font-anthropic-mono text-[48px] leading-none tracking-tighter text-slate-dark">
+                <AnimatedCounter value={customers.length} loading={statsLoading} />
+              </span>
+            </div>
+          </div>
         </motion.div>
-        <motion.div variants={fadeInUp} transition={springCalm} className="bg-[#fdfaf6] border border-stone/40 rounded-[32px] p-10 flex flex-col justify-between group hover:shadow-xl hover:shadow-stone/10 transition-shadow">
-          <p className="font-anthropic-sans font-semibold text-[11px] uppercase tracking-[0.2em] text-slate-dark/50 mb-12">Total Meetings</p>
-          <p className="font-anthropic-serif text-[64px] leading-none tracking-tight text-slate-dark">
-            <AnimatedCounter value={totalMeetings ?? 0} loading={statsLoading} />
-          </p>
+
+        {/* Stat Card 2 */}
+        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-white border border-black/[0.06] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] group">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(115,191,196,0.1),transparent_60%)] pointer-events-none" />
+          <div className="relative z-10 flex flex-col justify-between h-full">
+            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-slate-dark/50 mb-8 flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+              Analyzed Meetings
+            </p>
+            <div className="flex items-end gap-3">
+              <span className="font-anthropic-mono text-[48px] leading-none tracking-tighter text-slate-dark">
+                <AnimatedCounter value={totalMeetings ?? 0} loading={statsLoading} />
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Links */}
+        <motion.div variants={fadeInUp} transition={springCalm} className="flex flex-col gap-3">
+          <Link href="/dashboard/chat" className="flex-1 bg-slate-dark rounded-xl border border-black p-5 flex items-center justify-between group hover:bg-[#1a1a19] transition-colors relative overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-clay/20 blur-[30px] rounded-full translate-x-1/2 -translate-y-1/2 transition-transform group-hover:scale-150" />
+            <div className="relative z-10 flex flex-col">
+              <span className="font-anthropic-sans font-semibold text-[14px] text-white">Ask Smriti AI</span>
+              <span className="font-anthropic-sans text-[12px] text-white/50">Query your global memory</span>
+            </div>
+            <div className="relative z-10 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </div>
+          </Link>
+          <div className="flex gap-3 flex-1">
+            <Link href="/dashboard/meetings" className="flex-1 bg-white border border-black/[0.06] rounded-xl p-4 flex flex-col justify-between hover:border-black/[0.15] hover:shadow-sm transition-all group">
+              <svg className="w-5 h-5 text-slate-dark/30 group-hover:text-slate-dark transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span className="font-anthropic-sans font-medium text-[12px] text-slate-dark mt-2">All Meetings</span>
+            </Link>
+            <Link href="/dashboard/customers" className="flex-1 bg-white border border-black/[0.06] rounded-xl p-4 flex flex-col justify-between hover:border-black/[0.15] hover:shadow-sm transition-all group">
+              <svg className="w-5 h-5 text-slate-dark/30 group-hover:text-slate-dark transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              <span className="font-anthropic-sans font-medium text-[12px] text-slate-dark mt-2">Customers</span>
+            </Link>
+          </div>
         </motion.div>
       </motion.div>
 
-      {/* ── ADD CUSTOMER ── */}
+      {/* ── LOWER SECTION: FORMS & ACTIVITY ── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...springCalm, delay: 0.3 }}
-        className="bg-white border border-stone/40 rounded-[32px] p-10 shadow-sm"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-5"
       >
-        <h2 className="font-anthropic-serif text-[32px] tracking-tight text-slate-dark mb-2">
-          Add a <em className="italic font-normal text-clay-deep">customer.</em>
-        </h2>
-        <p className="font-anthropic-sans text-[15px] text-slate-dark/50 mb-8">Create a new lead or client in your organisation.</p>
-
-        <AnimatePresence>
-          {custSuccess && (
-            <motion.div variants={fadeInDown} initial="initial" animate="animate" exit="exit" transition={easeSoft} className="bg-green-50 border border-green-200 rounded-xl px-5 py-4 mb-6 flex items-center gap-3">
-              <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              <p className="font-anthropic-sans text-[14px] text-green-700">{custSuccess}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {custError && (
-            <motion.div variants={fadeInDown} initial="initial" animate="animate" exit="exit" transition={easeSoft} className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 mb-6">
-              <p className="font-anthropic-sans text-[14px] text-red-600">{custError}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <form onSubmit={handleAddCustomer} className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Customer name *</label>
-              <input required placeholder="Netflix" value={custForm.customer_name} onChange={e => setCustForm({ ...custForm, customer_name: e.target.value })} className={inputCls} />
+        {/* Add Customer Form */}
+        <div className="lg:col-span-2 bg-white border border-black/[0.06] rounded-2xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between mb-8 pb-6 border-b border-black/[0.04]">
+            <div>
+              <h2 className="font-anthropic-serif text-[22px] tracking-tight text-slate-dark">Add New Customer</h2>
+              <p className="font-anthropic-sans text-[13px] text-slate-dark/50 mt-1">Create a profile to associate meetings and generate insights.</p>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Email *</label>
-              <input required type="email" placeholder="contact@netflix.com" value={custForm.email} onChange={e => setCustForm({ ...custForm, email: e.target.value })} className={inputCls} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Industry</label>
-              <input placeholder="Entertainment" value={custForm.industry} onChange={e => setCustForm({ ...custForm, industry: e.target.value })} className={inputCls} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Website</label>
-              <input placeholder="netflix.com" value={custForm.website} onChange={e => setCustForm({ ...custForm, website: e.target.value })} className={inputCls} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Status</label>
-              <select value={custForm.status} onChange={e => setCustForm({ ...custForm, status: e.target.value })} className={selectCls}>
-                <option value="Lead">Lead</option>
-                <option value="Active">Active</option>
-                <option value="Closed">Closed</option>
-              </select>
+            <div className="w-10 h-10 rounded-xl bg-clay/10 border border-clay/20 flex items-center justify-center text-clay-deep shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
             </div>
           </div>
-          <div className="pt-2">
-            <motion.button whileHover={hoverScale} whileTap={tapScale} type="submit" disabled={custLoading} className="font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-8 py-3.5 rounded-full hover:bg-black transition-colors shadow-sm disabled:opacity-50">
-              {custLoading ? "Adding…" : "Add customer"}
-            </motion.button>
+
+          <AnimatePresence>
+            {custSuccess && (
+              <motion.div variants={fadeInDown} initial="initial" animate="animate" exit="exit" transition={easeSoft} className="bg-green-50/50 border border-green-200/60 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                <p className="font-anthropic-sans text-[13px] font-medium text-green-700">{custSuccess}</p>
+              </motion.div>
+            )}
+            {custError && (
+              <motion.div variants={fadeInDown} initial="initial" animate="animate" exit="exit" transition={easeSoft} className="bg-red-50/50 border border-red-200/60 rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <p className="font-anthropic-sans text-[13px] font-medium text-red-600">{custError}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <form onSubmit={handleAddCustomer} className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div className="flex flex-col gap-2">
+                <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Company Name</label>
+                <input required placeholder="e.g. Acme Corp" value={custForm.customer_name} onChange={e => setCustForm({ ...custForm, customer_name: e.target.value })} className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Contact Email</label>
+                <input required type="email" placeholder="contact@acme.com" value={custForm.email} onChange={e => setCustForm({ ...custForm, email: e.target.value })} className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Industry</label>
+                <input placeholder="e.g. Software" value={custForm.industry} onChange={e => setCustForm({ ...custForm, industry: e.target.value })} className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Status</label>
+                <select value={custForm.status} onChange={e => setCustForm({ ...custForm, status: e.target.value })} className={selectCls}>
+                  <option value="Lead">Lead</option>
+                  <option value="Active">Active</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-5 mt-2 border-t border-black/[0.04] flex justify-end">
+              <button type="submit" disabled={custLoading} className="font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-6 py-2.5 rounded-lg hover:bg-black transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
+                {custLoading ? "Adding..." : "Add Customer"}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* System Status */}
+        <div className="lg:col-span-1 bg-white border border-black/[0.06] rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex flex-col">
+          <h3 className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50 mb-8">System Status</h3>
+          
+          <div className="flex flex-col gap-6 flex-1">
+            <div className="flex gap-4 items-start">
+              <div className="mt-1 relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </div>
+              <div>
+                <p className="font-anthropic-sans font-medium text-[13px] text-slate-dark leading-tight">Meeting Analysis Engine</p>
+                <p className="font-anthropic-sans text-[12px] text-slate-dark/50 mt-1">Online • Processing 0 items</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 items-start">
+              <div className="mt-1 relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-dark/20"></span>
+              </div>
+              <div>
+                <p className="font-anthropic-sans font-medium text-[13px] text-slate-dark leading-tight">Zoom Bot Fleet</p>
+                <p className="font-anthropic-sans text-[12px] text-slate-dark/50 mt-1">Idle • Ready for deployment</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 items-start">
+              <div className="mt-1 relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-dark/20"></span>
+              </div>
+              <div>
+                <p className="font-anthropic-sans font-medium text-[13px] text-slate-dark leading-tight">Global Memory Vector DB</p>
+                <p className="font-anthropic-sans text-[12px] text-slate-dark/50 mt-1">Synced • 12ms latency</p>
+              </div>
+            </div>
           </div>
-        </form>
+          
+          <div className="mt-6 pt-6 border-t border-black/[0.04]">
+            <p className="font-anthropic-mono text-[10px] text-slate-dark/30 flex justify-between">
+              <span>v2.0.4</span>
+              <span>us-east-1</span>
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       {/* ── ADD MEETING MODAL ── */}
@@ -379,7 +467,7 @@ export default function DashboardPage() {
             animate="animate"
             exit="exit"
             transition={easeSoft}
-            className="fixed inset-0 bg-slate-dark/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-slate-dark/30 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => setShowMeetingModal(false)}
           >
             <motion.div
@@ -388,26 +476,27 @@ export default function DashboardPage() {
               animate="animate"
               exit="exit"
               transition={springCalm}
-              className="bg-white rounded-[32px] w-full max-w-[560px] p-10 shadow-2xl border border-stone/20"
+              className="bg-white rounded-3xl w-full max-w-[520px] p-8 shadow-2xl border border-black/[0.08]"
               onClick={e => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="font-anthropic-serif text-[28px] tracking-tight text-slate-dark">Add a <em className="italic font-normal text-clay-deep">meeting.</em></h2>
-                <button onClick={() => setShowMeetingModal(false)} className="text-slate-dark/40 hover:text-slate-dark transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/[0.04]">
+                <div>
+                  <h2 className="font-anthropic-serif text-[22px] tracking-tight text-slate-dark">New Meeting</h2>
+                  <p className="font-anthropic-sans text-[13px] text-slate-dark/50 mt-1">Import a meeting for analysis.</p>
+                </div>
+                <button onClick={() => setShowMeetingModal(false)} className="w-8 h-8 rounded-full bg-black/[0.03] hover:bg-black/[0.08] flex items-center justify-center text-slate-dark/50 hover:text-slate-dark transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
 
-              {/* Tabs */}
-              <div className="flex gap-2 bg-[#fdfaf6] border border-stone/40 rounded-xl p-1.5 mb-8">
-                {([["bot", "🤖 Deploy Bot"], ["transcript", "📝 Transcript"], ["audio", "🎙️ Audio"]] as [MeetingModalTab, string][]).map(([tab, label]) => (
+              <div className="flex gap-1 bg-black/[0.03] border border-black/[0.04] rounded-xl p-1 mb-8">
+                {([["bot", "🤖 Bot"], ["transcript", "📝 Text"], ["audio", "🎙️ Audio"]] as [MeetingModalTab, string][]).map(([tab, label]) => (
                   <button key={tab} onClick={() => setMeetingTab(tab)}
-                    className={`relative flex-1 font-anthropic-sans text-[13px] font-medium py-2.5 rounded-lg transition-colors ${meetingTab === tab ? "text-slate-dark" : "text-slate-dark/50 hover:text-slate-dark"}`}>
+                    className={`relative flex-1 font-anthropic-sans text-[13px] font-medium py-2 rounded-lg transition-colors ${meetingTab === tab ? "text-slate-dark" : "text-slate-dark/50 hover:text-slate-dark"}`}>
                     {meetingTab === tab && (
                       <motion.div
-                        layoutId="modal-tab-indicator"
-                        className="absolute inset-0 bg-white shadow-sm rounded-lg"
+                        layoutId="modal-tab"
+                        className="absolute inset-0 bg-white shadow-sm border border-black/[0.04] rounded-lg"
                         transition={springCalm}
                       />
                     )}
@@ -416,73 +505,66 @@ export default function DashboardPage() {
                 ))}
               </div>
 
-              {/* Tab Content with cross-fade */}
               <AnimatePresence mode="wait">
-                {/* Bot Tab */}
                 {meetingTab === "bot" && (
-                  <motion.form key="bot" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleDeployBot} className="flex flex-col gap-6">
-                    <p className="font-anthropic-sans text-[15px] leading-relaxed text-slate-dark/70">Deploy an AI bot to join a live Zoom or Google Meet call and capture the transcript automatically.</p>
+                  <motion.form key="bot" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleDeployBot} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Meeting URL *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Meeting URL *</label>
                       <input required type="url" placeholder="https://zoom.us/j/..." value={botUrl} onChange={e => setBotUrl(e.target.value)} className={inputCls} />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Customer *</label>
                       <select required value={botCustomer} onChange={e => setBotCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
-                    {botMsg && <p className="font-anthropic-sans text-[14px] text-slate-dark/80">{botMsg}</p>}
-                    <button type="button" disabled className="font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-8 py-3.5 rounded-full opacity-50 cursor-not-allowed w-max mt-2">
-                      Coming Soon
+                    {botMsg && <p className="font-anthropic-sans text-[13px] text-slate-dark/80">{botMsg}</p>}
+                    <button type="button" disabled className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-6 py-3 rounded-xl opacity-50 cursor-not-allowed">
+                      Bot Deployment (Coming Soon)
                     </button>
                   </motion.form>
                 )}
 
-                {/* Transcript Tab */}
                 {meetingTab === "transcript" && (
-                  <motion.form key="transcript" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleTranscript} className="flex flex-col gap-6">
-                    <p className="font-anthropic-sans text-[15px] leading-relaxed text-slate-dark/70">Paste a raw meeting transcript and our AI will generate a full report.</p>
+                  <motion.form key="transcript" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleTranscript} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Customer *</label>
                       <select required value={transcriptCustomer} onChange={e => setTranscriptCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Transcript *</label>
-                      <textarea required rows={6} placeholder="Paste your meeting transcript here…" value={transcript} onChange={e => setTranscript(e.target.value)}
-                        className="w-full bg-[#fdfaf6] border border-stone/60 text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-all placeholder:text-slate-dark/30 resize-none" />
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Raw Transcript *</label>
+                      <textarea required rows={5} placeholder="Paste your meeting transcript here…" value={transcript} onChange={e => setTranscript(e.target.value)}
+                        className="w-full bg-black/[0.02] border border-black/[0.06] text-slate-dark font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-clay/50 focus:ring-4 focus:ring-clay/10 transition-all placeholder:text-slate-dark/30 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" />
                     </div>
-                    {transcriptMsg && <p className="font-anthropic-sans text-[14px] text-slate-dark/80">{transcriptMsg}</p>}
-                    <motion.button whileHover={hoverScale} whileTap={tapScale} type="submit" disabled={transcriptLoading} className="w-max font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-8 py-3.5 rounded-full hover:bg-black transition-colors disabled:opacity-50 mt-2">
+                    {transcriptMsg && <p className="font-anthropic-sans text-[13px] text-slate-dark/80">{transcriptMsg}</p>}
+                    <button type="submit" disabled={transcriptLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-6 py-3 rounded-xl hover:bg-black transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
                       {transcriptLoading ? "Analysing…" : "Analyse Transcript"}
-                    </motion.button>
+                    </button>
                   </motion.form>
                 )}
 
-                {/* Audio Tab */}
                 {meetingTab === "audio" && (
-                  <motion.form key="audio" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleAudio} className="flex flex-col gap-6">
-                    <p className="font-anthropic-sans text-[15px] leading-relaxed text-slate-dark/70">Upload a meeting recording and our AI will transcribe and generate a report.</p>
+                  <motion.form key="audio" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleAudio} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Customer *</label>
                       <select required value={audioCustomer} onChange={e => setAudioCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-dark/70">Audio file *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-dark/50">Audio File *</label>
                       <input ref={audioRef} type="file" accept=".mp3,.wav,.m4a,.ogg" onChange={e => setAudioFile(e.target.files?.[0] || null)}
-                        className="w-full font-anthropic-sans text-[14px] text-slate-dark file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:font-medium file:bg-slate-dark file:text-white hover:file:bg-black file:transition-all cursor-pointer" />
+                        className="w-full font-anthropic-sans text-[13px] text-slate-dark file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:font-medium file:bg-black/[0.04] hover:file:bg-black/[0.08] file:text-slate-dark file:cursor-pointer file:transition-colors cursor-pointer border border-black/[0.06] rounded-xl bg-black/[0.02] p-1.5" />
                     </div>
-                    {audioMsg && <p className="font-anthropic-sans text-[14px] text-slate-dark/80">{audioMsg}</p>}
-                    <motion.button whileHover={hoverScale} whileTap={tapScale} type="submit" disabled={audioLoading} className="w-max font-anthropic-sans font-medium text-[14px] bg-slate-dark text-white px-8 py-3.5 rounded-full hover:bg-black transition-colors disabled:opacity-50 mt-2">
+                    {audioMsg && <p className="font-anthropic-sans text-[13px] text-slate-dark/80">{audioMsg}</p>}
+                    <button type="submit" disabled={audioLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-6 py-3 rounded-xl hover:bg-black transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
                       {audioLoading ? "Uploading…" : "Upload & Analyse"}
-                    </motion.button>
+                    </button>
                   </motion.form>
                 )}
               </AnimatePresence>

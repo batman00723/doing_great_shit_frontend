@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
+import { ShaderGradientCanvas, ShaderGradient } from "shadergradient";
 import {
   fadeInUp,
   fadeInDown,
@@ -68,21 +69,19 @@ export default function LoginPage() {
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden"
       >
-        {/* Topographic background texture */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
-          <svg viewBox="0 0 600 800" className="w-full h-full" fill="none" stroke="white" strokeWidth="1">
-            <path d="M 600 0 C 500 100 400 150 300 100 C 200 50 100 100 0 150" />
-            <path d="M 600 40 C 510 130 410 180 310 130 C 210 80 100 130 0 180" />
-            <path d="M 600 80 C 520 160 420 210 320 160 C 220 110 100 160 0 210" />
-            <path d="M 600 120 C 530 180 430 230 330 180 C 230 130 100 180 0 230" />
-            <path d="M 600 300 C 450 400 350 300 250 400 C 150 500 50 450 0 500" />
-            <path d="M 600 340 C 460 430 360 330 260 430 C 160 530 50 480 0 530" />
-            <path d="M 600 380 C 470 460 370 360 270 460 C 170 560 50 510 0 560" />
-            <path d="M 600 600 C 500 700 400 650 300 700 C 200 750 100 700 0 750" />
-            <path d="M 600 640 C 510 730 410 680 310 730 C 210 780 100 730 0 780" />
-            <path d="M 450 280 C 480 260 520 260 520 300 C 520 340 480 350 440 320 C 410 300 420 290 450 280 Z" />
-            <path d="M 445 285 C 468 272 500 272 500 300 C 500 328 474 332 448 318 C 428 305 430 292 445 285 Z" />
-          </svg>
+        {/* Beautiful WebGL Shader Gradient Background */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <ShaderGradientCanvas
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+          >
+            {/* @ts-ignore */}
+            <ShaderGradient {...{
+              animate:"on", axesHelper:"off", brightness:1.2, cAzimuthAngle:565, cDistance:13.1, cPolarAngle:160, cameraZoom:5, color1:"#ff5005", color2:"#dbba95", color3:"#d0bce1", destination:"onCanvas", embedMode:"off", envPreset:"lobby", format:"gif", fov:30, frameRate:10, gizmoHelper:"hide", grain:"on", lightType:"3d", pixelDensity:1, positionX:-1.4, positionY:0, positionZ:0, range:"disabled", rangeEnd:40, rangeStart:0, reflection:0.1, rotationX:0, rotationY:10, rotationZ:50, shader:"defaults", type:"plane", uAmplitude:0.4, uDensity:1.3, uFrequency:5.5, uSpeed:0.2, uStrength:4, uTime:0, wireframe:false, zoomOut:true
+            }} />
+          </ShaderGradientCanvas>
+          {/* Dark overlay to ensure white text remains readable over the bright gradient */}
+          <div className="absolute inset-0 bg-slate-dark/30 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-black/20" />
         </div>
 
         {/* Logo */}

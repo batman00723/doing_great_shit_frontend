@@ -30,7 +30,7 @@ const NAV_LINKS = [
     label: "Dashboard",
     href: "/dashboard",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
       </svg>
     ),
@@ -39,7 +39,7 @@ const NAV_LINKS = [
     label: "Customers",
     href: "/dashboard/customers",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
@@ -48,7 +48,7 @@ const NAV_LINKS = [
     label: "Meetings",
     href: "/dashboard/meetings",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
@@ -57,7 +57,7 @@ const NAV_LINKS = [
     label: "Chat",
     href: "/dashboard/chat",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
       </svg>
     ),
@@ -66,7 +66,7 @@ const NAV_LINKS = [
     label: "Team",
     href: "/admin/dashboard",
     icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg>
     ),
@@ -78,12 +78,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [meetingUrl, setMeetingUrl] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [botLoading, setBotLoading] = useState(false);
-  const [botMessage, setBotMessage] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
@@ -143,37 +140,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchCustomers();
   }, [router]);
 
-  const handleDeployBot = async () => {
-    if (!meetingUrl || !selectedCustomer) {
-      setBotMessage("Please enter a meeting URL and select a customer.");
-      return;
-    }
-    setBotLoading(true);
-    setBotMessage("");
-    try {
-      const res = await fetch("https://doing-great-shit.onrender.com/api_v1/bot/deploy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ meeting_url: meetingUrl, customer_id: parseInt(selectedCustomer) }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setBotMessage("🚀 Bot deployed!");
-        setMeetingUrl("");
-        setSelectedCustomer("");
-      } else {
-        setBotMessage(data?.detail || "Failed to deploy bot.");
-      }
-    } catch {
-      setBotMessage("Could not reach the server.");
-    } finally {
-      setBotLoading(false);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
@@ -192,13 +158,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <motion.aside
         initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
+        animate={{ 
+          opacity: 1, 
+          x: 0, 
+          width: isSidebarCollapsed ? 80 : 200 
+        }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex w-[240px] shrink-0 bg-[#fdfaf6] border-r border-stone/30 flex-col justify-between py-8 px-6"
+        className="hidden md:flex shrink-0 bg-[#fdfaf6] border-r border-black/[0.04] flex-col justify-between py-8 px-4 overflow-hidden relative"
       >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className={`absolute top-8 ${isSidebarCollapsed ? "right-1/2 translate-x-1/2" : "right-4"} z-10 w-8 h-8 rounded-lg bg-black/[0.03] border border-black/[0.05] flex items-center justify-center text-slate-dark/40 hover:text-slate-dark hover:bg-white transition-all`}
+          suppressHydrationWarning
+        >
+          <motion.svg 
+            animate={{ rotate: isSidebarCollapsed ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-4 h-4" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </motion.svg>
+        </button>
+
         {/* Top */}
         <div>
-          <Link href="/" className="font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-10 block">
+          <Link href="/" className={`font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-10 block transition-all ${isSidebarCollapsed ? "opacity-0 invisible" : "px-3"}`}>
             Smriti
           </Link>
 
@@ -212,7 +200,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-anthropic-sans text-[13px] transition-colors"
+                  className={`relative flex items-center rounded-xl font-anthropic-sans text-[13px] transition-colors ${
+                    isSidebarCollapsed ? "justify-center p-3" : "gap-3 px-3 py-2.5"
+                  }`}
+                  title={isSidebarCollapsed ? link.label : undefined}
                   suppressHydrationWarning
                 >
                   {/* Shared layout active indicator */}
@@ -223,11 +214,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       transition={springCalm}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-3 transition-colors font-medium ${
+                  <span className={`relative z-10 flex items-center transition-colors font-medium ${
+                    isSidebarCollapsed ? "justify-center" : "gap-3"
+                  } ${
                     isActive ? "text-slate-dark" : "text-slate-dark/50 hover:text-slate-dark"
                   }`}>
-                    {link.icon}
-                    {link.label}
+                    <div className="shrink-0">{link.icon}</div>
+                    <AnimatePresence>
+                      {!isSidebarCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          className="whitespace-nowrap"
+                        >
+                          {link.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </span>
                 </Link>
               );
@@ -236,85 +240,84 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Bottom — User + Logout */}
-        <div className="border-t border-stone/30 pt-6">
+        <div className={`border-t border-black/[0.04] pt-6 flex flex-col ${isSidebarCollapsed ? "items-center" : "px-3"}`}>
           <AnimatePresence>
-            {user && (
+            {!isSidebarCollapsed ? (
               <motion.div
-                variants={fadeIn}
-                initial="initial"
-                animate="animate"
+                key="full-user"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 overflow-hidden"
+              >
+                {user && (
+                  <>
+                    <p className="font-anthropic-sans text-[12px] text-slate-dark font-medium truncate">{user.salesperson_name}</p>
+                    <p className="font-anthropic-sans text-[11px] text-slate-dark/50 truncate">{user.role} · {user.organisation}</p>
+                  </>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="icon-user"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="mb-4"
               >
-                <p className="font-anthropic-sans text-[12px] text-slate-dark font-medium truncate">{user.salesperson_name}</p>
-                <p className="font-anthropic-sans text-[11px] text-slate-dark/50 truncate">{user.role} · {user.organisation}</p>
+                {user && (
+                  <div className="w-10 h-10 rounded-full bg-slate-dark text-white flex items-center justify-center text-[14px] font-bold shrink-0">
+                    {user.salesperson_name.charAt(0)}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
           <button
             onClick={handleLogout}
-            className="font-anthropic-sans text-[12px] text-slate-dark/40 hover:text-slate-dark transition-colors"
+            className={`font-anthropic-sans text-slate-dark/40 hover:text-slate-dark transition-colors ${
+              isSidebarCollapsed ? "p-2 rounded-lg hover:bg-black/[0.03]" : "text-[12px] text-left"
+            }`}
+            title={isSidebarCollapsed ? "Sign out" : undefined}
           >
-            Sign out
+            {isSidebarCollapsed ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            ) : (
+              "Sign out"
+            )}
           </button>
         </div>
       </motion.aside>
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 bg-white">
-        {/* Top Navbar — Quick Action */}
+        {/* Minimal Top Navbar */}
         <motion.header
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full bg-white/90 backdrop-blur-sm border-b border-stone/30 px-6 py-4 flex items-center gap-4 sticky top-0 z-40"
+          className="w-full bg-white/90 backdrop-blur-md border-b border-black/[0.04] px-8 py-3 flex items-center justify-end sticky top-0 z-40 relative"
         >
-          <div ref={dropdownRef} className="flex items-center gap-3 flex-1 max-w-[600px]">
-            {/* Customer selector */}
-            <select
-              value={selectedCustomer}
-              onChange={(e) => setSelectedCustomer(e.target.value)}
-              className="font-anthropic-sans text-[13px] text-slate-dark border border-stone/40 rounded-xl px-4 py-2.5 bg-[#fdfaf6] outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors min-w-[160px]"
-            >
-              <option value="">Select customer…</option>
-              {customers.map((c) => (
-               <option key={c.id} value={c.id}>{c.customer_name}</option>
-              ))}
-            </select>
-
-            {/* Zoom link input */}
-            <input
-              type="url"
-              placeholder="Paste Zoom / Meet link…"
-              value={meetingUrl}
-              onChange={(e) => setMeetingUrl(e.target.value)}
-              className="flex-1 font-anthropic-sans text-[13px] text-slate-dark border border-stone/40 rounded-xl px-4 py-2.5 bg-[#fdfaf6] outline-none focus:border-clay/50 focus:ring-1 focus:ring-clay/20 transition-colors placeholder:text-slate-dark/30"
-            />
-
-            {/* Deploy button */}
-            <button
-              type="button"
-              disabled
-              className="font-anthropic-sans font-medium text-[13px] bg-slate-dark text-white px-5 py-2.5 rounded-full opacity-50 cursor-not-allowed whitespace-nowrap"
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Bot feedback */}
-          <AnimatePresence>
-            {botMessage && (
-              <motion.p
-                variants={fadeInUp}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={easeSoft}
-                className="font-anthropic-sans text-[12px] text-slate-dark/60 ml-2"
+          {/* Header Navigation */}
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12" suppressHydrationWarning>
+            {NAV_LINKS.filter(link => {
+              if (link.href === "/admin/dashboard") return mounted && user?.role === "Admin";
+              return true;
+            }).map((link) => (
+              <Link
+                key={`header-${link.href}`}
+                href={link.href}
+                className={`font-anthropic-mono text-[10px] uppercase tracking-widest transition-colors ${
+                  isLinkActive(link.href) ? "font-bold text-slate-dark" : "font-medium text-slate-dark/40 hover:text-slate-dark"
+                }`}
+                suppressHydrationWarning
               >
-                {botMessage}
-              </motion.p>
-            )}
-          </AnimatePresence>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
           {/* Right side — user pill */}
           <AnimatePresence>
@@ -323,9 +326,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 variants={fadeIn}
                 initial="initial"
                 animate="animate"
-                className="ml-auto font-anthropic-sans text-[12px] font-medium text-slate-dark/50 bg-[#fdfaf6] border border-stone/30 px-3 py-1.5 rounded-full"
+                className="font-anthropic-sans text-[12px] font-medium text-slate-dark bg-black/[0.02] border border-black/[0.06] px-2 py-1.5 pr-4 rounded-full flex items-center gap-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-black/[0.04] transition-colors"
               >
-                {user.salesperson_name.charAt(0)}
+                <div className="w-5 h-5 rounded-full bg-slate-dark text-white flex items-center justify-center text-[10px] font-bold">
+                   {user.salesperson_name.charAt(0)}
+                </div>
+                {user.salesperson_name}
               </motion.div>
             )}
           </AnimatePresence>

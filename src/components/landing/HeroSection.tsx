@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePres
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { ShaderGradientCanvas, ShaderGradient } from 'shadergradient';
 import { springCalm, hoverScale, tapScale } from "@/lib/animations";
 
 // Split text into words/characters for staggered animation
@@ -92,7 +93,7 @@ function DeckPaper({ children, rest, hover }: { children: React.ReactNode, rest:
        </div>
        {children}
     </motion.div>
-  )
+  );
 }
 
 export function HeroSection() {
@@ -103,21 +104,19 @@ export function HeroSection() {
   const opacity = useTransform(scrollY, [0, 400], [1, 0]);
 
   return (
-    <section ref={containerRef} className="relative w-full mx-auto pt-[40px] lg:pt-[60px] pb-[120px] z-10 flex flex-col items-center justify-center overflow-visible perspective-[2000px] min-h-screen">
+    <section ref={containerRef} className="relative w-full mx-auto pt-[40px] lg:pt-[60px] pb-[120px] flex flex-col items-center justify-center overflow-visible perspective-[2000px] min-h-screen">
       
-      {/* Decorative background glow that follows mouse slightly */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-tr from-clay/20 via-transparent to-manilla/20 blur-[120px] rounded-full pointer-events-none -z-10" />
-
-      {/* Floating UI Elements */}
-      <FloatingBadge delay={0.8} initialY={-120} initialX={-280} className="top-1/4 left-1/4 -translate-y-1/2">
-        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-          <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-anthropic-sans text-[11px] font-bold text-slate-dark uppercase tracking-wider">Action Item</span>
-          <span className="font-anthropic-serif text-[13px] text-slate-dark/70">Send proposal by EOD</span>
-        </div>
-      </FloatingBadge>
+      {/* 3D Liquid Orb Background */}
+      <div className="absolute inset-0 w-full h-[120vh] pointer-events-none -z-10 overflow-hidden opacity-90">
+        <ShaderGradientCanvas
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+        >
+          {/* @ts-ignore */}
+          <ShaderGradient {...{
+            animate: "on", axesHelper: "off", bgColor1: "transparent", bgColor2: "transparent", brightness: 0.8, cAzimuthAngle: 270, cDistance: 14, cPolarAngle: 180, cameraZoom: 5, color1: "#73bfc4", color2: "#ff810a", color3: "#8da0ce", destination: "onCanvas", embedMode: "off", envPreset: "city", format: "gif", fov: 45, frameRate: 10, gizmoHelper: "hide", grain: "on", lightType: "env", pixelDensity: 1, positionX: -0.1, positionY: 0, positionZ: 0, range: "disabled", rangeEnd: 40, rangeStart: 0, reflection: 0.4, rotationX: 0, rotationY: 130, rotationZ: 70, shader: "defaults", type: "sphere", uAmplitude: 3.2, uDensity: 0.8, uFrequency: 5.5, uSpeed: 0.2, uStrength: 8.5, uTime: 0, wireframe: false, zoomOut: true
+          }} />
+        </ShaderGradientCanvas>
+      </div>      {/* Floating UI Elements */}
 
       <FloatingBadge delay={1.1} initialY={100} initialX={320} className="top-[30%] right-[20%] -translate-y-1/2">
         <div className="w-8 h-8 rounded-full bg-clay/10 flex items-center justify-center shrink-0">
@@ -191,7 +190,7 @@ export function HeroSection() {
         >
           <MagneticButton href="/register" className="relative group overflow-hidden inline-flex items-center justify-center font-anthropic-sans font-semibold text-[17px] sm:text-[18px] text-white px-12 py-5 sm:py-6 rounded-full bg-gradient-to-b from-[#2e2e2d] to-[#1a1a19] shadow-[0_8px_30px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] border border-[#3e3e3c] hover:shadow-[0_12px_40px_rgba(200,100,80,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:border-clay transition-all duration-500 hover:-translate-y-0.5">
             <span className="relative z-10 flex items-center tracking-wide">
-              Start building your memory
+              Give it a spin
               <motion.svg
                 animate={{ x: [0, 5, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
@@ -205,7 +204,7 @@ export function HeroSection() {
           </MagneticButton>
           
           <MagneticButton href="/login" className="inline-flex items-center justify-center font-anthropic-sans font-semibold text-[17px] sm:text-[18px] text-slate-dark px-12 py-5 sm:py-6 rounded-full bg-white/70 backdrop-blur-xl border border-white shadow-[0_4px_20px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] hover:-translate-y-0.5 transition-all duration-500">
-            Sign in to workspace
+            Hop back in
           </MagneticButton>
         </motion.div>
       </motion.div>
