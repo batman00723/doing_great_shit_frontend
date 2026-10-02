@@ -80,7 +80,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [customers, setCustomers] = useState<Customer[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen bg-[#fdfaf6] flex">
+    <div className="min-h-screen bg-[#050a0c] flex">
       {/* Sidebar */}
       <motion.aside
         initial={{ opacity: 0, x: -10 }}
@@ -164,12 +164,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           width: isSidebarCollapsed ? 80 : 200 
         }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex shrink-0 bg-[#fdfaf6] border-r border-black/[0.04] flex-col justify-between py-8 px-4 overflow-hidden relative"
+        className="hidden md:flex shrink-0 bg-[#050a0c] border-r border-teal-900/20 flex-col justify-between py-8 px-4 overflow-hidden relative"
       >
         {/* Toggle Button */}
         <button
           onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className={`absolute top-8 ${isSidebarCollapsed ? "right-1/2 translate-x-1/2" : "right-4"} z-10 w-9 h-9 rounded-[10px] bg-black/[0.03] border border-black/[0.05] flex items-center justify-center text-slate-dark/40 hover:text-slate-dark hover:bg-white transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)]`}
+          className={`absolute top-8 ${isSidebarCollapsed ? "right-1/2 translate-x-1/2" : "right-4"} z-10 w-9 h-9 rounded-[10px] bg-teal-900/10 border border-teal-900/25 flex items-center justify-center text-teal-100/40 hover:text-white hover:bg-[#091114] transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)]`}
           suppressHydrationWarning
         >
           <motion.svg 
@@ -186,7 +186,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Top */}
         <div>
-          <Link href="/" className={`font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark mb-10 block transition-all ${isSidebarCollapsed ? "opacity-0 invisible" : "px-3"}`}>
+          <Link href="/" className={`font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-white mb-10 block transition-all ${isSidebarCollapsed ? "opacity-0 invisible" : "px-3"}`}>
             Smriti
           </Link>
 
@@ -217,7 +217,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className={`relative z-10 flex items-center transition-colors font-medium ${
                     isSidebarCollapsed ? "justify-center" : "gap-3"
                   } ${
-                    isActive ? "text-slate-dark" : "text-slate-dark/50 hover:text-slate-dark"
+                    isActive ? "text-white" : "text-teal-100/50 hover:text-white"
                   }`}>
                     <div className="shrink-0">{link.icon}</div>
                     <AnimatePresence>
@@ -240,7 +240,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Bottom — User + Logout */}
-        <div className={`border-t border-black/[0.04] pt-6 flex flex-col ${isSidebarCollapsed ? "items-center" : "px-3"}`}>
+        <div className={`border-t border-teal-900/20 pt-6 flex flex-col ${isSidebarCollapsed ? "items-center" : "px-3"}`}>
           <AnimatePresence>
             {!isSidebarCollapsed ? (
               <motion.div
@@ -252,8 +252,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               >
                 {user && (
                   <>
-                    <p className="font-anthropic-sans text-[12px] text-slate-dark font-medium truncate">{user.salesperson_name}</p>
-                    <p className="font-anthropic-sans text-[11px] text-slate-dark/50 truncate">{user.role} · {user.organisation}</p>
+                    <p className="font-anthropic-sans text-[12px] text-white font-medium truncate">{user.salesperson_name}</p>
+                    <p className="font-anthropic-sans text-[11px] text-teal-100/50 truncate">{user.role} · {user.organisation}</p>
                   </>
                 )}
               </motion.div>
@@ -266,7 +266,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="mb-4"
               >
                 {user && (
-                  <div className="w-10 h-10 rounded-full bg-slate-dark text-white flex items-center justify-center text-[14px] font-bold shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center text-[14px] font-bold shrink-0">
                     {user.salesperson_name.charAt(0)}
                   </div>
                 )}
@@ -275,8 +275,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </AnimatePresence>
           <button
             onClick={handleLogout}
-            className={`font-anthropic-sans text-slate-dark/40 hover:text-slate-dark transition-colors ${
-              isSidebarCollapsed ? "p-2 rounded-lg hover:bg-black/[0.03]" : "text-[12px] text-left"
+            className={`font-anthropic-sans text-teal-100/40 hover:text-white transition-colors ${
+              isSidebarCollapsed ? "p-2 rounded-lg hover:bg-teal-900/10" : "text-[12px] text-left"
             }`}
             title={isSidebarCollapsed ? "Sign out" : undefined}
           >
@@ -292,13 +292,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </motion.aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#091114]">
         {/* Minimal Top Navbar */}
         <motion.header
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full bg-white/90 backdrop-blur-md border-b border-black/[0.04] px-8 py-3 flex items-center justify-end sticky top-0 z-40 relative"
+          className="w-full bg-[#091114]/90 backdrop-blur-md border-b border-teal-900/20 px-8 py-3 flex items-center justify-end sticky top-0 z-40 relative"
         >
           {/* Header Navigation */}
           <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12" suppressHydrationWarning>
@@ -310,7 +310,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={`header-${link.href}`}
                 href={link.href}
                 className={`font-anthropic-mono text-[10px] uppercase tracking-widest transition-colors ${
-                  isLinkActive(link.href) ? "font-bold text-slate-dark" : "font-medium text-slate-dark/40 hover:text-slate-dark"
+                  isLinkActive(link.href) ? "font-bold text-white" : "font-medium text-teal-100/40 hover:text-white"
                 }`}
                 suppressHydrationWarning
               >
@@ -326,9 +326,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 variants={fadeIn}
                 initial="initial"
                 animate="animate"
-                className="font-anthropic-sans text-[12px] font-medium text-slate-dark bg-black/[0.02] border border-black/[0.06] px-2 py-1.5 pr-4 rounded-full flex items-center gap-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-black/[0.04] transition-colors"
+                className="font-anthropic-sans text-[12px] font-medium text-white bg-teal-900/10 border border-teal-900/30 px-2 py-1.5 pr-4 rounded-full flex items-center gap-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer hover:bg-teal-900/20 transition-colors"
               >
-                <div className="w-5 h-5 rounded-full bg-slate-dark text-white flex items-center justify-center text-[10px] font-bold">
+                <div className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] font-bold">
                    {user.salesperson_name.charAt(0)}
                 </div>
                 {user.salesperson_name}

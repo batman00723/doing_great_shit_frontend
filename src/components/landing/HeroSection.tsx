@@ -132,10 +132,10 @@ export function HeroSection() {
           className="font-anthropic-serif text-[72px] sm:text-[88px] md:text-[110px] leading-[1] tracking-tight text-slate-dark dark:text-white transition-colors duration-500 mb-10 flex flex-col items-center"
         >
           <span className="flex overflow-hidden pb-4">
-            {splitText("Perfect memory")}
+            {splitText("Unfair advantage")}
           </span>
           <span className="flex overflow-hidden pb-6">
-            <span className="mr-4">{splitText("for")}</span>
+            <span className="mr-4">{splitText("on")}</span>
             <em className="italic font-normal relative">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-clay-deep via-clay to-clay-deep bg-300% animate-gradient">
                 {splitText("every call.")}

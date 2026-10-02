@@ -80,7 +80,7 @@ export default function RegisterPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-16 relative overflow-hidden"
+        className="hidden lg:flex lg:w-[45%] bg-slate-dark flex-col justify-between p-20 xl:p-24 relative overflow-hidden"
       >
         {/* Beautiful WebGL Shader Gradient Background */}
         <div className="absolute inset-0 pointer-events-none z-0">
@@ -89,8 +89,49 @@ export default function RegisterPage() {
           >
             {/* @ts-ignore */}
             <ShaderGradient {...{
-              animate:"on", axesHelper:"off", brightness:1.2, cAzimuthAngle:565, cDistance:13.1, cPolarAngle:160, cameraZoom:5, color1:"#ff5005", color2:"#dbba95", color3:"#d0bce1", destination:"onCanvas", embedMode:"off", envPreset:"lobby", format:"gif", fov:30, frameRate:10, gizmoHelper:"hide", grain:"on", lightType:"3d", pixelDensity:1, positionX:-1.4, positionY:0, positionZ:0, range:"disabled", rangeEnd:40, rangeStart:0, reflection:0.1, rotationX:0, rotationY:10, rotationZ:50, shader:"defaults", type:"plane", uAmplitude:0.4, uDensity:1.3, uFrequency:5.5, uSpeed:0.2, uStrength:4, uTime:0, wireframe:false, zoomOut:true
-            }} />
+  animate: "on",
+  axesHelper: "off",
+  bgColor1: "#000000",
+  bgColor2: "#000000",
+  brightness: 1.5,
+  cAzimuthAngle: 250,
+  cDistance: 1.5,
+  cPolarAngle: 140,
+  cameraZoom: 5,
+  color1: "#005000",
+  color2: "#4d2023",
+  color3: "#00009b",
+  destination: "onCanvas",
+  embedMode: "off",
+  envPreset: "city",
+  format: "gif",
+  fov: 45,
+  frameRate: 10,
+  gizmoHelper: "hide",
+  grain: "off",
+  lightType: "env",
+  pixelDensity: 1.3,
+  positionX: 0,
+  positionY: 0,
+  positionZ: 0,
+  range: "disabled",
+  rangeEnd: 40,
+  rangeStart: 0,
+  reflection: 0.5,
+  rotationX: 0,
+  rotationY: 0,
+  rotationZ: 140,
+  shader: "defaults",
+  type: "sphere",
+  uAmplitude: 4.9,
+  uDensity: 2.3,
+  uFrequency: 5.5,
+  uSpeed: 0.1,
+  uStrength: 0.7,
+  uTime: 0,
+  wireframe: false,
+  zoomOut: true
+}} />
           </ShaderGradientCanvas>
           {/* Dark overlay to ensure white text remains readable over the bright gradient */}
           <div className="absolute inset-0 bg-slate-dark/30 mix-blend-multiply" />
@@ -112,7 +153,7 @@ export default function RegisterPage() {
           <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-3 px-3 py-1.5 rounded-full border border-clay/30 bg-clay/10 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-clay animate-pulse" />
             <span className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-clay-deep">
-              Smriti Intelligence
+              Smriti
             </span>
           </motion.div>
           <motion.h2 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[56px] leading-[1.05] tracking-tight text-white mb-6">
@@ -256,7 +297,7 @@ export default function RegisterPage() {
               disabled={loading}
               whileHover={!loading ? hoverScale : undefined}
               whileTap={!loading ? tapScale : undefined}
-              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-4 rounded-full hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
+              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-4 rounded-xl hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
             >
               {loading ? "Creating your account…" : "Create account"}
             </motion.button>

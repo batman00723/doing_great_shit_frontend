@@ -77,8 +77,8 @@ export default function Home() {
             </span>
           </div>
           <h2 className="font-anthropic-serif text-[60px] md:text-[120px] leading-[1.1] tracking-tighter text-white mb-12">
-            Ready to remember <br/> 
-            <em className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-clay-light to-manilla pr-2">everything?</em>
+            Ready to win <br/> 
+            <em className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-clay-light to-manilla pr-2">every deal?</em>
           </h2>
           <p className="font-anthropic-sans text-[18px] md:text-[22px] text-white/50 max-w-[600px] mb-20">
             Stop writing things down on sticky notes. Let the robots do the administrative heavy lifting.
