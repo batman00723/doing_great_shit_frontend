@@ -247,7 +247,7 @@ export default function LoginPage() {
               disabled={loading}
               whileHover={!loading ? hoverScale : undefined}
               whileTap={!loading ? tapScale : undefined}
-              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-4 rounded-xl hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
+              className="w-full bg-slate-dark text-white font-anthropic-sans font-medium text-[15px] py-3 rounded-[10px] hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-sm"
             >
               {loading ? "Signing in…" : "Sign in to workspace"}
             </motion.button>

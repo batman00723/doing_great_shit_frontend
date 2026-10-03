@@ -11,9 +11,9 @@ import {
 } from "@/components/landing/AnimatedSections";
 
 import { HeroSection } from "@/components/landing/HeroSection";
-import { PremiumBento } from "@/components/landing/PremiumBento";
 import { PremiumFeatures } from "@/components/landing/PremiumFeatures";
 import { ShaderBackground } from "@/components/landing/ShaderBackground";
+
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -48,8 +48,9 @@ export default function Home() {
 
       {/* Wrapper for continuous Shader Background */}
       <div className="w-full relative">
-        <ShaderBackground />
         
+        
+        <ShaderBackground />
         {/* 2. Hero Section - Anthropic Editorial */}
         <HeroSection />
 
@@ -57,17 +58,26 @@ export default function Home() {
         <PremiumFeatures />
       </div>
 
-      {/* 4. "Why Smriti?" Section (Refined Bento) */}
-      <PremiumBento />
 
       {/* 5. Footer Section - Million Bucks Tier */}
       <footer className="w-full bg-[#0a0a09] pt-[160px] pb-0 mt-12 relative z-10 overflow-hidden rounded-t-[40px] md:rounded-t-[80px]">
+        {/* Arjuna Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/arjuna.png"
+            alt="Arjuna"
+            fill
+            className="object-cover object-top opacity-30 dark:opacity-[0.25] saturate-50 mix-blend-lighten"
+            priority
+          />
+          {/* Fades only the bottom and sides, leaving the top fully visible */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a09] via-[#0a0a09]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a09] via-transparent to-[#0a0a09]" />
+        </div>
+
         {/* Ambient Underglow & Light beams */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(230,120,90,0.15)_0%,rgba(0,0,0,0)_60%)] pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-[radial-gradient(ellipse_at_bottom,rgba(200,200,200,0.05)_0%,rgba(0,0,0,0)_70%)] pointer-events-none" />
-        
-        {/* Subtle grid mesh */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_0%,#000_20%,transparent_100%)] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(230,120,90,0.15)_0%,rgba(0,0,0,0)_60%)] pointer-events-none z-10" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-[radial-gradient(ellipse_at_bottom,rgba(200,200,200,0.05)_0%,rgba(0,0,0,0)_70%)] pointer-events-none z-10" />
 
         <FadeOnScroll className="w-full max-w-[1280px] mx-auto relative z-10 flex flex-col items-center text-center mb-[160px] px-6">
           <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
@@ -163,3 +173,4 @@ export default function Home() {
     </main>
   );
 }
+

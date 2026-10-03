@@ -83,7 +83,7 @@ function DeckPaper({ children, rest, hover }: { children: React.ReactNode, rest:
         rest: { ...rest, boxShadow: "0 20px 40px rgba(0,0,0,0.05)", transition: { type: "spring", stiffness: 350, damping: 30 } },
         hover: { ...hover, boxShadow: "0 40px 80px rgba(0,0,0,0.15)", transition: { type: "spring", stiffness: 350, damping: 30 } }
       }}
-      className="absolute w-[90%] sm:w-[75%] max-w-[800px] aspect-[16/11] rounded-[24px] border border-stone/20 dark:border-white/10 bg-white/95 dark:bg-[#141414]/95 backdrop-blur-3xl overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu transition-colors duration-500"
+      className="absolute w-[90%] sm:w-[75%] max-w-[800px] aspect-[16/9.9] rounded-[24px] border border-stone/20 dark:border-white/10 bg-white/95 dark:bg-[#141414]/95 backdrop-blur-3xl overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu transition-colors duration-500"
     >
        <div className="h-8 sm:h-10 border-b border-stone/10 dark:border-white/10 bg-white/40 dark:bg-white/5 flex items-center px-4 gap-2 shrink-0 backdrop-blur-md transition-colors duration-500">
           <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
@@ -202,72 +202,73 @@ function StickyNewspaperStack() {
     offset: ["start start", "end end"]
   });
 
-  // Paper 1 (Top) flies up and fades out between 0% and 33% of scroll
-  const p1Y = useTransform(scrollYProgress, [0, 0.33], [0, -1000]);
-  const p1Rotate = useTransform(scrollYProgress, [0, 0.33], [0, -10]);
-  const p1Opacity = useTransform(scrollYProgress, [0.2, 0.33], [1, 0]);
+  // Paper 1 (Top) leaves
+  const p1Y = useTransform(scrollYProgress, [0, 0.25], [0, -1000]);
+  const p1Rotate = useTransform(scrollYProgress, [0, 0.25], [0, -10]);
+  const p1Opacity = useTransform(scrollYProgress, [0.15, 0.25], [1, 0]);
 
-  // Paper 2 (Middle) flies up and fades out between 33% and 66% of scroll
-  const p2Y = useTransform(scrollYProgress, [0.33, 0.66], [0, -1000]);
-  const p2Rotate = useTransform(scrollYProgress, [0.33, 0.66], [0, 10]);
-  const p2Opacity = useTransform(scrollYProgress, [0.5, 0.66], [1, 0]);
+  // Paper 2 entrance & leave
+  const p2Scale = useTransform(scrollYProgress, [0, 0.25], [0.95, 1]);
+  const p2BaseRotate = useTransform(scrollYProgress, [0, 0.25], [-2, 0]);
+  const p2Y = useTransform(scrollYProgress, [0.33, 0.58], [0, -1000]);
+  const p2Rotate = useTransform(scrollYProgress, [0.33, 0.58], [0, 10]);
+  const p2Opacity = useTransform(scrollYProgress, [0.48, 0.58], [1, 0]);
   
-  // Paper 2 entrance scale/rotate (scales up as Paper 1 leaves)
-  const p2Scale = useTransform(scrollYProgress, [0, 0.33], [0.95, 1]);
-  const p2BaseRotate = useTransform(scrollYProgress, [0, 0.33], [-2, 0]);
+  // Paper 3 entrance & leave
+  const p3Scale = useTransform(scrollYProgress, [0.33, 0.58], [0.9, 1]);
+  const p3BaseRotate = useTransform(scrollYProgress, [0.33, 0.58], [2, 0]);
+  const p3Y = useTransform(scrollYProgress, [0.66, 0.91], [0, -1000]);
+  const p3Rotate = useTransform(scrollYProgress, [0.66, 0.91], [0, -10]);
+  const p3Opacity = useTransform(scrollYProgress, [0.81, 0.91], [1, 0]);
 
-  // Paper 3 (Bottom) entrance scale/rotate (scales up as Paper 2 leaves)
-  const p3Scale = useTransform(scrollYProgress, [0.33, 0.66], [0.9, 1]);
-  const p3BaseRotate = useTransform(scrollYProgress, [0.33, 0.66], [2, 0]);
+  // Paper 4 (Bottom) entrance
+  const p4Scale = useTransform(scrollYProgress, [0.66, 0.91], [0.85, 1]);
+  const p4BaseRotate = useTransform(scrollYProgress, [0.66, 0.91], [-2, 0]);
 
   return (
-    <div ref={containerRef} className="w-full h-[300vh] relative z-20 mt-12 sm:mt-24">
+    <div ref={containerRef} className="w-full h-[400vh] relative z-20 mt-12 sm:mt-24">
       <div className="sticky top-0 w-full h-screen flex justify-center items-center overflow-hidden px-6 perspective-[2000px]">
         
-        <div className="relative w-full max-w-[900px] aspect-[16/11] max-h-[70vh] flex justify-center items-center">
+        <div className="relative w-full max-w-[1000px] aspect-[16/9.9] max-h-[80vh] flex justify-center items-center">
           
-          {/* Paper 3 (Bottom - Insights) */}
+          {/* Paper 4 (Bottom) */}
           <motion.div
-            style={{ scale: p3Scale, rotate: p3BaseRotate, zIndex: 10 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 transition-colors duration-500 bg-white/95 dark:bg-[#141414]/95 transition-colors duration-500 backdrop-blur-3xl overflow-hidden flex flex-col ring-1 ring-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu"
+            style={{ scale: p4Scale, rotate: p4BaseRotate, zIndex: 10 }}
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu overflow-hidden bg-black"
           >
-             <div className="h-8 sm:h-10 border-b border-stone/10 dark:border-white/10 transition-colors duration-500 bg-white/40 dark:bg-white/5 transition-colors duration-500 flex items-center px-4 gap-2 shrink-0 backdrop-blur-md">
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-             </div>
-             <MockupInsights />
+            <Image src="/images/hero-img-4.png" alt="Dashboard 4" fill className="object-cover" />
           </motion.div>
 
-          {/* Paper 2 (Middle - Actions) */}
+          {/* Paper 3 */}
           <motion.div
-            style={{ y: p2Y, opacity: p2Opacity, scale: p2Scale, zIndex: 20 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 transition-colors duration-500 bg-white/95 dark:bg-[#141414]/95 transition-colors duration-500 backdrop-blur-3xl overflow-hidden flex flex-col ring-1 ring-black/5 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom"
+            style={{ y: p3Y, opacity: p3Opacity, scale: p3Scale, zIndex: 20 }}
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-black"
           >
-             {/* We combine the base entrance rotation and the exit rotation */}
-             <motion.div style={{ rotate: p2BaseRotate, width: "100%", height: "100%" }}>
-               <motion.div style={{ rotate: p2Rotate, width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-                 <div className="h-8 sm:h-10 border-b border-stone/10 dark:border-white/10 transition-colors duration-500 bg-white/40 dark:bg-white/5 transition-colors duration-500 flex items-center px-4 gap-2 shrink-0 backdrop-blur-md">
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                 </div>
-                 <MockupActions />
+             <motion.div style={{ rotate: p3BaseRotate, width: "100%", height: "100%" }}>
+               <motion.div style={{ rotate: p3Rotate, width: "100%", height: "100%" }}>
+                 <Image src="/images/hero-img-3.png" alt="Dashboard 3" fill className="object-cover" />
                </motion.div>
              </motion.div>
           </motion.div>
 
-          {/* Paper 1 (Top - Transcript) */}
+          {/* Paper 2 */}
           <motion.div
-            style={{ y: p1Y, rotate: p1Rotate, opacity: p1Opacity, zIndex: 30 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 transition-colors duration-500 bg-white/95 dark:bg-[#141414]/95 transition-colors duration-500 backdrop-blur-3xl overflow-hidden flex flex-col ring-1 ring-black/5 shadow-[0_40px_80px_rgba(0,0,0,0.15)] transform-gpu origin-bottom"
+            style={{ y: p2Y, opacity: p2Opacity, scale: p2Scale, zIndex: 30 }}
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-black"
           >
-             <div className="h-8 sm:h-10 border-b border-stone/10 dark:border-white/10 transition-colors duration-500 bg-white/40 dark:bg-white/5 transition-colors duration-500 flex items-center px-4 gap-2 shrink-0 backdrop-blur-md">
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-                <div className="w-2.5 h-2.5 rounded-full bg-stone/20" />
-             </div>
-             <MockupTranscript />
+             <motion.div style={{ rotate: p2BaseRotate, width: "100%", height: "100%" }}>
+               <motion.div style={{ rotate: p2Rotate, width: "100%", height: "100%" }}>
+                 <Image src="/images/hero-img-1.png" alt="Dashboard 2" fill className="object-cover" />
+               </motion.div>
+             </motion.div>
+          </motion.div>
+
+          {/* Paper 1 (Top) */}
+          <motion.div
+            style={{ y: p1Y, rotate: p1Rotate, opacity: p1Opacity, zIndex: 40 }}
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.15)] transform-gpu origin-bottom overflow-hidden bg-black"
+          >
+             <Image src="/images/hero-img-2.png" alt="Dashboard 1" fill className="object-cover" />
           </motion.div>
 
         </div>
@@ -275,192 +276,3 @@ function StickyNewspaperStack() {
     </div>
   );
 }
-
-const MockupTranscript = () => (
-  <motion.div 
-    key="transcript"
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.3 }}
-    className="flex-1 p-6 sm:p-10 flex flex-col gap-6 bg-[#fdfaf6]/60 dark:bg-[#141414]/90 transition-colors duration-500 relative w-full h-full"
-  >
-    {/* Background Grid Pattern */}
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
-
-    <div className="flex items-center justify-between border-b border-stone/20 dark:border-white/10 transition-colors duration-500 pb-5">
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 transition-colors duration-500 border border-green-200 dark:border-green-800/30 transition-colors duration-500 text-green-700 dark:text-green-400 transition-colors duration-500 rounded text-[9px] font-bold uppercase tracking-[0.15em]">Completed</span>
-          <span className="font-anthropic-sans text-[11px] text-slate-dark/50 dark:text-white/50 transition-colors duration-500 uppercase tracking-widest">Oct 14, 2026</span>
-        </div>
-        <h2 className="font-anthropic-serif text-[28px] font-semibold tracking-tight text-slate-dark dark:text-white transition-colors duration-500">Q4 Architecture Sync</h2>
-      </div>
-      <div className="hidden sm:flex items-center gap-3">
-        <div className="px-5 py-2 bg-white dark:bg-[#1a1a1a] transition-colors duration-500 border border-stone/30 dark:border-white/20 transition-colors duration-500 rounded-full font-anthropic-sans text-[12px] font-semibold text-slate-dark dark:text-white transition-colors duration-500 shadow-sm hover:shadow-md transition-shadow cursor-default">
-          Export Report
-        </div>
-        <div className="w-9 h-9 rounded-full bg-slate-dark text-white flex items-center justify-center shadow-md">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
-        </div>
-      </div>
-    </div>
-
-    <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 mt-2">
-      <div className="sm:col-span-8 flex flex-col gap-5">
-        <h3 className="font-anthropic-sans text-[11px] font-bold text-slate-dark/50 dark:text-white/50 transition-colors duration-500 uppercase tracking-[0.15em]">Live Transcript Extract</h3>
-        
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-dark to-slate-medium text-white flex items-center justify-center font-anthropic-sans font-bold text-[10px] shrink-0 shadow-sm">S</div>
-            <div className="bg-white dark:bg-[#1a1a1a] transition-colors duration-500 p-4 rounded-2xl rounded-tl-[4px] shadow-sm border border-stone/20 dark:border-white/10 transition-colors duration-500 font-anthropic-serif text-[14px] leading-[1.6] text-slate-dark dark:text-white transition-colors duration-500">
-              We need to ensure the new cluster can handle 10x the throughput during Black Friday. Are we aligned on upgrading the database tiers?
-            </div>
-          </div>
-          
-          <div className="flex gap-3 flex-row-reverse">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-clay to-clay-deep text-white flex items-center justify-center font-anthropic-sans font-bold text-[10px] shrink-0 shadow-sm">C</div>
-            <div className="bg-slate-dark p-4 rounded-2xl rounded-tr-[4px] shadow-md border border-black text-white font-anthropic-serif text-[14px] leading-[1.6]">
-              Yes, completely aligned. <span className="bg-clay/40 px-1.5 py-0.5 rounded text-white font-medium">Let's set a follow-up for next Tuesday to review the stress test results.</span>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-dark to-slate-medium text-white flex items-center justify-center font-anthropic-sans font-bold text-[10px] shrink-0 shadow-sm">S</div>
-            <div className="bg-white dark:bg-[#1a1a1a] transition-colors duration-500 p-4 rounded-2xl rounded-tl-[4px] shadow-sm border border-stone/20 dark:border-white/10 transition-colors duration-500 font-anthropic-serif text-[14px] leading-[1.6] text-slate-dark dark:text-white transition-colors duration-500">
-              Perfect. I'll have the infrastructure team send over the benchmarks before then.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="sm:col-span-4 flex flex-col gap-5">
-        <div className="w-full bg-white dark:bg-[#1a1a1a] transition-colors duration-500 rounded-[20px] border border-stone/30 dark:border-white/20 transition-colors duration-500 p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-red-100 dark:bg-red-900/40 transition-colors duration-500 rounded-full blur-2xl -mr-4 -mt-4 pointer-events-none" />
-          <h4 className="font-anthropic-sans text-[10px] font-bold text-slate-dark dark:text-white transition-colors duration-500 uppercase tracking-[0.15em] mb-4">Detected Action</h4>
-          <div className="flex items-start gap-2.5 p-3 bg-[#fff9f9] dark:bg-red-950/20 transition-colors duration-500 text-[#902525] dark:text-red-300 transition-colors duration-500 rounded-xl text-[12px] font-medium border border-[#f0d4d4] dark:border-red-900/40 transition-colors duration-500 leading-snug">
-            <div className="w-2 h-2 rounded-full bg-red-500 mt-1 shrink-0" />
-            Review stress test results with client next Tuesday
-          </div>
-        </div>
-
-        <div className="w-full bg-white dark:bg-[#1a1a1a] transition-colors duration-500 rounded-[20px] border border-stone/30 dark:border-white/20 transition-colors duration-500 p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-green-100 dark:bg-green-900/30 transition-colors duration-500 rounded-full blur-2xl -mr-4 -mt-4 pointer-events-none" />
-          <h4 className="font-anthropic-sans text-[10px] font-bold text-slate-dark dark:text-white transition-colors duration-500 uppercase tracking-[0.15em] mb-4">Key Sentiment</h4>
-          <div className="w-full h-2 bg-stone/20 rounded-full mb-3 overflow-hidden">
-            <div className="w-[85%] h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" />
-          </div>
-          <div className="flex justify-between items-end font-anthropic-sans text-[11px] font-bold uppercase tracking-wide">
-            <span className="text-slate-dark/40">Negative</span>
-            <div className="flex flex-col items-end gap-0.5">
-               <span className="text-green-600 dark:text-green-400 transition-colors duration-500 text-[18px] font-black leading-none">85%</span>
-               <span className="text-green-700 dark:text-green-400 transition-colors duration-500/60">Positive</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
-
-const MockupInsights = () => (
-  <motion.div 
-    key="insights"
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.3 }}
-    className="flex-1 p-6 sm:p-10 flex flex-col gap-6 bg-[#fdfaf6]/60 dark:bg-[#141414]/90 transition-colors duration-500 relative w-full h-full"
-  >
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
-
-    <div className="flex items-center justify-between border-b border-stone/20 dark:border-white/10 transition-colors duration-500 pb-5">
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <span className="px-2 py-0.5 bg-blue-100 border border-blue-200 text-blue-700 dark:text-blue-400 transition-colors duration-500 rounded text-[9px] font-bold uppercase tracking-[0.15em]">Global</span>
-          <span className="font-anthropic-sans text-[11px] text-slate-dark/50 dark:text-white/50 transition-colors duration-500 uppercase tracking-widest">Customer Base</span>
-        </div>
-        <h2 className="font-anthropic-serif text-[28px] font-semibold tracking-tight text-slate-dark dark:text-white transition-colors duration-500">Portfolio Insights</h2>
-      </div>
-    </div>
-
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {[ 
-         { label: "Total Meetings", val: "1,204", color: "text-slate-dark dark:text-white transition-colors duration-500" },
-         { label: "Avg Sentiment", val: "8.4", sub: "/ 10", color: "text-green-600 dark:text-green-400 transition-colors duration-500" },
-         { label: "Action Items Pending", val: "32", color: "text-clay-deep" }
-       ].map((m, i) => (
-        <div key={i} className="bg-white dark:bg-[#1a1a1a] transition-colors duration-500 border border-stone/20 dark:border-white/10 transition-colors duration-500 rounded-2xl p-5 shadow-sm">
-          <h4 className="font-anthropic-sans text-[10px] font-bold text-slate-dark/50 dark:text-white/50 transition-colors duration-500 uppercase tracking-widest mb-3">{m.label}</h4>
-          <div className={`font-anthropic-serif text-[32px] leading-none ${m.color}`}>
-             {m.val} {m.sub && <span className="text-[16px] text-slate-dark/40">{m.sub}</span>}
-          </div>
-        </div>
-      ))}
-    </div>
-
-    <div className="flex-1 w-full bg-white dark:bg-[#1a1a1a] transition-colors duration-500 border border-stone/20 dark:border-white/10 transition-colors duration-500 rounded-2xl p-6 shadow-sm mt-2 flex flex-col min-h-[200px]">
-       <h4 className="font-anthropic-sans text-[12px] font-bold text-slate-dark dark:text-white transition-colors duration-500 mb-6">Engagement Trends</h4>
-       <div className="flex-1 flex items-end gap-2 sm:gap-4 h-full">
-          {[40, 60, 45, 80, 50, 90, 75, 100, 85, 60, 95].map((h, i) => (
-             <div key={i} className="flex-1 bg-gradient-to-t from-clay/20 to-clay hover:from-clay/40 transition-colors rounded-t-md relative group h-full flex flex-col justify-end">
-               <div className="w-full rounded-t-md bg-clay transition-all duration-500" style={{ height: `${h}%` }}>
-                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-slate-dark text-white text-[10px] font-bold px-2 py-1 rounded transition-opacity pointer-events-none">
-                   {h * 12}
-                 </div>
-               </div>
-             </div>
-          ))}
-       </div>
-    </div>
-  </motion.div>
-);
-
-const MockupActions = () => (
-  <motion.div 
-    key="actions"
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.3 }}
-    className="flex-1 p-6 sm:p-10 flex flex-col gap-6 bg-[#fdfaf6]/60 dark:bg-[#141414]/90 transition-colors duration-500 relative w-full h-full"
-  >
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
-
-    <div className="flex items-center justify-between border-b border-stone/20 dark:border-white/10 transition-colors duration-500 pb-5">
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <span className="px-2 py-0.5 bg-clay/20 border border-clay/30 text-clay-deep rounded text-[9px] font-bold uppercase tracking-[0.15em]">Automated</span>
-          <span className="font-anthropic-sans text-[11px] text-slate-dark/50 dark:text-white/50 transition-colors duration-500 uppercase tracking-widest">Workflow Engine</span>
-        </div>
-        <h2 className="font-anthropic-serif text-[28px] font-semibold tracking-tight text-slate-dark dark:text-white transition-colors duration-500">Pending Actions</h2>
-      </div>
-    </div>
-
-    <div className="flex flex-col gap-3">
-      {[
-        { label: "Send follow-up email to Acme Corp", status: "Sent via Gmail", checked: true, color: "green" },
-        { label: "Update Salesforce Opportunity (Stage: Negotiation)", status: "Syncing...", checked: true, color: "blue", spinner: true },
-        { label: "Schedule Q4 technical review with Alex", status: "Awaiting approval", checked: false, color: "stone" },
-        { label: "Draft legal summary for compliance team", status: "Draft created", checked: true, color: "green" },
-      ].map((act, i) => (
-        <div key={i} className="flex items-center justify-between bg-white dark:bg-[#1a1a1a] transition-colors duration-500 border border-stone/20 dark:border-white/10 transition-colors duration-500 p-4 rounded-xl shadow-sm hover:shadow-md transition-all">
-           <div className="flex items-center gap-4">
-              <div className={`w-6 h-6 rounded-md border flex items-center justify-center ${act.checked ? 'bg-slate-dark border-slate-dark text-white' : 'border-stone/40 bg-stone/5'}`}>
-                {act.checked && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-              </div>
-              <span className={`font-anthropic-sans text-[13px] sm:text-[14px] ${act.checked && !act.spinner ? 'text-slate-dark/50 dark:text-white/50 transition-colors duration-500 line-through' : 'text-slate-dark dark:text-white transition-colors duration-500 font-medium'}`}>{act.label}</span>
-           </div>
-           <div className={`hidden sm:flex px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider items-center gap-2 ${
-             act.color === 'green' ? 'bg-green-100 dark:bg-green-900/30 transition-colors duration-500 text-green-700 dark:text-green-400 transition-colors duration-500' :
-             act.color === 'blue' ? 'bg-blue-100 text-blue-700 dark:text-blue-400 transition-colors duration-500' :
-             'bg-stone/20 text-slate-dark/60'
-           }`}>
-              {act.spinner && <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />}
-              {act.status}
-           </div>
-        </div>
-      ))}
-    </div>
-  </motion.div>
-);

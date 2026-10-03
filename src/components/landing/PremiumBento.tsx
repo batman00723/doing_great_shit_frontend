@@ -14,7 +14,7 @@ function TechnicalBentoCard({
 }: { 
   children: React.ReactNode, 
   className?: string, 
-  visual: React.ElementType, 
+  visual: any, 
   tagText: string, 
   tagColor: string 
 }) {

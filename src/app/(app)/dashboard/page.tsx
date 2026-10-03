@@ -65,7 +65,7 @@ function AnimatedCounter({ value, loading }: { value: number; loading: boolean }
     return () => { controls.stop(); unsubscribe(); };
   }, [value, loading, count, rounded]);
 
-  if (loading) return <span className="text-teal-100/20">—</span>;
+  if (loading) return <span className="text-orange-100/20">—</span>;
   return <>{display}</>;
 }
 
@@ -238,44 +238,44 @@ export default function DashboardPage() {
   const firstName = user?.salesperson_name?.split(" ")[0] || "";
 
   // Ultra-premium input classes
-  const inputCls = "w-full bg-teal-900/10 border border-teal-900/30 text-white font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-[#091114] focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/10 transition-all placeholder:text-teal-100/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
-  const selectCls = "w-full bg-teal-900/10 border border-teal-900/30 text-white font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-[#091114] focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/10 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
+  const inputCls = "w-full bg-white border border-slate-200 text-slate-900 font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-slate-400 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
+  const selectCls = "w-full bg-white border border-slate-200 text-slate-900 font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/10 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
 
   return (
-    <div className="w-full max-w-[1080px] mx-auto pb-24">
+    <div className="w-full max-w-[1080px] mx-auto pb-8">
       
       {/* ── HEADER & GREETING ── */}
       <motion.div
         variants={staggerContainerSlow}
         initial="initial"
         animate="animate"
-        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 mt-4"
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 mt-2"
       >
         <div>
-          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-teal-500/10 border border-teal-500/20 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-            <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-400 font-bold">
+          <motion.div variants={fadeInUp} transition={springCalm} className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-orange-50 border border-orange-100 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+            <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-orange-800 font-bold">
               {user?.organisation || "Workspace"}
             </span>
           </motion.div>
-          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[36px] md:text-[56px] tracking-tight leading-[1] text-white">
-            {getGreeting()},<br /><em className="italic font-normal text-teal-100/50">{firstName}.</em>
+          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[36px] md:text-[56px] tracking-tight leading-[1] text-slate-900">
+            {getGreeting()},<br /><em className="italic font-normal text-slate-500">{firstName}.</em>
           </motion.h1>
         </div>
 
         <motion.div variants={fadeInUp} transition={springCalm} className="flex flex-wrap items-center gap-3">
           <Link
             href="/dashboard/chat"
-            className="font-anthropic-sans font-medium text-[13px] border border-teal-900/40 bg-[#091114] text-white px-5 py-2.5 rounded-lg hover:bg-teal-900/40 transition-colors shadow-sm"
+            className="font-anthropic-sans font-medium text-[13px] border border-slate-300 bg-white text-slate-900 px-5 py-2.5 rounded-lg hover:bg-orange-900/40 transition-colors shadow-sm"
           >
             Ask AI
           </Link>
           <button
             onClick={() => { setShowMeetingModal(true); setBotMsg(""); setTranscriptMsg(""); setAudioMsg(""); }}
-            className="group relative inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-teal-600 text-white px-5 py-2.5 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-teal-500 transition-all overflow-hidden"
+            className="group relative inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-black text-white px-5 py-2.5 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)] hover:bg-slate-800 transition-all overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
-              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
               New Meeting
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
@@ -288,18 +288,18 @@ export default function DashboardPage() {
         variants={staggerContainer}
         initial="initial"
         animate="animate"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
       >
         {/* Stat Card 1 */}
-        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-[#091114] border border-teal-900/30 rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(45,212,191,0.15),transparent_60%)] pointer-events-none" />
+        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-white border border-slate-200 rounded-2xl p-5 shadow-sm border border-slate-100 group">
+          <svg className="absolute bottom-0 left-0 w-full h-3/5 opacity-40 pointer-events-none" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0 50 L0 30 Q 25 10, 50 30 T 100 20 L100 50 Z" fill="url(#orange-grad)"/><defs><linearGradient id="orange-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f97316"/><stop offset="100%" stopColor="#f97316" stopOpacity="0"/></linearGradient></defs></svg>
           <div className="relative z-10 flex flex-col justify-between h-full">
-            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-teal-100/50 mb-6 flex items-center gap-2">
+            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
               Total Customers
             </p>
             <div className="flex items-end gap-3">
-              <span className="font-anthropic-mono text-[36px] leading-none tracking-tighter text-white">
+              <span className="font-anthropic-mono text-[36px] leading-none tracking-tighter text-slate-900">
                 <AnimatedCounter value={customers.length} loading={statsLoading} />
               </span>
             </div>
@@ -307,15 +307,15 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stat Card 2 */}
-        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-[#091114] border border-teal-900/30 rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] group">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(20,184,166,0.15),transparent_60%)] pointer-events-none" />
+        <motion.div variants={fadeInUp} transition={springCalm} className="relative overflow-hidden bg-white border border-slate-200 rounded-2xl p-5 shadow-sm border border-slate-100 group">
+          <svg className="absolute bottom-0 left-0 w-full h-3/5 opacity-30 pointer-events-none" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0 50 L0 25 Q 20 40, 50 25 T 100 15 L100 50 Z" fill="url(#purple-grad)"/><defs><linearGradient id="purple-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a855f7"/><stop offset="100%" stopColor="#a855f7" stopOpacity="0"/></linearGradient></defs></svg>
           <div className="relative z-10 flex flex-col justify-between h-full">
-            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-teal-100/50 mb-6 flex items-center gap-2">
+            <p className="font-anthropic-sans font-bold text-[10px] uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
               Analyzed Meetings
             </p>
             <div className="flex items-end gap-3">
-              <span className="font-anthropic-mono text-[36px] leading-none tracking-tighter text-white">
+              <span className="font-anthropic-mono text-[36px] leading-none tracking-tighter text-slate-900">
                 <AnimatedCounter value={totalMeetings ?? 0} loading={statsLoading} />
               </span>
             </div>
@@ -325,16 +325,22 @@ export default function DashboardPage() {
         {/* Quick Links */}
         {/* Quick links unpacked */}
         <motion.div variants={fadeInUp} transition={springCalm} className="flex h-full">
-          <Link href="/dashboard/meetings" className="w-full h-full bg-[#091114] border border-teal-900/30 rounded-2xl p-5 flex flex-col justify-between hover:border-teal-500/30 hover:shadow-[0_8px_20px_rgba(13,148,136,0.15)] transition-all group">
-            <svg className="w-6 h-6 text-teal-100/70 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-            <span className="font-anthropic-sans font-medium text-[14px] text-white mt-2">All Meetings</span>
+          <Link href="/dashboard/meetings" className="w-full h-full bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between hover:border-orange-500/30 hover:shadow-[0_8px_20px_rgba(13,148,136,0.15)] transition-all group">
+            <svg className="w-6 h-6 text-slate-600 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <div className="mt-2 flex items-center justify-between w-full">
+              <span className="font-anthropic-sans font-medium text-[14px] text-slate-900">All Meetings</span>
+              <svg className="w-6 h-6 text-slate-900 group-hover:translate-x-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </div>
           </Link>
         </motion.div>
         
         <motion.div variants={fadeInUp} transition={springCalm} className="flex h-full">
-          <Link href="/dashboard/customers" className="w-full h-full bg-[#091114] border border-teal-900/30 rounded-2xl p-5 flex flex-col justify-between hover:border-teal-500/30 hover:shadow-[0_8px_20px_rgba(13,148,136,0.15)] transition-all group">
-            <svg className="w-6 h-6 text-teal-100/70 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            <span className="font-anthropic-sans font-medium text-[14px] text-white mt-2">Customers</span>
+          <Link href="/dashboard/customers" className="w-full h-full bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between hover:border-orange-500/30 hover:shadow-[0_8px_20px_rgba(13,148,136,0.15)] transition-all group">
+            <svg className="w-6 h-6 text-slate-600 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <div className="mt-2 flex items-center justify-between w-full">
+              <span className="font-anthropic-sans font-medium text-[14px] text-slate-900">Customers</span>
+              <svg className="w-6 h-6 text-slate-900 group-hover:translate-x-1 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </div>
           </Link>
         </motion.div>
       </motion.div>
@@ -347,14 +353,14 @@ export default function DashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
       >
         {/* Add Customer Form */}
-        <div className="lg:col-span-2 bg-[#091114] border border-teal-900/30 rounded-2xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center justify-between mb-10 pb-8 border-b border-teal-900/20">
+        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border border-slate-100">
+          <div className="flex items-center justify-between mb-6 pb-6 border-b border-slate-200">
             <div>
-              <h2 className="font-anthropic-serif text-[24px] tracking-tight text-white">Add New Customer</h2>
-              <p className="font-anthropic-sans text-[14px] text-teal-100/50 mt-2 leading-[1.75]">Create a profile to associate meetings and generate insights.</p>
+              <h2 className="font-anthropic-serif text-[24px] tracking-tight text-black">Add New Customer</h2>
+              <p className="font-anthropic-sans text-[14px] text-slate-500 mt-2 leading-[1.75]">Create a profile to associate meetings and generate insights.</p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shadow-sm">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+            <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm cursor-pointer hover:bg-slate-50">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
             </div>
           </div>
 
@@ -373,22 +379,22 @@ export default function DashboardPage() {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleAddCustomer} className="flex flex-col gap-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
+          <form onSubmit={handleAddCustomer} className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div className="flex flex-col gap-2.5">
-                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-teal-100/50">Company Name</label>
+                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Company Name</label>
                 <input required placeholder="e.g. Acme Corp" value={custForm.customer_name} onChange={e => setCustForm({ ...custForm, customer_name: e.target.value })} className={inputCls} />
               </div>
               <div className="flex flex-col gap-2.5">
-                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-teal-100/50">Contact Email</label>
+                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Contact Email</label>
                 <input required type="email" placeholder="contact@acme.com" value={custForm.email} onChange={e => setCustForm({ ...custForm, email: e.target.value })} className={inputCls} />
               </div>
               <div className="flex flex-col gap-2.5">
-                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-teal-100/50">Industry</label>
+                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Industry</label>
                 <input placeholder="e.g. Software" value={custForm.industry} onChange={e => setCustForm({ ...custForm, industry: e.target.value })} className={inputCls} />
               </div>
               <div className="flex flex-col gap-2.5">
-                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-teal-100/50">Status</label>
+                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Status</label>
                 <select value={custForm.status} onChange={e => setCustForm({ ...custForm, status: e.target.value })} className={selectCls}>
                   <option value="Lead">Lead</option>
                   <option value="Active">Active</option>
@@ -396,8 +402,8 @@ export default function DashboardPage() {
                 </select>
               </div>
             </div>
-            <div className="pt-6 mt-4 border-t border-teal-900/20 flex justify-end">
-              <button type="submit" disabled={custLoading} className="font-anthropic-sans font-medium text-[14px] bg-teal-600 text-white px-8 py-3 rounded-[10px] hover:bg-teal-500 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
+            <div className="pt-6 mt-4 border-t border-slate-200 flex justify-end">
+              <button type="submit" disabled={custLoading} className="font-anthropic-sans font-medium text-[14px] bg-black text-white px-8 py-3 rounded-[10px] hover:bg-slate-800 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
                 {custLoading ? "Adding..." : "Add Customer"}
               </button>
             </div>
@@ -405,18 +411,18 @@ export default function DashboardPage() {
         </div>
 
         {/* System Status */}
-        <div className="lg:col-span-1 bg-[#091114] border border-teal-900/30 rounded-2xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col">
-          <h3 className="font-anthropic-mono text-[11px] uppercase tracking-widest text-teal-100/50 mb-10">System Status</h3>
+        <div className="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col">
+          <h3 className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500 mb-10">System Status</h3>
           
-          <div className="flex flex-col gap-8 flex-1">
+          <div className="flex flex-col gap-5 flex-1">
             <div className="flex gap-5 items-start">
               <div className="mt-1 relative flex h-2.5 w-2.5 items-center justify-center shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </div>
               <div>
-                <p className="font-anthropic-sans font-medium text-[14px] text-white leading-snug">Meeting Analysis Engine</p>
-                <p className="font-anthropic-sans text-[13px] text-teal-100/50 mt-1.5">Online • Processing 0 items</p>
+                <p className="font-anthropic-sans font-medium text-[14px] text-black font-semibold leading-snug">Meeting Analysis Engine</p>
+                <p className="font-anthropic-sans text-[13px] text-slate-500 mt-1.5">Online • Processing 0 items</p>
               </div>
             </div>
 
@@ -425,8 +431,8 @@ export default function DashboardPage() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-dark/20"></span>
               </div>
               <div>
-                <p className="font-anthropic-sans font-medium text-[14px] text-white leading-snug">Zoom Bot Fleet</p>
-                <p className="font-anthropic-sans text-[13px] text-teal-100/50 mt-1.5">Idle • Ready for deployment</p>
+                <p className="font-anthropic-sans font-medium text-[14px] text-slate-900 leading-snug">Zoom Bot Fleet</p>
+                <p className="font-anthropic-sans text-[13px] text-slate-500 mt-1.5">Idle • Ready for deployment</p>
               </div>
             </div>
 
@@ -435,14 +441,14 @@ export default function DashboardPage() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-dark/20"></span>
               </div>
               <div>
-                <p className="font-anthropic-sans font-medium text-[14px] text-white leading-snug">Global Memory Vector DB</p>
-                <p className="font-anthropic-sans text-[13px] text-teal-100/50 mt-1.5">Synced • 12ms latency</p>
+                <p className="font-anthropic-sans font-medium text-[14px] text-slate-900 leading-snug">Global Memory Vector DB</p>
+                <p className="font-anthropic-sans text-[13px] text-slate-500 mt-1.5">Synced • 12ms latency</p>
               </div>
             </div>
           </div>
           
-          <div className="mt-8 pt-6 border-t border-teal-900/20">
-            <p className="font-anthropic-mono text-[10px] text-teal-100/30 flex justify-between">
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <p className="font-anthropic-mono text-[10px] text-slate-400 flex justify-between">
               <span>v2.0.4</span>
               <span>us-east-1</span>
             </p>
@@ -468,27 +474,27 @@ export default function DashboardPage() {
               animate="animate"
               exit="exit"
               transition={springCalm}
-              className="bg-[#091114] rounded-3xl w-full max-w-[520px] p-8 shadow-2xl border border-black/[0.08]"
+              className="bg-white rounded-3xl w-full max-w-[520px] p-8 shadow-2xl border border-black/[0.08]"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-teal-900/20">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
                 <div>
-                  <h2 className="font-anthropic-serif text-[22px] tracking-tight text-white">New Meeting</h2>
-                  <p className="font-anthropic-sans text-[13px] text-teal-100/50 mt-1">Import a meeting for analysis.</p>
+                  <h2 className="font-anthropic-serif text-[22px] tracking-tight text-slate-900">New Meeting</h2>
+                  <p className="font-anthropic-sans text-[13px] text-slate-500 mt-1">Import a meeting for analysis.</p>
                 </div>
-                <button onClick={() => setShowMeetingModal(false)} className="w-8 h-8 rounded-full bg-teal-900/10 hover:bg-teal-900/40 flex items-center justify-center text-teal-100/50 hover:text-white transition-colors">
+                <button onClick={() => setShowMeetingModal(false)} className="w-8 h-8 rounded-full bg-white hover:bg-orange-900/40 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
 
-              <div className="flex gap-1 bg-teal-900/10 border border-teal-900/20 rounded-xl p-1 mb-8">
+              <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 mb-8">
                 {([["bot", "🤖 Bot"], ["transcript", "📝 Text"], ["audio", "🎙️ Audio"]] as [MeetingModalTab, string][]).map(([tab, label]) => (
                   <button key={tab} onClick={() => setMeetingTab(tab)}
-                    className={`relative flex-1 font-anthropic-sans text-[13px] font-medium py-2 rounded-lg transition-colors ${meetingTab === tab ? "text-white" : "text-teal-100/50 hover:text-white"}`}>
+                    className={`relative flex-1 font-anthropic-sans text-[13px] font-medium py-2 rounded-lg transition-colors ${meetingTab === tab ? "text-slate-900" : "text-slate-500 hover:text-slate-900"}`}>
                     {meetingTab === tab && (
                       <motion.div
                         layoutId="modal-tab"
-                        className="absolute inset-0 bg-[#091114] shadow-sm border border-teal-900/20 rounded-lg"
+                        className="absolute inset-0 bg-white shadow-sm border border-slate-200 rounded-lg"
                         transition={springCalm}
                       />
                     )}
@@ -501,18 +507,18 @@ export default function DashboardPage() {
                 {meetingTab === "bot" && (
                   <motion.form key="bot" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleDeployBot} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Meeting URL *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Meeting URL *</label>
                       <input required type="url" placeholder="https://zoom.us/j/..." value={botUrl} onChange={e => setBotUrl(e.target.value)} className={inputCls} />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Customer *</label>
                       <select required value={botCustomer} onChange={e => setBotCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
-                    {botMsg && <p className="font-anthropic-sans text-[13px] text-white/80">{botMsg}</p>}
-                    <button type="button" disabled className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-teal-600 text-white px-6 py-3 rounded-xl opacity-50 cursor-not-allowed">
+                    {botMsg && <p className="font-anthropic-sans text-[13px] text-slate-900/80">{botMsg}</p>}
+                    <button type="button" disabled className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-black text-white px-6 py-3 rounded-xl opacity-50 cursor-not-allowed">
                       Bot Deployment (Coming Soon)
                     </button>
                   </motion.form>
@@ -521,19 +527,19 @@ export default function DashboardPage() {
                 {meetingTab === "transcript" && (
                   <motion.form key="transcript" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleTranscript} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Customer *</label>
                       <select required value={transcriptCustomer} onChange={e => setTranscriptCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Raw Transcript *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Raw Transcript *</label>
                       <textarea required rows={5} placeholder="Paste your meeting transcript here…" value={transcript} onChange={e => setTranscript(e.target.value)}
-                        className="w-full bg-teal-900/10 border border-teal-900/30 text-white font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-[#091114] focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/10 transition-all placeholder:text-teal-100/30 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" />
+                        className="w-full bg-white border border-slate-200 text-slate-900 font-anthropic-sans text-[14px] px-4 py-3 rounded-xl outline-none focus:bg-white focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/10 transition-all placeholder:text-slate-400 resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]" />
                     </div>
-                    {transcriptMsg && <p className="font-anthropic-sans text-[13px] text-white/80">{transcriptMsg}</p>}
-                    <button type="submit" disabled={transcriptLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-teal-600 text-white px-6 py-3 rounded-xl hover:bg-teal-500 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
+                    {transcriptMsg && <p className="font-anthropic-sans text-[13px] text-slate-900/80">{transcriptMsg}</p>}
+                    <button type="submit" disabled={transcriptLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-black text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
                       {transcriptLoading ? "Analysing…" : "Analyse Transcript"}
                     </button>
                   </motion.form>
@@ -542,19 +548,19 @@ export default function DashboardPage() {
                 {meetingTab === "audio" && (
                   <motion.form key="audio" variants={fadeInUp} initial="initial" animate="animate" exit="exit" transition={easeSoft} onSubmit={handleAudio} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Customer *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Customer *</label>
                       <select required value={audioCustomer} onChange={e => setAudioCustomer(e.target.value)} className={selectCls}>
                         <option value="">Select customer…</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.customer_name}</option>)}
                       </select>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/50">Audio File *</label>
+                      <label className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500">Audio File *</label>
                       <input ref={audioRef} type="file" accept=".mp3,.wav,.m4a,.ogg" onChange={e => setAudioFile(e.target.files?.[0] || null)}
-                        className="w-full font-anthropic-sans text-[13px] text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:font-medium file:bg-teal-900/20 hover:file:bg-teal-900/40 file:text-white file:cursor-pointer file:transition-colors cursor-pointer border border-teal-900/30 rounded-xl bg-teal-900/10 p-1.5" />
+                        className="w-full font-anthropic-sans text-[13px] text-slate-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:font-medium file:bg-orange-900/20 hover:file:bg-orange-900/40 file:text-slate-900 file:cursor-pointer file:transition-colors cursor-pointer border border-slate-200 rounded-xl bg-white p-1.5" />
                     </div>
-                    {audioMsg && <p className="font-anthropic-sans text-[13px] text-white/80">{audioMsg}</p>}
-                    <button type="submit" disabled={audioLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-teal-600 text-white px-6 py-3 rounded-xl hover:bg-teal-500 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
+                    {audioMsg && <p className="font-anthropic-sans text-[13px] text-slate-900/80">{audioMsg}</p>}
+                    <button type="submit" disabled={audioLoading} className="w-full mt-2 font-anthropic-sans font-medium text-[13px] bg-black text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] disabled:opacity-50">
                       {audioLoading ? "Uploading…" : "Upload & Analyse"}
                     </button>
                   </motion.form>
@@ -567,3 +573,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+
+
+
