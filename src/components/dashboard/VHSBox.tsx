@@ -33,7 +33,7 @@ export function VHSTape({
       >
         {/* We now use the transparent PNG so there is ZERO background or square artifacts */}
         <Image
-          src="/images/vhs-tape-transparent.png"
+          src="/images/vhs-tape-custom.png"
           alt="VHS Tape"
           fill
           className="object-cover pointer-events-none"
@@ -43,21 +43,21 @@ export function VHSTape({
         {/* The Text Overlay (positioned directly over the tape) */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-12 z-10">
             
-            <span className="font-anthropic-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/60 mb-2">
+            <span className="font-anthropic-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-[#1a1a1a]/60 mb-2">
               No.{(index + 1).toString().padStart(3, "0")}
             </span>
             
-            {/* Switched text color to white since the tape is matte black */}
-            <h3 className="font-anthropic-serif text-2xl md:text-3xl text-white/90 text-center leading-snug max-w-[80%] truncate">
+            {/* Switched text color to black */}
+            <h3 className="font-anthropic-serif text-2xl md:text-3xl text-[#1a1a1a]/90 text-center leading-snug max-w-[80%] truncate">
               {title}
             </h3>
             
             <div className="flex items-center gap-4 mt-3">
-              <span className="font-anthropic-sans text-xs md:text-sm text-white/80 font-medium tracking-wide">
+              <span className="font-anthropic-sans text-xs md:text-sm text-[#1a1a1a]/80 font-medium tracking-wide">
                 {customer}
               </span>
-              <span className="text-white/40 text-[10px]">•</span>
-              <span className="font-anthropic-mono text-[10px] md:text-xs text-white/70 uppercase tracking-widest">
+              <span className="text-[#1a1a1a]/40 text-[10px]">•</span>
+              <span className="font-anthropic-mono text-[10px] md:text-xs text-[#1a1a1a]/70 uppercase tracking-widest">
                 {date}
               </span>
             </div>
