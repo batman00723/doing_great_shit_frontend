@@ -167,7 +167,7 @@ export function HeroSection() {
           transition={{ duration: 1, delay: 1, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col sm:flex-row gap-5 items-center mt-2"
         >
-          <MagneticButton href="/register" className="relative group overflow-hidden inline-flex items-center justify-center font-anthropic-sans font-semibold text-[17px] sm:text-[18px] text-white px-12 py-5 sm:py-6 rounded-full bg-gradient-to-b from-[#2e2e2d] to-[#1a1a19] shadow-[0_8px_30px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] border border-[#3e3e3c] hover:shadow-[0_12px_40px_rgba(200,100,80,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:border-clay transition-all duration-500 hover:-translate-y-0.5">
+          <MagneticButton href="/register" className="relative group overflow-hidden inline-flex items-center justify-center font-anthropic-sans font-semibold text-[15px] sm:text-[16px] text-white px-10 py-4 sm:px-12 sm:py-5 rounded-full bg-gradient-to-b from-[#2e2e2d] to-[#1a1a19] shadow-[0_8px_30px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] border border-[#3e3e3c] hover:shadow-[0_12px_40px_rgba(200,100,80,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:border-clay transition-all duration-500 hover:-translate-y-0.5">
             <span className="relative z-10 flex items-center tracking-wide">
               Give it a spin
               <motion.svg
@@ -182,8 +182,8 @@ export function HeroSection() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
           </MagneticButton>
           
-          <MagneticButton href="/login" className="inline-flex items-center justify-center font-anthropic-sans font-semibold text-[17px] sm:text-[18px] text-slate-dark dark:text-white transition-colors duration-500 px-12 py-5 sm:py-6 rounded-full bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white dark:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] hover:bg-white dark:hover:bg-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all duration-500">
-            Hop back in
+          <MagneticButton href="/login" className="inline-flex items-center justify-center font-anthropic-sans font-semibold text-[15px] sm:text-[16px] text-slate-dark dark:text-white transition-colors duration-500 px-10 py-4 sm:px-12 sm:py-5 rounded-full bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white dark:border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1)] hover:bg-white dark:hover:bg-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all duration-500">
+            Let's hop in
           </MagneticButton>
         </motion.div>
       </motion.div>
@@ -234,7 +234,7 @@ function StickyNewspaperStack() {
           {/* Paper 4 (Bottom) */}
           <motion.div
             style={{ scale: p4Scale, rotate: p4BaseRotate, zIndex: 10 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu overflow-hidden bg-black"
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu overflow-hidden bg-transparent"
           >
             <Image src="/images/hero-img-4.png" alt="Dashboard 4" fill className="object-cover" />
           </motion.div>
@@ -242,7 +242,7 @@ function StickyNewspaperStack() {
           {/* Paper 3 */}
           <motion.div
             style={{ y: p3Y, opacity: p3Opacity, scale: p3Scale, zIndex: 20 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-black"
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-transparent"
           >
              <motion.div style={{ rotate: p3BaseRotate, width: "100%", height: "100%" }}>
                <motion.div style={{ rotate: p3Rotate, width: "100%", height: "100%" }}>
@@ -254,7 +254,7 @@ function StickyNewspaperStack() {
           {/* Paper 2 */}
           <motion.div
             style={{ y: p2Y, opacity: p2Opacity, scale: p2Scale, zIndex: 30 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-black"
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.12)] transform-gpu origin-bottom overflow-hidden bg-transparent"
           >
              <motion.div style={{ rotate: p2BaseRotate, width: "100%", height: "100%" }}>
                <motion.div style={{ rotate: p2Rotate, width: "100%", height: "100%" }}>
@@ -266,7 +266,7 @@ function StickyNewspaperStack() {
           {/* Paper 1 (Top) */}
           <motion.div
             style={{ y: p1Y, rotate: p1Rotate, opacity: p1Opacity, zIndex: 40 }}
-            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.15)] transform-gpu origin-bottom overflow-hidden bg-black"
+            className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.15)] transform-gpu origin-bottom overflow-hidden bg-transparent"
           >
              <Image src="/images/hero-img-2.png" alt="Dashboard 1" fill className="object-cover" />
           </motion.div>

@@ -50,7 +50,7 @@ function HorizontalStackCard({
         </div>
 
         {/* The Image */}
-        <div className="relative w-full aspect-video rounded-xl sm:rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/5">
+        <div className="relative w-full aspect-video rounded-xl sm:rounded-3xl overflow-hidden bg-transparent border border-slate-200/50 dark:bg-[#0a0a0a] dark:border-white/5 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
           <Image 
             src={feature.src} 
             alt={feature.title} 
