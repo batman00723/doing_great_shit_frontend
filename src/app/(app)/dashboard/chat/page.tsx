@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import {
  fadeInUp,
@@ -449,8 +450,8 @@ export default function ChatPage() {
  </div>
  ) : (
  <div className="flex gap-4 max-w-[95%]">
- <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-900 to-slate-700 flex items-center justify-center shrink-0 shadow-md border border-slate-800/50">
- <span className="font-anthropic-serif italic text-white text-[18px] pr-0.5 pb-0.5 leading-none">S</span>
+ <div className="w-9 h-9 rounded-full shrink-0 shadow-md border border-slate-200 overflow-hidden relative">
+ <Image src="/chatbot.webp" alt="AI Avatar" fill className="object-cover" />
  </div>
  <div className="flex flex-col items-start w-full mt-2">
  {m.pending ? (
