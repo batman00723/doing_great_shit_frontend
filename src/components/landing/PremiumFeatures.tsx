@@ -29,7 +29,7 @@ function HorizontalStackCard({
   const x = useTransform(
     scrollYProgress,
     [start, end],
-    index === 0 ? ["0vw", "0vw"] : ["100vw", "0vw"]
+    index === 0 ? ["0vw", "0vw"] : [index % 2 === 0 ? "-100vw" : "100vw", "0vw"]
   );
 
   return (

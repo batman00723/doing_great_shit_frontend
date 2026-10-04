@@ -80,15 +80,15 @@ export default function Home() {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-[radial-gradient(ellipse_at_bottom,rgba(200,200,200,0.05)_0%,rgba(0,0,0,0)_70%)] pointer-events-none z-10" />
 
         <FadeOnScroll className="w-full max-w-[1280px] mx-auto relative z-10 flex flex-col items-center text-center mb-[160px] px-6">
-          <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
-            <span className="w-2 h-2 rounded-full bg-clay animate-pulse" />
-            <span className="font-anthropic-sans text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 mb-8 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+            <span className="font-anthropic-mono text-[10px] font-bold uppercase tracking-widest text-white/60">
               Get Started
             </span>
           </div>
           <h2 className="font-anthropic-serif text-[60px] md:text-[120px] leading-[1.1] tracking-tighter text-white mb-12">
             Ready to win <br/> 
-            <em className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-clay-light to-manilla pr-2">every deal?</em>
+            <em className="italic font-medium text-white">every deal?</em>
           </h2>
           <p className="font-anthropic-sans text-[18px] md:text-[22px] text-white/50 max-w-[600px] mb-20">
             Stop writing things down on sticky notes. Let the robots do the administrative heavy lifting.
@@ -156,7 +156,7 @@ export default function Home() {
         
         {/* Massive Typography & Bottom Bar */}
         <div className="w-full mt-24 relative flex flex-col items-center pb-[80px] md:pb-[100px]">
-          <div className="font-anthropic-sans font-black text-[22vw] leading-none tracking-tighter text-white/[0.03] select-none pointer-events-none w-full text-center">
+          <div className="font-anthropic-sans font-bold text-[22vw] leading-none tracking-tighter text-white/[0.03] select-none pointer-events-none w-full text-center">
             SMRITI
           </div>
           
@@ -173,4 +173,5 @@ export default function Home() {
     </main>
   );
 }
+
 
