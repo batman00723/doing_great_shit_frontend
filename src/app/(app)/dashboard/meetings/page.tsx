@@ -147,7 +147,7 @@ export default function AllMeetingsPage() {
           hidden: {},
           visible: { transition: { staggerChildren: 0.06 } },
         }}
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-12"
       >
         <AnimatePresence>
           {filteredMeetings.map((m, i) => (
@@ -181,4 +181,5 @@ export default function AllMeetingsPage() {
     </div>
   );
 }
+
 

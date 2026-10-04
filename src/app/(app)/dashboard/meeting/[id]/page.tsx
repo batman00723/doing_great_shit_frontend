@@ -1,6 +1,5 @@
 "use client";
 
-
 import { use, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -25,6 +24,7 @@ export default function MeetingReportPage({
   const router = useRouter();
 
   const [initialHtml, setInitialHtml] = useState<string>("");
+  const [meetingDetails, setMeetingDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
@@ -34,13 +34,17 @@ export default function MeetingReportPage({
   const [isSending, setIsSending] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
+  // Find & Replace
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+
   // Feedback
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     if (!meetingId) return;
 
-    const fetchReport = async () => {
+    const fetchData = async () => {
       const token = getToken();
       if (!token) {
         setError("Not logged in.");
@@ -49,16 +53,26 @@ export default function MeetingReportPage({
       }
 
       try {
-        const res = await fetch(`${BASE}/analyse/${meetingId}/report`, {
+        const reportRes = await fetch(`${BASE}/analyse/${meetingId}/report`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = await res.json();
-        
-        if (res.ok) {
-          setInitialHtml(data.html || "<p>No report content available.</p>");
+        const meetingsRes = await fetch(`${BASE}/analyse/meetings`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (reportRes.ok && meetingsRes.ok) {
+          const reportData = await reportRes.json();
+          const meetingsData = await meetingsRes.json();
+          
+          setInitialHtml(reportData.html || "<p>No report content available.</p>");
+          
+          const meeting = meetingsData.find((m: any) => m.meeting_id === Number(meetingId));
+          if (meeting) {
+            setMeetingDetails(meeting);
+          }
         } else {
-          setError(data?.detail || "Failed to load the report.");
+          setError("Failed to load the report or meeting details.");
         }
       } catch (err) {
         setError("Could not reach the server.");
@@ -67,7 +81,7 @@ export default function MeetingReportPage({
       }
     };
 
-    fetchReport();
+    fetchData();
   }, [meetingId]);
 
   const showToast = (msg: string, type: "success" | "error") => {
@@ -79,7 +93,10 @@ export default function MeetingReportPage({
     if (!editorRef.current) return;
     setIsSaving(true);
     
-    const updatedHtml = editorRef.current.innerHTML;
+    let updatedHtml = editorRef.current.innerHTML;
+    // Clean up any stray highlight markers before saving
+    updatedHtml = updatedHtml.replace(/<mark class="bg-yellow-200 text-black px-1 rounded">/g, "");
+    updatedHtml = updatedHtml.replace(/<\/mark>/g, "");
 
     const token = getToken();
     try {
@@ -123,7 +140,7 @@ export default function MeetingReportPage({
       const data = await res.json();
       
       if (res.ok) {
-        showToast(`Email successfully sent to customer!`, "success");
+        showToast("Email successfully sent to customer!", "success");
       } else {
         showToast(data?.detail || data?.message || "Failed to send email.", "error");
       }
@@ -134,9 +151,35 @@ export default function MeetingReportPage({
     }
   };
 
+  const handleFindAll = () => {
+    if (!editorRef.current || !findText) return;
+    
+    let html = editorRef.current.innerHTML;
+    html = html.replace(/<mark class="bg-yellow-200 text-black px-1 rounded">/g, "");
+    html = html.replace(/<\/mark>/g, "");
+    
+    const regex = new RegExp(`(${findText})`, "gi");
+    html = html.replace(regex, `<mark class="bg-yellow-200 text-black px-1 rounded">$1</mark>`);
+    
+    editorRef.current.innerHTML = html;
+  };
+
+  const handleReplaceAll = () => {
+    if (!editorRef.current || !findText) return;
+    
+    let html = editorRef.current.innerHTML;
+    html = html.replace(/<mark class="bg-yellow-200 text-black px-1 rounded">/g, "");
+    html = html.replace(/<\/mark>/g, "");
+    
+    const regex = new RegExp(`(${findText})`, "gi");
+    html = html.replace(regex, replaceText);
+    
+    editorRef.current.innerHTML = html;
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-transparent">
+      <div className="flex items-center justify-center min-h-[60vh] bg-transparent">
         <p className="font-anthropic-mono text-xs uppercase tracking-widest text-slate-400">Loading Document...</p>
       </div>
     );
@@ -144,7 +187,7 @@ export default function MeetingReportPage({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-transparent">
+      <div className="flex items-center justify-center min-h-[60vh] bg-transparent">
         <p className="font-anthropic-sans text-red-500">{error}</p>
       </div>
     );
@@ -168,120 +211,137 @@ export default function MeetingReportPage({
         )}
       </AnimatePresence>
 
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* LEFT COMPARTMENT - STICKY COVER */}
-        <div className="lg:w-[45%] lg:sticky lg:top-0 lg:h-screen p-6 lg:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 bg-[#f7f5ef]">
+      <div className="flex flex-col lg:flex-row min-h-full">
+        {/* LEFT COMPARTMENT - STICKY COVER - 30% Width */}
+        <div className="lg:w-[30%] lg:sticky lg:top-4 lg:h-[calc(100vh-8rem)] self-start p-6 lg:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 bg-transparent">
           <div>
             <button 
               onClick={() => router.back()}
-              className="font-anthropic-mono text-xs uppercase tracking-widest text-slate-500 hover:text-[#1a1a1a] transition-colors mb-12 block"
+              className="font-anthropic-mono text-xs uppercase tracking-widest text-slate-500 hover:text-[#1a1a1a] transition-colors block"
             >
               [ Return to Archive ]
             </button>
-            <div className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-400 mb-4">
-              Record No. {meetingId}
-            </div>
-            <h1 className="font-anthropic-serif text-5xl lg:text-7xl leading-[1.1] tracking-tight mb-8">
-              Meeting <br/>
-              <span className="italic text-slate-500">Dossier</span>
-            </h1>
           </div>
 
-          <div className="relative w-full aspect-[3/4] max-w-md mx-auto lg:mx-0 overflow-visible z-10">
-            <VHSTape title="Meeting Dossier" date={new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} customer={`Record No. ${meetingId}`} index={Number(meetingId) || 0} />
+          <div className="relative w-full overflow-visible z-10 flex-1 flex items-center justify-center">
+            <VHSTape 
+              title={meetingDetails?.title || "Meeting Report"} 
+              date={meetingDetails ? new Date(meetingDetails.meeting_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })} 
+              customer={meetingDetails?.customer?.customer_name || `Record No. ${meetingId}`} 
+              index={Number(meetingId) || 0}
+              compact={true}
+            />
           </div>
 
-          <div className="mt-12 lg:mt-0 font-anthropic-sans text-sm text-slate-500 max-w-xs">
-            This document contains the transcribed insights and analysis of the recorded session.
+          {/* Action Buttons below tape */}
+          <div className="mt-8 flex flex-col gap-3">
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="font-anthropic-mono text-[10px] uppercase tracking-widest px-6 py-3 border border-slate-300 rounded hover:bg-slate-100 transition-colors w-full text-center"
+              >
+                Edit Report
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="font-anthropic-mono text-[10px] uppercase tracking-widest px-4 py-3 border border-slate-300 rounded hover:bg-slate-100 transition-colors flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="font-anthropic-mono text-[10px] uppercase tracking-widest px-4 py-3 bg-[#1a1a1a] text-white rounded hover:bg-black transition-colors disabled:opacity-50 flex-1"
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+              </div>
+            )}
+            
+            <button
+              onClick={handleSendEmail}
+              disabled={isSending}
+              className="font-anthropic-mono text-[10px] uppercase tracking-widest px-6 py-3 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:opacity-50 w-full text-center"
+            >
+              {isSending ? "Sharing..." : "Share to Customer"}
+            </button>
           </div>
         </div>
 
-        {/* RIGHT COMPARTMENT - EDITORIAL CONTENT */}
-        <div className="lg:w-[55%] p-6 lg:p-16 xl:p-24 bg-transparent">
-          <div className="max-w-3xl mx-auto">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-12 border-b border-slate-200 gap-4">
-              <div className="font-anthropic-mono text-xs uppercase tracking-widest text-slate-400">
-                Reading Mode
-              </div>
-              <div className="flex items-center gap-4">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="font-anthropic-sans text-sm text-slate-500 hover:text-[#1a1a1a]"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="font-anthropic-sans text-sm bg-[#1a1a1a] text-[#FDFCF8] px-6 py-2 rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50"
-                    >
-                      {isSaving ? "Saving..." : "Save Edition"}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="font-anthropic-sans text-sm border border-slate-300 px-6 py-2 rounded-full hover:border-[#1a1a1a] transition-colors"
-                    >
-                      Edit Text
-                    </button>
-                    <button
-                      onClick={handleSendEmail}
-                      disabled={isSending}
-                      className="font-anthropic-sans text-sm bg-[#1a1a1a] text-[#FDFCF8] px-6 py-2 rounded-full hover:bg-slate-800 transition-colors disabled:opacity-50"
-                    >
-                      {isSending ? "Dispatching..." : "Dispatch Email"}
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
+        {/* RIGHT COMPARTMENT - EDITORIAL CONTENT - 70% Width */}
+        <div className="lg:w-[70%] p-6 lg:p-16 xl:p-24 bg-transparent">
+          <div className="max-w-4xl mx-auto">
+            
+            {/* Editor Find/Replace Toolbar */}
+            <AnimatePresence>
+              {isEditing && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden mb-12"
+                >
+                  <div className="bg-orange-50 border border-orange-200/60 rounded-xl p-5 shadow-sm flex flex-col gap-4">
+                    <div className="flex items-center justify-between border-b border-orange-200/50 pb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                        <span className="font-anthropic-mono text-[10px] font-bold uppercase tracking-widest text-orange-900/60">
+                          Edit Mode Active
+                        </span>
+                      </div>
+                      <p className="font-anthropic-sans text-[12px] text-orange-900/60">
+                        Click directly into the document to edit.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-3 pt-1">
+                      {/* Find Input */}
+                      <div className="flex-1 flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm focus-within:border-orange-300 transition-colors">
+                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input 
+                          type="text" 
+                          placeholder="Find in document..." 
+                          value={findText}
+                          onChange={(e) => setFindText(e.target.value)}
+                          className="bg-transparent border-none outline-none font-anthropic-mono text-xs text-slate-700 placeholder:text-slate-400 w-full" 
+                        />
+                        <button onClick={handleFindAll} disabled={!findText} className="font-anthropic-sans text-[10px] font-medium bg-slate-100 px-2 py-1 rounded text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-50">Find</button>
+                      </div>
+                      
+                      {/* Replace Input */}
+                      <div className="flex-1 flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm focus-within:border-orange-300 transition-colors">
+                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                        <input 
+                          type="text" 
+                          placeholder="Replace with..." 
+                          value={replaceText}
+                          onChange={(e) => setReplaceText(e.target.value)}
+                          className="bg-transparent border-none outline-none font-anthropic-mono text-xs text-slate-700 placeholder:text-slate-400 w-full" 
+                        />
+                        <button onClick={handleReplaceAll} disabled={!findText} className="font-anthropic-sans text-[10px] font-medium bg-[#1a1a1a] text-white px-2 py-1 rounded hover:bg-black transition-colors disabled:opacity-50">Replace</button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Document Content */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className={`prose-editorial ${isEditing ? 'ring-1 ring-slate-300 p-8 bg-white' : ''}`}
-            >
-              <div
-                ref={editorRef}
-                contentEditable={isEditing}
-                suppressContentEditableWarning={true}
-                dangerouslySetInnerHTML={{ __html: initialHtml }}
-                className={`
-                  outline-none
-                  font-anthropic-serif text-lg md:text-xl text-[#1a1a1a] leading-relaxed
-                  
-                  [&>h1]:font-anthropic-serif [&>h1]:text-4xl [&>h1]:md:text-5xl [&>h1]:tracking-tight [&>h1]:mb-10 [&>h1]:leading-tight
-                  [&>h2]:font-anthropic-sans [&>h2]:text-2xl [&>h2]:font-normal [&>h2]:tracking-tight [&>h2]:mt-16 [&>h2]:mb-6 [&>h2]:border-b [&>h2]:border-slate-200 [&>h2]:pb-4
-                  [&>h3]:font-anthropic-mono [&>h3]:text-xs [&>h3]:uppercase [&>h3]:tracking-[0.2em] [&>h3]:mt-10 [&>h3]:mb-4 [&>h3]:text-slate-500
-                  
-                  [&>p]:mb-8 [&>p]:text-slate-800
-                  [&>ul]:mb-8 [&>ul]:list-none [&>ul]:pl-0 [&>ul>li]:relative [&>ul>li]:pl-6 [&>ul>li]:mb-3 [&>ul>li]:text-slate-800 [&>ul>li]:before:content-['—'] [&>ul>li]:before:absolute [&>ul>li]:before:left-0 [&>ul>li]:before:text-slate-400
-                  [&>ol]:mb-8 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol>li]:mb-3 [&>ol>li]:text-slate-800
-                  
-                  [&>strong]:font-semibold [&>strong]:text-[#1a1a1a]
-                  [&>em]:italic [&>em]:text-slate-600
-                  
-                  ${isEditing ? "[&>*]:cursor-text min-h-[50vh]" : ""}
-                `}
-              />
-            </motion.div>
+            <div 
+              ref={editorRef}
+              contentEditable={isEditing}
+              suppressContentEditableWarning
+              className={`prose prose-slate max-w-none font-anthropic-sans text-lg leading-relaxed ${isEditing ? 'p-6 border border-dashed border-orange-300 bg-white/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200' : ''}`}
+              dangerouslySetInnerHTML={{ __html: initialHtml }}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-

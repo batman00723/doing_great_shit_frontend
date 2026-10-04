@@ -6,7 +6,6 @@ import {
  fadeInUp,
  staggerContainer,
  springCalm,
- easeSoft,
  hoverScale,
  tapScale,
 } from "@/lib/animations";
@@ -44,16 +43,15 @@ function getToken() {
 
 function formatDate(iso: string) {
  const d = new Date(iso);
- return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+ return d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 }
 
-// ── Suggestion chips for the empty state ──
-const SUGGESTIONS = [
- { label: "Summarize last week", query: "Summarize all meetings from last week" },
- { label: "Key action items", query: "What are the open action items across all customers?" },
- { label: "Customer sentiment", query: "How is customer sentiment trending this month?" },
- { label: "Revenue insights", query: "What revenue-related insights have come up recently?" },
-];
+function getGreeting() {
+ const hour = new Date().getHours();
+ if (hour < 12) return "Good morning";
+ if (hour < 17) return "Good afternoon";
+ return "Good evening";
+}
 
 export default function ChatPage() {
  const [sessions, setSessions] = useState<Session[]>([]);
@@ -63,6 +61,9 @@ export default function ChatPage() {
  const [query, setQuery] = useState("");
  const [sending, setSending] = useState(false);
  const [sessionsLoading, setSessionsLoading] = useState(true);
+ const [isHistoryCollapsed, setIsHistoryCollapsed] = useState(false);
+
+ const [user, setUser] = useState<{ salesperson_name: string } | null>(null);
 
  // Filters
  const [showFilters, setShowFilters] = useState(false);
@@ -70,26 +71,26 @@ export default function ChatPage() {
  const [startDate, setStartDate] = useState("");
  const [endDate, setEndDate] = useState("");
  const [specificDate, setSpecificDate] = useState("");
- const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
- const [greeting, setGreeting] = useState("Good morning");
 
- const bottomRef = useRef<HTMLDivElement>(null);
- const textareaRef = useRef<HTMLTextAreaElement>(null);
-
- // Derived: how many filters are active
  const activeFilterCount = [
  customerId,
  specificDate || startDate || endDate ? "date" : "",
  ].filter(Boolean).length;
 
- // Load sessions + customers + time on mount
+ const bottomRef = useRef<HTMLDivElement>(null);
+ const textareaRef = useRef<HTMLTextAreaElement>(null);
+
  useEffect(() => {
  const token = getToken();
 
- const hour = new Date().getHours();
- if (hour < 12) setGreeting("Good morning");
- else if (hour < 18) setGreeting("Good afternoon");
- else setGreeting("Good evening");
+ const fetchUser = async () => {
+ try {
+ const res = await fetch(`${BASE}/auth/me`, {
+ headers: { Authorization: `Bearer ${token}` },
+ });
+ if (res.ok) setUser(await res.json());
+ } catch { /* silent */ }
+ };
 
  const fetchSessions = async () => {
  try {
@@ -110,16 +111,15 @@ export default function ChatPage() {
  } catch { /* silent */ }
  };
 
+ fetchUser();
  fetchSessions();
  fetchCustomers();
  }, []);
 
- // Scroll to bottom on new messages
  useEffect(() => {
  bottomRef.current?.scrollIntoView({ behavior: "smooth" });
  }, [messages]);
 
- // Auto-resize textarea
  useEffect(() => {
  if (textareaRef.current) {
  textareaRef.current.style.height = "auto";
@@ -230,174 +230,247 @@ export default function ChatPage() {
  }
  };
 
+ // Parse markdown-like syntax for the AI response to match the screenshot structured cards
+ const renderStructuredContent = (content: string) => {
+ if (!content.includes("---")) {
  return (
- <div className="-m-8 md:-m-12 flex h-[calc(100vh-69px)] overflow-hidden relative">
- {/* ── SESSIONS SIDEBAR ── */}
+ <div className="bg-[#f0f4f8] rounded-[24px] rounded-tl-md px-6 py-4">
+ <div className="font-anthropic-sans text-[16px] text-slate-800 leading-relaxed whitespace-pre-wrap">
+ {content}
+ </div>
+ </div>
+ );
+ }
+
+ const parts = content.split("---");
+ const preamble = parts[0].trim();
+ const cardsText = parts[1].trim();
+ const postamble = parts[2]?.trim();
+
+ const cardLines = cardsText.split(/\d+\.\s\*\*/).filter(Boolean);
+
+ return (
+ <div className="flex flex-col gap-4">
+ {preamble && (
+ <div className="bg-[#f0f4f8] rounded-[24px] rounded-tl-md px-6 py-4">
+ <p className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed">{preamble}</p>
+ </div>
+ )}
+ 
+ <div className="flex flex-col bg-white border border-slate-200 rounded-[20px] shadow-sm overflow-hidden ml-2">
+ {cardLines.map((card, i) => {
+ const titleMatch = card.split("**");
+ const title = titleMatch[0]?.trim();
+ const desc = titleMatch[1]?.trim();
+ 
+ const icons = [
+ { bg: "bg-orange-50", text: "text-orange-500", svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /> },
+ { bg: "bg-purple-50", text: "text-purple-500", svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /> },
+ { bg: "bg-blue-50", text: "text-blue-500", svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /> },
+ { bg: "bg-red-50", text: "text-red-500", svg: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /> }
+ ];
+ const icon = icons[i % icons.length];
+
+ return (
+ <div key={i} className={`p-4 flex gap-4 ${i !== cardLines.length - 1 ? 'border-b border-slate-100' : ''}`}>
+ <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${icon.bg} ${icon.text}`}>
+ <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ {icon.svg}
+ </svg>
+ </div>
+ <div>
+ <h4 className="font-anthropic-sans font-medium text-[15px] text-slate-900 mb-1">{title}</h4>
+ <p className="font-anthropic-sans text-[14px] text-slate-500 leading-relaxed">{desc}</p>
+ </div>
+ </div>
+ );
+ })}
+ </div>
+
+ {postamble && (
+ <div className="bg-[#f0f4f8] rounded-[24px] px-6 py-4">
+ <p className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed">{postamble}</p>
+ </div>
+ )}
+ 
+ {/* Action Buttons below AI structured content */}
+ <div className="flex items-center gap-3 pt-2 ml-4">
+ <button className="text-slate-400 hover:text-slate-700 transition-colors">
+ <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+ </button>
+ <button className="text-slate-400 hover:text-slate-700 transition-colors">
+ <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+ </button>
+ <button className="text-slate-400 hover:text-slate-700 transition-colors transform rotate-180">
+ <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+ </button>
+ </div>
+ </div>
+ );
+ };
+
+ return (
+ <div className="-m-4 md:-m-8 flex h-[calc(100vh-66px)] overflow-hidden bg-[#fdfcfc]">
+ {/* HISTORY SIDEBAR */}
  <motion.aside
  initial={false}
- animate={{ width: isSidebarCollapsed ? 0 : 260, opacity: isSidebarCollapsed ? 0 : 1 }}
+ animate={{ width: isHistoryCollapsed ? 0 : 360, opacity: isHistoryCollapsed ? 0 : 1 }}
  transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
- className="shrink-0 bg-[#0a1317] border-r border-teal-900/30 flex flex-col overflow-hidden whitespace-nowrap"
+ className="shrink-0 border-r border-slate-100 flex flex-col bg-[#fdfcfc] whitespace-nowrap overflow-hidden"
  >
  {/* Sidebar Header */}
- <div className="p-4 pb-3">
+ <div className="p-6 flex flex-col gap-6">
+ <div className="flex items-center justify-between">
+ <h2 className="font-anthropic-serif text-[22px] font-medium text-slate-800 tracking-tight ml-2">Conversations</h2>
+ <button 
+ onClick={() => setIsHistoryCollapsed(true)}
+ className="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-all"
+ title="Collapse history"
+ >
+ <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+ </svg>
+ </button>
+ </div>
  <button
  onClick={startNewChat}
- className="w-full flex items-center gap-2.5 font-anthropic-sans text-[13px] font-medium text-white/80 hover:text-white bg-[#091114] border border-teal-900/40 px-4 py-3 rounded-xl hover:border-black/[0.12] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all"
+ className="w-full flex items-center justify-center gap-2.5 font-anthropic-sans text-[15px] font-medium text-slate-700 bg-white border border-slate-200 px-4 py-3.5 rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-slate-300 hover:shadow-sm transition-all mb-4"
  >
- <svg className="w-4 h-4 text-teal-100/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+ <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
  </svg>
  New conversation
  </button>
  </div>
 
  {/* Sessions List */}
- <div className="flex-1 overflow-y-auto px-3 pb-4" data-lenis-prevent="true">
- <p className="font-anthropic-mono text-[9px] font-bold uppercase tracking-[0.15em] text-teal-100/30 px-2 pt-3 pb-2">
- History
+ <div className="flex-1 overflow-y-auto px-6 pb-6" data-lenis-prevent="true">
+ <p className="font-anthropic-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 ml-2">
+ Recent
  </p>
 
- {sessionsLoading ? (
- <div className="flex flex-col gap-1.5">
- {[1, 2, 3].map((i) => (
- <div key={i} className="h-10 bg-teal-900/10 rounded-lg animate-pulse" />
- ))}
- </div>
- ) : sessions.length === 0 ? (
- <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-2 py-8 text-center">
- <p className="font-anthropic-sans text-[12px] text-teal-100/30 leading-relaxed">
- No conversations yet.
- </p>
- </motion.div>
- ) : (
  <motion.div
  variants={staggerContainer}
  initial="initial"
  animate="animate"
- className="flex flex-col gap-0.5"
+ className="flex flex-col gap-2"
  >
- {sessions.map((s) => (
+ {sessions.length === 0 && !sessionsLoading ? (
+ <p className="font-anthropic-sans text-[13px] text-slate-500 px-4 mt-4 text-center">No conversations yet.</p>
+ ) : (
+ sessions.map((s) => {
+ const isActive = activeSession === s.id;
+ return (
  <motion.div key={s.id} variants={fadeInUp} transition={springCalm}>
  <button
  onClick={() => loadHistory(s.id)}
- className={`group w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 ${
- activeSession === s.id
- ? "bg-[#091114] shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-white"
- : "text-teal-100/50 hover:bg-[#091114]/60 hover:text-white/80"
+ className={`group w-full text-left px-5 py-3.5 rounded-2xl transition-all duration-200 flex flex-col gap-1 ${
+ isActive
+ ? "bg-[#f4eae1]"
+ : "hover:bg-slate-50"
  }`}
  >
- <p className="font-anthropic-sans text-[13px] font-medium truncate leading-tight">
+ <div className="flex items-center justify-between w-full">
+ <p className={`font-anthropic-sans text-[14px] font-medium truncate ${isActive ? "text-slate-900" : "text-slate-700"}`}>
  {s.title || "Untitled"}
  </p>
- <p className="font-anthropic-mono text-[9px] uppercase tracking-widest text-white/25 mt-0.5">
- {formatDate(s.created_at)}
+ <span className="font-anthropic-sans text-[11px] text-slate-400 shrink-0 ml-3">{formatDate(s.created_at)}</span>
+ </div>
+ <p className={`font-anthropic-sans text-[12px] truncate ${isActive ? "text-slate-600" : "text-slate-400"}`}>
+ {s.title}
  </p>
  </button>
  </motion.div>
- ))}
- </motion.div>
+ );
+ })
  )}
+ </motion.div>
  </div>
  </motion.aside>
 
- {/* ── MAIN CHAT AREA ── */}
- <div className="flex-1 flex flex-col bg-[#091114] overflow-hidden relative">
+ {/* MAIN CHAT AREA */}
+ <div className="flex-1 flex flex-col bg-white overflow-hidden relative">
 
- {/* Floating sidebar toggle */}
- <button
- onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
- className="absolute top-4 left-4 z-40 w-10 h-10 flex items-center justify-center rounded-[10px] bg-[#091114]/80 backdrop-blur-sm border border-teal-900/30 text-teal-100/40 hover:text-white hover:bg-[#091114] hover:border-teal-500/40 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
- title={isSidebarCollapsed ? "Open history" : "Close history"}
+ {/* Floating sidebar toggle (when collapsed) */}
+ <AnimatePresence>
+ {isHistoryCollapsed && (
+ <motion.button
+ initial={{ opacity: 0, scale: 0.8 }}
+ animate={{ opacity: 1, scale: 1 }}
+ exit={{ opacity: 0, scale: 0.8 }}
+ onClick={() => setIsHistoryCollapsed(false)}
+ className="absolute top-6 left-6 z-40 w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 transition-all shadow-sm"
+ title="Open history"
  >
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={isSidebarCollapsed ? "M4 6h16M4 12h16M4 18h16" : "M4 6h16M4 12h16M4 18h7"} />
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
  </svg>
- </button>
+ </motion.button>
+ )}
+ </AnimatePresence>
 
- {/* ── Message Thread ── */}
- <div className="flex-1 overflow-y-auto scroll-smooth" data-lenis-prevent="true">
- {messages.length === 0 ? (
- /* ── EMPTY STATE: Big greeting + suggestion chips ── */
- <div className="h-full flex flex-col items-center justify-center px-6">
- <motion.div
- initial={{ opacity: 0, y: 16 }}
- animate={{ opacity: 1, y: 0 }}
- transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
- className="text-center max-w-[560px] mx-auto -mt-16"
- >
- {/* Gradient greeting */}
- <h1 className="font-anthropic-serif text-[52px] md:text-[64px] tracking-tight leading-[1] mb-4">
- <span className="bg-gradient-to-br from-white via-white/70 to-white/40 bg-clip-text text-transparent">
- {greeting}
- </span>
- </h1>
- <p className="font-anthropic-sans text-[16px] text-teal-100/40 leading-relaxed max-w-[560px] mx-auto mb-12 leading-[1.8] text-[17px]">
- Search across all your meetings. I can find action items, sentiment, or anything you&apos;ve discussed.
- </p>
-
- {/* Suggestion chips */}
- <motion.div
+ {/* Message Thread */}
+ <div className="flex-1 overflow-y-auto px-8 py-10 relative flex flex-col" data-lenis-prevent="true">
+ {messages.length === 0 && !sessionsLoading ? (
+ <div className="flex-1 flex flex-col items-center justify-center -mt-10">
+ <motion.h1 
  initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
- transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
- className="flex flex-wrap justify-center gap-3 max-w-[640px] mx-auto"
+ transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+ className="font-anthropic-serif text-3xl md:text-4xl text-slate-300 text-center tracking-tight"
  >
- {SUGGESTIONS.map((s) => (
- <button
- key={s.label}
- onClick={() => handleSend(s.query)}
- className="font-anthropic-sans text-[13px] text-teal-100/50 hover:text-white bg-teal-900/10 hover:bg-teal-900/20 border border-teal-900/30 hover:border-teal-500/40 px-5 py-3 rounded-xl text-[14px] transition-all duration-200 hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
- >
- {s.label}
- </button>
- ))}
- </motion.div>
- </motion.div>
+ {getGreeting()}, {user?.salesperson_name ? user.salesperson_name.split(' ')[0] : 'there'}.
+ </motion.h1>
  </div>
  ) : (
- /* ── MESSAGE THREAD ── */
- <div className="max-w-[720px] mx-auto px-6 py-12 flex flex-col gap-0">
+ <div className="max-w-4xl mx-auto w-full flex flex-col gap-10">
  <AnimatePresence initial={false}>
  {messages.map((m, i) => (
  <motion.div
  key={i}
- initial={{ opacity: 0, y: 8 }}
+ initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
- className={`py-6 ${i > 0 ? "border-t border-teal-900/20" : ""}`}
+ className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} w-full`}
  >
- {/* Role label */}
- <div className="flex items-center gap-2.5 mb-3">
- <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
- m.role === "user"
- ? "bg-teal-600 text-white"
- : "bg-gradient-to-br from-clay/80 to-clay-deep text-white"
- }`}>
- {m.role === "user" ? "Y" : "S"}
+ {m.role === "user" ? (
+ <div className="flex gap-4 max-w-[85%] flex-row-reverse">
+ <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-[14px] font-bold shrink-0 shadow-sm">
+ A
  </div>
- <span className="font-anthropic-mono text-[10px] font-bold uppercase tracking-[0.12em] text-teal-100/40">
- {m.role === "user" ? "You" : "Smriti"}
- </span>
+ <div className="flex flex-col items-end w-full mt-2">
+ <div className="bg-[#f4eae1] rounded-[24px] rounded-tr-md px-6 py-4">
+ <div className="font-anthropic-sans text-[16px] text-slate-900 leading-relaxed">
+ {m.content}
  </div>
-
- {/* Content */}
+ </div>
+ <span className="font-anthropic-sans text-[11px] text-slate-400 mt-2 mr-2">9:38 AM</span>
+ </div>
+ </div>
+ ) : (
+ <div className="flex gap-4 max-w-[95%]">
+ <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-900 to-slate-700 flex items-center justify-center shrink-0 shadow-md border border-slate-800/50">
+ <span className="font-anthropic-serif italic text-white text-[18px] pr-0.5 pb-0.5 leading-none">S</span>
+ </div>
+ <div className="flex flex-col items-start w-full mt-2">
  {m.pending ? (
- <div className="flex gap-1 items-center h-6 pl-[34px]">
+ <div className="bg-[#f0f4f8] rounded-[24px] rounded-tl-md px-6 py-4 flex gap-1 items-center h-[56px]">
  {[0, 1, 2].map((dot) => (
  <motion.span
  key={dot}
  animate={{ opacity: [0.3, 1, 0.3] }}
  transition={{ duration: 1.2, repeat: Infinity, delay: dot * 0.2, ease: "easeInOut" }}
- className="w-1.5 h-1.5 rounded-full bg-slate-dark/30"
+ className="w-1.5 h-1.5 rounded-full bg-slate-400"
  />
  ))}
  </div>
  ) : (
- <div className={`font-anthropic-sans text-[15px] leading-[1.7] pl-[34px] ${
- m.role === "user" ? "text-white" : "text-white/80"
- }`}>
- <div className="whitespace-pre-wrap">{m.content}</div>
+ <div className="w-full">
+ {renderStructuredContent(m.content)}
+ </div>
+ )}
+ <span className="font-anthropic-sans text-[11px] text-slate-400 mt-2 ml-2">9:38 AM</span>
+ </div>
  </div>
  )}
  </motion.div>
@@ -408,67 +481,35 @@ export default function ChatPage() {
  )}
  </div>
 
- {/* ── INPUT DOCK ── */}
- <div className="px-4 pb-6 pt-2 shrink-0">
- {/* Active filter pills */}
- <AnimatePresence>
- {(customerId || startDate || endDate || specificDate) && (
- <motion.div
- initial={{ opacity: 0, y: 6 }}
- animate={{ opacity: 1, y: 0 }}
- exit={{ opacity: 0, y: 6 }}
- className="max-w-[720px] mx-auto flex flex-wrap gap-1.5 mb-2"
- >
- {customerId && (
- <span className="inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold uppercase tracking-widest bg-teal-500/10 text-teal-400 px-2.5 py-1 rounded-md border border-clay/15">
- {customers.find(c => c.id === parseInt(customerId))?.customer_name || "Customer"}
- <button onClick={() => setCustomerId("")} className="hover:text-white transition-colors ml-0.5 opacity-60 hover:opacity-100">×</button>
- </span>
- )}
- {specificDate && (
- <span className="inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold uppercase tracking-widest bg-teal-500/10 text-teal-400 px-2.5 py-1 rounded-md border border-clay/15">
- {specificDate}
- <button onClick={() => setSpecificDate("")} className="hover:text-white transition-colors ml-0.5 opacity-60 hover:opacity-100">×</button>
- </span>
- )}
- {!specificDate && (startDate || endDate) && (
- <span className="inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold uppercase tracking-widest bg-teal-500/10 text-teal-400 px-2.5 py-1 rounded-md border border-clay/15">
- {startDate && endDate ? `${startDate} → ${endDate}` : startDate ? `From ${startDate}` : `Until ${endDate}`}
- <button onClick={() => { setStartDate(""); setEndDate(""); }} className="hover:text-white transition-colors ml-0.5 opacity-60 hover:opacity-100">×</button>
- </span>
- )}
- <button onClick={clearFilters} className="font-anthropic-sans text-[10px] font-semibold text-teal-100/30 hover:text-white/60 transition-colors uppercase tracking-widest ml-1">
- Clear
- </button>
- </motion.div>
- )}
- </AnimatePresence>
-
- {/* ── Collapsible filter panel ── */}
+ {/* INPUT DOCK WITH FILTERS */}
+ <div className="px-8 pb-4 pt-2 shrink-0 bg-white relative z-10">
+ <div className="max-w-4xl mx-auto flex flex-col gap-4">
+ 
+ {/* Filter Panel (Collapsible) */}
  <AnimatePresence>
  {showFilters && (
  <motion.div
- initial={{ height: 0, opacity: 0 }}
- animate={{ height: "auto", opacity: 1 }}
- exit={{ height: 0, opacity: 0 }}
+ initial={{ height: 0, opacity: 0, y: 10 }}
+ animate={{ height: "auto", opacity: 1, y: 0 }}
+ exit={{ height: 0, opacity: 0, y: 10 }}
  transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
  className="overflow-hidden"
  >
- <div className="max-w-[720px] mx-auto mb-3 bg-[#0a1317] border border-teal-900/30 rounded-2xl p-5 flex flex-col gap-5">
+ <div className="bg-[#fdfcfc] border border-slate-200 rounded-[20px] p-5 flex flex-col gap-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
  <div className="flex items-center justify-between">
- <p className="font-anthropic-mono text-[9px] font-bold uppercase tracking-[0.15em] text-teal-100/40">Filters</p>
- <button onClick={() => setShowFilters(false)} className="text-teal-100/30 hover:text-white/60 transition-colors">
- <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+ <p className="font-anthropic-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">Search Filters</p>
+ <button onClick={() => setShowFilters(false)} className="text-slate-400 hover:text-slate-700 transition-colors">
+ <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
  </button>
  </div>
 
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
- <div className="flex flex-col gap-1.5">
- <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-widest text-teal-100/40">Customer</label>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+ <div className="flex flex-col gap-2">
+ <label className="font-anthropic-sans text-[12px] font-medium text-slate-600">Customer</label>
  <select
  value={customerId}
  onChange={(e) => setCustomerId(e.target.value)}
- className="font-anthropic-sans text-[13px] text-white bg-[#091114] border border-teal-900/30 rounded-lg px-3 py-2 outline-none focus:border-clay/40 focus:ring-2 focus:ring-teal-500/10 transition-all"
+ className="font-anthropic-sans text-[14px] text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition-all shadow-sm"
  >
  <option value="">All customers</option>
  {customers.map((c) => (
@@ -477,67 +518,67 @@ export default function ChatPage() {
  </select>
  </div>
 
- <div className="flex flex-col gap-1.5">
- <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-widest text-teal-100/40">
- Specific date
+ <div className="flex flex-col gap-2">
+ <label className="font-anthropic-sans text-[12px] font-medium text-slate-600">
+ Specific Date
  </label>
  <input
  type="date"
  value={specificDate}
  onChange={(e) => { setSpecificDate(e.target.value); if (e.target.value) { setStartDate(""); setEndDate(""); } }}
- className="font-anthropic-sans text-[13px] text-white bg-[#091114] border border-teal-900/30 rounded-lg px-3 py-2 outline-none focus:border-clay/40 focus:ring-2 focus:ring-teal-500/10 transition-all"
+ className="font-anthropic-sans text-[14px] text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition-all shadow-sm"
  />
  </div>
  </div>
 
- <div className="flex flex-col gap-1.5">
- <label className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-widest text-teal-100/40 flex items-center gap-2">
- Date range
- {specificDate && <span className="font-normal text-[9px] tracking-normal text-teal-100/20">(Disabled — using specific date)</span>}
+ <div className="flex flex-col gap-2">
+ <label className="font-anthropic-sans text-[12px] font-medium text-slate-600 flex items-center gap-2">
+ Date Range
+ {specificDate && <span className="font-normal text-[11px] text-slate-400">(Disabled ?" using specific date)</span>}
  </label>
- <div className="flex gap-2 items-center">
+ <div className="flex gap-3 items-center">
  <input
  type="date"
  value={startDate}
  disabled={!!specificDate}
  onChange={(e) => setStartDate(e.target.value)}
- className="flex-1 font-anthropic-sans text-[13px] text-white bg-[#091114] border border-teal-900/30 rounded-lg px-3 py-2 outline-none focus:border-clay/40 focus:ring-2 focus:ring-teal-500/10 transition-all disabled:opacity-30"
+ className="flex-1 font-anthropic-sans text-[14px] text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition-all shadow-sm disabled:opacity-50"
  />
- <span className="font-anthropic-mono text-[9px] text-white/25 uppercase tracking-widest">to</span>
+ <span className="font-anthropic-sans text-[12px] text-slate-400 font-medium">to</span>
  <input
  type="date"
  value={endDate}
  disabled={!!specificDate}
  onChange={(e) => setEndDate(e.target.value)}
- className="flex-1 font-anthropic-sans text-[13px] text-white bg-[#091114] border border-teal-900/30 rounded-lg px-3 py-2 outline-none focus:border-clay/40 focus:ring-2 focus:ring-teal-500/10 transition-all disabled:opacity-30"
+ className="flex-1 font-anthropic-sans text-[14px] text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2.5 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition-all shadow-sm disabled:opacity-50"
  />
  </div>
+ </div>
+ 
+ <div className="flex justify-end mt-1">
+ <button onClick={clearFilters} className="font-anthropic-sans text-[12px] font-medium text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-widest px-3 py-1">
+ Clear All
+ </button>
  </div>
  </div>
  </motion.div>
  )}
  </AnimatePresence>
 
- {/* ── Composer Bar ── */}
- <div className="max-w-[720px] mx-auto">
- <div className="bg-[#0a1317] border border-teal-900/40 rounded-2xl px-2 py-1.5 flex gap-1 items-end focus-within:border-teal-500/40 focus-within:shadow-[0_4px_24px_rgba(0,0,0,0.06)] focus-within:bg-[#091114] transition-all duration-300">
- {/* Filter toggle */}
- <button
+ {/* Input Field */}
+ <div className="bg-[#fdfcfc] border border-slate-200 rounded-[28px] pl-1.5 pr-1.5 py-1.5 flex items-center gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.02)] focus-within:border-slate-300 focus-within:shadow-md transition-all duration-300">
+ 
+ <button 
  onClick={() => setShowFilters(!showFilters)}
- className={`shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
- showFilters || activeFilterCount > 0
- ? "bg-teal-600 text-white"
- : "bg-teal-900/20 text-white/80 hover:bg-teal-900/40"
- }`}
+ className={`shrink-0 w-14 h-11 rounded-full flex items-center justify-center transition-colors relative ${showFilters || activeFilterCount > 0 ? "bg-slate-200 text-slate-900 shadow-inner" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+ title="Search Filters"
  >
- <div className="relative">
- <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+ <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
  </svg>
  {activeFilterCount > 0 && (
- <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-clay rounded-full" />
+ <span className="absolute top-2.5 right-3.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
  )}
- </div>
  </button>
 
  <textarea
@@ -546,39 +587,36 @@ export default function ChatPage() {
  value={query}
  onChange={(e) => setQuery(e.target.value)}
  onKeyDown={handleKeyDown}
- placeholder="Ask anything about your meetings."
+ placeholder="Ask anything about your meetings..."
  disabled={sending}
- className="flex-1 bg-transparent border-none text-white font-anthropic-sans text-[15px] leading-[1.5] py-2.5 px-2 outline-none placeholder:text-teal-100/40 resize-none max-h-[160px] disabled:opacity-50"
+ className="flex-1 bg-transparent border-none text-slate-900 font-anthropic-sans text-[15px] py-2.5 px-2 outline-none placeholder:text-slate-400 resize-none max-h-[160px] disabled:opacity-50"
  />
 
- {/* Send Button */}
+ <div className="shrink-0 flex items-center pr-1">
  <motion.button
  whileHover={!sending && query.trim() ? hoverScale : undefined}
  whileTap={!sending && query.trim() ? tapScale : undefined}
  onClick={() => handleSend()}
  disabled={!query.trim() || sending}
- className={`shrink-0 h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+ className={`shrink-0 h-11 w-14 rounded-full flex items-center justify-center transition-all duration-200 ${
  query.trim() && !sending
- ? "bg-teal-600 text-white shadow-sm"
- : "bg-teal-900/20 text-teal-100/50"
+ ? "bg-[#1a1a1a] text-white shadow-sm"
+ : "bg-slate-100 text-slate-400"
  }`}
  >
  {sending ? (
- <div className="w-4 h-4 border-2 border-slate-dark/20 border-t-slate-dark rounded-full animate-spin" />
+ <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin" />
  ) : (
- <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24">
- <path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+ <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24">
+ <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
  </svg>
  )}
  </motion.button>
  </div>
+ </div>
+ </div>
+ </div>
 
- <p className="mt-3 text-center font-anthropic-sans text-[11px] text-white/25">
- Smriti can make mistakes. Verify important information.
- {activeFilterCount > 0 && <span className="text-teal-100/50 ml-1 font-medium">· {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active</span>}
- </p>
- </div>
- </div>
  </div>
  </div>
  );

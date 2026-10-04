@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex">
+    <div className="min-h-screen bg-stone-50 flex items-start">
       {/* Sidebar */}
       <motion.aside
         initial={{ opacity: 0, x: -10 }}
@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           width: isSidebarCollapsed ? 80 : 200 
         }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="hidden md:flex shrink-0 bg-stone-50 border-r border-slate-200 flex-col justify-between py-8 px-4 overflow-hidden relative"
+        className="hidden md:flex shrink-0 bg-stone-50 border-r border-slate-200 flex-col justify-between py-8 px-4 overflow-hidden sticky top-0 h-screen"
       >
         {/* Toggle Button */}
         <button
@@ -298,7 +298,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full bg-stone-50/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center justify-end sticky top-0 z-40 relative"
+          className="w-full bg-stone-50/90 backdrop-blur-md border-b border-slate-200 px-8 h-[49px] flex items-center justify-end sticky top-0 z-40 relative"
         >
           {/* Header Navigation */}
           <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12" suppressHydrationWarning>
@@ -343,7 +343,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="flex-1 p-4 md:p-8 overflow-auto"
+          className="flex-1 p-4 md:p-8"
         >
           {children}
         </motion.main>

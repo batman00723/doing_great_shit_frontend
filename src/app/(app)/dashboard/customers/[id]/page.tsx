@@ -4,307 +4,229 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import {
- fadeIn,
- fadeInUp,
- staggerContainerSlow,
- springCalm,
-} from "@/lib/animations";
+import { VHSTape } from "@/components/dashboard/VHSBox";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
 
 interface Meeting {
- id: number;
- title: string;
- meeting_date: string;
- status: string;
+  id: number;
+  meeting_id: number;
+  title: string;
+  meeting_date: string;
+  status: string;
+  customer?: any; // The backend sometimes nests customer under customer
 }
 
 interface Customer {
- id: number;
- customer_name: string;
- industry: string;
- website: string;
- status: string;
+  id: number;
+  customer_name: string;
+  industry: string;
+  website: string;
+  status: string;
 }
 
 function getToken() {
- if (typeof window === "undefined") return null;
- return localStorage.getItem("access_token");
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("access_token");
 }
 
 function formatDate(iso: string) {
- if (!iso) return "Unknown Date";
- const d = new Date(iso);
- return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  if (!iso) return "Unknown Date";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
 export default function CustomerMeetingsPage({
- params,
+  params,
 }: {
- params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }) {
- const { id: customerId } = use(params);
- const router = useRouter();
+  const { id: customerId } = use(params);
+  const router = useRouter();
 
- const [customer, setCustomer] = useState<Customer | null>(null);
- const [meetings, setMeetings] = useState<Meeting[]>([]);
- const [loading, setLoading] = useState(true);
- const [error, setError] = useState("");
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
- useEffect(() => {
- if (!customerId) return;
+  useEffect(() => {
+    if (!customerId) return;
 
- const fetchData = async () => {
- const token = getToken();
- if (!token) {
- setError("Not logged in.");
- setLoading(false);
- return;
- }
+    const fetchData = async () => {
+      const token = getToken();
+      if (!token) {
+        setError("Not logged in.");
+        setLoading(false);
+        return;
+      }
 
- try {
- const [meetingsRes, customersRes] = await Promise.all([
- fetch(`${BASE}/analyse/customer/${customerId}`, {
- headers: { Authorization: `Bearer ${token}` },
- }),
- fetch(`${BASE}/customers/list`, {
- headers: { Authorization: `Bearer ${token}` },
- })
- ]);
+      try {
+        const [meetingsRes, customersRes] = await Promise.all([
+          fetch(`${BASE}/analyse/customer/${customerId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${BASE}/customers/list`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        ]);
 
- if (!meetingsRes.ok || !customersRes.ok) {
- throw new Error("Failed to load data");
- }
+        if (!meetingsRes.ok || !customersRes.ok) {
+          throw new Error("Failed to load data");
+        }
 
- const meetingsData = await meetingsRes.json();
- const customersData: Customer[] = await customersRes.json();
- 
- const foundCustomer = customersData.find(c => c.id === parseInt(customerId));
- if (foundCustomer) {
- setCustomer(foundCustomer);
- }
+        const meetingsData = await meetingsRes.json();
+        const customersData: Customer[] = await customersRes.json();
+        
+        const foundCustomer = customersData.find(c => c.id === parseInt(customerId));
+        if (foundCustomer) {
+          setCustomer(foundCustomer);
+        }
 
- setMeetings(meetingsData);
- } catch (err) {
- setError("Could not reach the server or data not found.");
- } finally {
- setLoading(false);
- }
- };
+        // Map the meeting IDs properly
+        const mappedMeetings = meetingsData.map((m: any) => ({
+          ...m,
+          meeting_id: m.meeting_id || m.id, // Handle backend inconsistency
+        }));
 
- fetchData();
- }, [customerId]);
+        setMeetings(mappedMeetings);
+      } catch (err) {
+        setError("Could not reach the server or data not found.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
- if (loading) {
- return (
- <motion.div variants={fadeIn} initial="initial" animate="animate" className="flex items-center justify-center h-[60vh]">
- <div className="flex flex-col items-center gap-4">
- <div className="w-6 h-6 border-2 border-slate-dark/20 border-t-slate-dark rounded-full animate-spin" />
- <p className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/40 font-bold">Loading Profile</p>
- </div>
- </motion.div>
- );
- }
+    fetchData();
+  }, [customerId]);
 
- if (error) {
- return (
- <motion.div variants={fadeInUp} initial="initial" animate="animate" className="bg-red-900/20 border border-red-500/30 rounded-2xl p-5 inline-flex items-center gap-4">
- <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
- <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
- </div>
- <div>
- <p className="font-anthropic-sans font-semibold text-[14px] text-red-400">Failed to load</p>
- <p className="font-anthropic-sans text-[13px] text-[#cc4a4a] mt-0.5">{error}</p>
- </div>
- </motion.div>
- );
- }
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] bg-transparent">
+        <p className="font-anthropic-mono text-xs uppercase tracking-widest text-slate-400">Loading Profile...</p>
+      </div>
+    );
+  }
 
- return (
- <div className="w-full max-w-[1200px] mx-auto pb-24 pt-4">
- {/* ── BREADCRUMB / BACK ── */}
- <button 
- onClick={() => router.back()}
- className="group flex items-center gap-3 font-anthropic-sans text-[12px] font-semibold uppercase tracking-[0.1em] text-teal-100/40 hover:text-white transition-colors mb-10"
- >
- <div className="w-8 h-8 rounded-[8px] bg-teal-900/10 border border-teal-900/25 flex items-center justify-center group-hover:bg-[#091114] group-hover:shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] transition-all">
- <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
- </svg>
- </div>
- Back to Directory
- </button>
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] bg-transparent">
+        <p className="font-anthropic-sans text-red-500">{error}</p>
+      </div>
+    );
+  }
 
- {/* ── HEADER PROFILE ── */}
- <motion.div
- variants={staggerContainerSlow}
- initial="initial"
- animate="animate"
- className="mb-12 bg-[#091114] border border-teal-900/30 rounded-[24px] p-10 shadow-[0_12px_40px_rgba(0,0,0,0.03)] relative overflow-hidden"
- >
- <div className="flex flex-col md:flex-row items-start justify-between gap-10">
- <div className="flex gap-6">
- <div className="w-20 h-20 rounded-[18px] bg-gradient-to-b from-[#0a1317] to-[#050a0c] border border-teal-900/30 flex items-center justify-center shrink-0 shadow-[inset_0_2px_4px_rgba(255,255,255,0.05)] mt-1">
- <span className="font-anthropic-serif text-[32px] font-medium text-white">
- {customer?.customer_name?.charAt(0) || "C"}
- </span>
- </div>
- 
- <div>
- <motion.div variants={fadeInUp} transition={springCalm} className="mb-4">
- <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1.5 rounded-md ${
- customer?.status === "Active" ? "bg-emerald-900/20 text-emerald-400 border border-emerald-500/30" :
- customer?.status === "Closed" ? "bg-[#0b161b] text-teal-100/50 border border-teal-900/25" :
- "bg-teal-500/10 text-teal-400 border border-teal-500/20"
- }`}>
- <span className={`w-1.5 h-1.5 rounded-full ${
- customer?.status === "Active" ? "bg-[#429563]" :
- customer?.status === "Closed" ? "bg-slate-dark/30" :
- "bg-clay"
- }`} />
- {customer?.status || "Lead"}
- </span>
- </motion.div>
+  return (
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-24 bg-transparent">
+      <button 
+        onClick={() => router.back()}
+        className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 hover:text-[#1a1a1a] transition-colors mb-16 block"
+      >
+        [ Return to Directory ]
+      </button>
 
- <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[44px] md:text-[52px] leading-[1.1] tracking-tight text-white mb-5">
- {customer?.customer_name || "Unknown Customer"}
- </motion.h1>
- 
- <motion.div variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[15px] text-white/60 flex flex-wrap gap-8">
- {customer?.industry && (
- <div className="flex items-center gap-2.5">
- <svg className="w-5 h-5 opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
- </svg>
- {customer.industry}
- </div>
- )}
- {customer?.website && (
- <div className="flex items-center gap-2.5">
- <svg className="w-5 h-5 opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
- </svg>
- <a href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-black/20">
- {customer.website}
- </a>
- </div>
- )}
- </motion.div>
- </div>
- </div>
- 
- <motion.div variants={fadeInUp} transition={springCalm} className="md:text-right shrink-0 mt-6 md:mt-2 w-full md:w-auto">
- <div className="bg-[#091114] border border-teal-900/25 rounded-[16px] px-8 py-6 flex flex-col items-center justify-center min-w-[160px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
- <div className="font-anthropic-mono text-[48px] tracking-tighter leading-none text-white font-medium mb-3">
- {meetings.length}
- </div>
- <div className="font-anthropic-mono text-[10px] font-bold uppercase tracking-[0.15em] text-teal-100/40">
- Total Meetings
- </div>
- </div>
- </motion.div>
- </div>
- </motion.div>
+      {/* HEADER PROFILE */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="mb-24 flex flex-col items-center text-center"
+      >
 
- {/* ── MEETINGS LIST ── */}
- <div>
- <div className="flex items-end justify-between mb-8 px-2">
- <h2 className="font-anthropic-serif text-[28px] tracking-tight text-white">
- Meeting Archive
- </h2>
- <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/40 font-bold hidden md:block">
- Sorted by newest
- </span>
- </div>
- 
- <AnimatePresence mode="wait">
- {meetings.length === 0 ? (
- <motion.div
- key="empty"
- variants={fadeInUp}
- initial="initial"
- animate="animate"
- exit="exit"
- transition={springCalm}
- className="w-full flex flex-col items-center justify-center py-32 bg-[#091114] border border-teal-900/30 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
- >
- <div className="w-20 h-20 bg-[#0a1317] border border-teal-900/25 rounded-[20px] flex items-center justify-center mb-6 shadow-sm">
- <svg className="w-10 h-10 text-teal-100/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
- </div>
- <h3 className="font-anthropic-serif text-[28px] text-white tracking-tight mb-3">No meetings recorded</h3>
- <p className="font-anthropic-sans text-[15px] text-teal-100/50 max-w-[340px] text-center leading-[1.75]">
- Upload a transcript or deploy the bot to populate this customer&apos;s archive.
- </p>
- </motion.div>
- ) : (
- <motion.div
- key="list"
- variants={fadeInUp}
- initial="initial"
- animate="animate"
- className="bg-[#091114] border border-teal-900/30 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.4)] overflow-hidden"
- >
- {/* List Header (Desktop) */}
- <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 border-b border-teal-900/20 bg-[#0a1317]">
- <div className="col-span-8 font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/40 font-bold">Meeting Title</div>
- <div className="col-span-2 font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/40 font-bold">Date</div>
- <div className="col-span-2 font-anthropic-mono text-[10px] uppercase tracking-widest text-teal-100/40 font-bold">Status</div>
- </div>
- 
- {/* List Items */}
- <div className="flex flex-col divide-y divide-black/[0.04]">
- {meetings.map((m) => (
- <Link
- key={m.id}
- href={`/dashboard/meeting/${m.id}`}
- className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-[#0a1317] transition-colors group block"
- >
- <div className="col-span-8 flex items-center gap-4 min-w-0 pr-4">
- <div className="w-10 h-10 rounded-[10px] bg-gradient-to-b from-[#0a1317] to-[#050a0c] border border-teal-900/30 flex items-center justify-center shrink-0 shadow-[inset_0_2px_4px_rgba(255,255,255,0.05)] group-hover:scale-105 transition-transform duration-300">
- <svg className="w-5 h-5 text-teal-100/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
- </div>
- <span className="font-anthropic-sans text-[15px] font-semibold text-white leading-snug group-hover:text-teal-400 transition-colors truncate">
- {m.title || "Untitled Meeting"}
- </span>
- </div>
- 
- <div className="col-span-2 font-anthropic-mono text-[12px] text-teal-100/50">
- {formatDate(m.meeting_date)}
- </div>
- 
- <div className="col-span-2 flex items-center justify-between">
- <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md ${
- (m.status === "completed" || m.status === "Completed") ? "bg-emerald-900/20 text-emerald-400 border border-emerald-500/30" :
- (m.status === "recording" || m.status === "processing") ? "bg-teal-500/10 text-teal-400 border border-teal-500/20" :
- m.status === "failed" ? "bg-red-900/20 text-red-400 border border-red-500/30" :
- "bg-[#0b161b] text-teal-100/50 border border-teal-900/25"
- }`}>
- {(m.status === "recording" || m.status === "processing") ? (
- <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
- ) : (
- <span className={`w-1.5 h-1.5 rounded-full ${
- (m.status === "completed" || m.status === "Completed") ? "bg-[#429563]" :
- m.status === "failed" ? "bg-[#b93232]" :
- "bg-slate-dark/30"
- }`} />
- )}
- {m.status === "recording" ? "Recording" : m.status === "processing" ? "Processing" : m.status}
- </span>
+        <div className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-400 mb-6 flex items-center justify-center gap-3">
+          <span>Client Dossier</span>
+          <span className="text-slate-300">•</span>
+          <span className={`px-2 py-0.5 rounded-sm ${
+            customer?.status === "Active" ? "bg-green-100 text-green-800" :
+            customer?.status === "Closed" ? "bg-slate-200 text-slate-600" :
+            "bg-orange-100 text-orange-800"
+          }`}>
+            {customer?.status || "Lead"}
+          </span>
+        </div>
 
- <div className="w-8 h-8 rounded-full flex items-center justify-center text-teal-100/20 group-hover:text-white group-hover:bg-teal-900/10 transition-all hidden lg:flex">
- <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
- </svg>
- </div>
- </div>
- </Link>
- ))}
- </div>
- </motion.div>
- )}
- </AnimatePresence>
- </div>
- </div>
- );
+        <h1 className="font-anthropic-serif text-5xl md:text-7xl leading-[1.1] tracking-tight text-[#1a1a1a] mb-8">
+          {customer?.customer_name || "Unknown Customer"}
+        </h1>
+
+        <div className="flex flex-wrap items-center justify-center gap-6 font-anthropic-sans text-sm text-slate-600">
+          {customer?.industry && (
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">Industry:</span>
+              <span className="text-slate-800 font-medium">{customer.industry}</span>
+            </div>
+          )}
+          {customer?.website && (
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">Website:</span>
+              <a href={customer.website.startsWith('http') ? customer.website : `https://${customer.website}`} target="_blank" rel="noreferrer" className="text-slate-800 font-medium hover:underline underline-offset-4">
+                {customer.website.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400">Recordings:</span>
+            <span className="text-slate-800 font-medium">{meetings.length} tapes</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* MEETINGS LIST */}
+      <div>
+        <div className="flex items-center justify-between mb-16 border-b border-slate-200 pb-4">
+          <h2 className="font-anthropic-serif text-2xl tracking-tight text-[#1a1a1a]">
+            Archive
+          </h2>
+          <span className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-400">
+            Chronological Order
+          </span>
+        </div>
+        
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08 } },
+          }}
+          className="flex flex-col gap-12"
+        >
+          <AnimatePresence>
+            {meetings.length === 0 ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="w-full flex flex-col items-center justify-center py-24"
+              >
+                <h3 className="font-anthropic-serif text-3xl text-slate-400 tracking-tight mb-4">Blank Tape</h3>
+                <p className="font-anthropic-sans text-slate-500 max-w-sm text-center leading-relaxed">
+                  There are no recorded meetings for this client yet. Deploy the bot to your next meeting to populate this archive.
+                </p>
+              </motion.div>
+            ) : (
+              meetings.map((m, i) => (
+                <motion.div
+                  key={m.id || i}
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link href={`/dashboard/meeting/${m.meeting_id}`} className="block">
+                    <VHSTape
+                      title={m.title || "Untitled Meeting"}
+                      date={formatDate(m.meeting_date)}
+                      customer={customer?.customer_name || "Unknown"}
+                      index={i}
+                    />
+                  </Link>
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </div>
+  );
 }
