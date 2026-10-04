@@ -84,7 +84,7 @@ export default function TeamPage() {
 
   if (!user) return null;
 
-  const inputCls = "w-full bg-[#050a0c] border border-teal-900/30 text-white font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:bg-[#091114] focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/10 transition-all placeholder:text-white/25 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
+  const inputCls = "w-full bg-white border border-slate-200 text-slate-900 font-anthropic-sans text-[15px] px-4 py-3.5 rounded-xl outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition-all placeholder:text-slate-400 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]";
 
   return (
     <div className="w-full max-w-[1200px] mx-auto pb-24">
@@ -96,10 +96,10 @@ export default function TeamPage() {
         className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 mt-6"
       >
         <div>
-          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[48px] md:text-[56px] tracking-tight leading-[1] text-white">
-            Admin <em className="italic font-normal text-teal-100/40">Portal</em>
+          <motion.h1 variants={fadeInUp} transition={springCalm} className="font-anthropic-serif text-[48px] md:text-[56px] tracking-tight leading-[1] text-slate-900">
+            Admin <em className="italic font-normal text-slate-400">Portal</em>
           </motion.h1>
-          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[15px] text-teal-100/50 mt-5 max-w-[440px] leading-[1.75]">
+          <motion.p variants={fadeInUp} transition={springCalm} className="font-anthropic-sans text-[15px] text-slate-500 mt-5 max-w-[440px] leading-[1.75]">
             Provision new employee accounts. Generated credentials can be shared with the salesperson securely.
           </motion.p>
         </div>
@@ -113,18 +113,18 @@ export default function TeamPage() {
             animate={{ opacity: 1, y: 0, height: "auto", marginBottom: 32 }}
             exit="exit"
             transition={easeSoft}
-            className="bg-emerald-900/20 border border-emerald-500/30 rounded-2xl p-5 flex items-center justify-between"
+            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
               <div>
-                <p className="font-anthropic-sans font-semibold text-[14px] text-emerald-400">Success</p>
-                <p className="font-anthropic-sans text-[13px] text-emerald-500 mt-0.5">{success}</p>
+                <p className="font-anthropic-sans font-semibold text-[14px] text-emerald-700">Success</p>
+                <p className="font-anthropic-sans text-[13px] text-emerald-600 mt-0.5">{success}</p>
               </div>
             </div>
-            <button onClick={() => setSuccess("")} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-teal-900/20 text-emerald-400 transition-colors">
+            <button onClick={() => setSuccess("")} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-emerald-700 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </motion.div>
@@ -136,18 +136,18 @@ export default function TeamPage() {
             animate={{ opacity: 1, y: 0, height: "auto", marginBottom: 32 }}
             exit="exit"
             transition={easeSoft}
-            className="bg-red-900/20 border border-red-500/30 rounded-2xl p-5 flex items-center justify-between"
+            className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
               </div>
               <div>
-                <p className="font-anthropic-sans font-semibold text-[14px] text-red-400">Failed to create account</p>
-                <p className="font-anthropic-sans text-[13px] text-red-500 mt-0.5">{error}</p>
+                <p className="font-anthropic-sans font-semibold text-[14px] text-red-700">Failed to create account</p>
+                <p className="font-anthropic-sans text-[13px] text-red-600 mt-0.5">{error}</p>
               </div>
             </div>
-            <button onClick={() => setError("")} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-teal-900/20 text-red-400 transition-colors">
+            <button onClick={() => setError("")} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-red-700 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </motion.div>
@@ -160,16 +160,16 @@ export default function TeamPage() {
         transition={{ ...springCalm, delay: 0.2 }}
         className="max-w-[500px]"
       >
-        <div className="bg-[#091114] border border-teal-900/30 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.4)] w-full overflow-hidden">
-          <div className="px-8 py-6 border-b border-teal-900/20 bg-[#0a1317]">
-            <h3 className="font-anthropic-mono text-[10px] uppercase tracking-widest text-white/60 font-bold">
+        <div className="bg-white border border-slate-200 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] w-full overflow-hidden">
+          <div className="px-8 py-6 border-b border-slate-200 bg-stone-50">
+            <h3 className="font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">
               Create Salesperson Account
             </h3>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-7">
             <div className="flex flex-col gap-3">
-              <label htmlFor="salesperson_name" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-white/60">
+              <label htmlFor="salesperson_name" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
                 Full Name
               </label>
               <input
@@ -185,7 +185,7 @@ export default function TeamPage() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <label htmlFor="email" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-white/60">
+              <label htmlFor="email" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
                 Work Email
               </label>
               <input
@@ -201,7 +201,7 @@ export default function TeamPage() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <label htmlFor="sp-password" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-white/60">
+              <label htmlFor="sp-password" className="font-anthropic-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
                 Password
               </label>
               <input
@@ -221,7 +221,7 @@ export default function TeamPage() {
               whileTap={tapScale}
               type="submit"
               disabled={loading}
-              className="mt-4 w-full font-anthropic-sans font-semibold text-[16px] bg-teal-600 text-white py-[18px] rounded-xl hover:bg-teal-500 transition-colors disabled:opacity-50 shadow-sm"
+              className="mt-4 w-full font-anthropic-sans font-semibold text-[16px] bg-slate-900 text-white py-[18px] rounded-xl hover:bg-slate-900 transition-colors disabled:opacity-50 shadow-sm"
             >
               {loading ? "Provisioning account..." : "Add team member"}
             </motion.button>
@@ -231,3 +231,4 @@ export default function TeamPage() {
     </div>
   );
 }
+
