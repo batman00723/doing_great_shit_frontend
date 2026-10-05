@@ -39,7 +39,12 @@ export default function MeetingReportPage({
   const [replaceText, setReplaceText] = useState("");
 
   // Feedback
-  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{ 
+    msg: string; 
+    type: "success" | "error"; 
+    title?: string;
+    email?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!meetingId) return;
@@ -84,9 +89,13 @@ export default function MeetingReportPage({
     fetchData();
   }, [meetingId]);
 
-  const showToast = (msg: string, type: "success" | "error") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 4000);
+  const showToast = (
+    msg: string, 
+    type: "success" | "error", 
+    opts?: { title?: string; email?: string }
+  ) => {
+    setToast({ msg, type, title: opts?.title, email: opts?.email });
+    setTimeout(() => setToast(null), 5500);
   };
 
   const handleSave = async () => {
@@ -112,13 +121,13 @@ export default function MeetingReportPage({
       if (res.ok) {
         setInitialHtml(updatedHtml);
         setIsEditing(false);
-        showToast("Report saved successfully.", "success");
+        showToast("Report saved successfully.", "success", { title: "Document Saved" });
       } else {
         const data = await res.json();
-        showToast(data?.detail || "Failed to save the report.", "error");
+        showToast(data?.detail || "Failed to save the report.", "error", { title: "Save Error" });
       }
     } catch {
-      showToast("Network error. Could not save.", "error");
+      showToast("Network error. Could not save.", "error", { title: "Network Error" });
     } finally {
       setIsSaving(false);
     }
@@ -140,12 +149,25 @@ export default function MeetingReportPage({
       const data = await res.json();
       
       if (res.ok) {
-        showToast("Email successfully sent to customer!", "success");
+        // Extract recipient email from backend response, regex from message, or meetingDetails
+        const emailFromMsg = typeof data?.message === "string"
+          ? data.message.match(/[\w.+-]+@[\w.-]+\.\w+/)?.[0]
+          : null;
+        const targetEmail = data?.email || emailFromMsg || meetingDetails?.customer?.email || "";
+
+        showToast(
+          targetEmail ? `Email sent to ${targetEmail}` : "Email sent to customer successfully!",
+          "success",
+          {
+            title: "Email Sent Successfully",
+            email: targetEmail || undefined
+          }
+        );
       } else {
-        showToast(data?.detail || data?.message || "Failed to send email.", "error");
+        showToast(data?.detail || data?.message || "Failed to send email.", "error", { title: "Delivery Failed" });
       }
     } catch {
-      showToast("Network error. Could not send email.", "error");
+      showToast("Network error. Could not send email.", "error", { title: "Connection Error" });
     } finally {
       setIsSending(false);
     }
@@ -198,15 +220,61 @@ export default function MeetingReportPage({
       <AnimatePresence>
         {toast && (
           <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className={`fixed bottom-8 right-8 px-6 py-4 shadow-xl border font-anthropic-sans text-sm z-50 ${
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 max-w-sm sm:max-w-md bg-[#fdfdfc] border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-[0_16px_40px_rgba(0,0,0,0.14)] font-anthropic-sans z-50 flex items-start gap-3.5"
+          >
+            {/* Status Icon */}
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
               toast.type === "success" 
-                ? "bg-white border-green-200 text-green-800" 
-                : "bg-white border-red-200 text-red-800"
+                ? "bg-emerald-50 text-emerald-600 border border-emerald-200/60" 
+                : "bg-red-50 text-red-600 border border-red-200/60"
             }`}>
-            {toast.msg}
+              {toast.type === "success" ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.25} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0 pr-1">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <h4 className="font-anthropic-serif text-base font-semibold text-slate-900 tracking-tight">
+                  {toast.title || (toast.type === "success" ? "Success" : "Notification")}
+                </h4>
+              </div>
+              
+              {toast.email ? (
+                <div className="text-[13px] text-slate-600 leading-relaxed">
+                  Email sent to{" "}
+                  <span className="font-anthropic-mono text-emerald-700 bg-emerald-50/80 border border-emerald-200/60 px-1.5 py-0.5 rounded font-medium break-all">
+                    {toast.email}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[13px] text-slate-600 leading-relaxed break-words">
+                  {toast.msg}
+                </p>
+              )}
+            </div>
+
+            {/* Dismiss Button */}
+            <button
+              onClick={() => setToast(null)}
+              className="text-slate-400 hover:text-slate-700 transition-colors p-1 -mr-1 -mt-1 rounded-lg hover:bg-slate-100"
+              title="Dismiss notification"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -263,9 +331,24 @@ export default function MeetingReportPage({
             <button
               onClick={handleSendEmail}
               disabled={isSending}
-              className="font-anthropic-mono text-[10px] uppercase tracking-widest px-6 py-3 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:opacity-50 w-full text-center"
+              className="font-anthropic-mono text-[10px] uppercase tracking-widest px-6 py-3.5 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:opacity-50 w-full text-center flex items-center justify-center gap-2 shadow-xs"
             >
-              {isSending ? "Sharing..." : "Share to Customer"}
+              {isSending ? (
+                <>
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <span>Sending Email...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Share with Customers</span>
+                </>
+              )}
             </button>
           </div>
         </div>

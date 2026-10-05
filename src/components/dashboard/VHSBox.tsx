@@ -35,7 +35,7 @@ export function VHSTape({
       >
         {/* We use object-contain so the VHS tape is NEVER cropped, making percentage offsets perfectly reliable */}
         <Image
-          src="/images/vhs-tape-custom.png"
+          src="/images/vhs-tape-custom.webp"
           alt="VHS Tape"
           fill
           className="object-contain pointer-events-none"

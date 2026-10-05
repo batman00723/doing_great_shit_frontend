@@ -17,8 +17,79 @@ interface Customer {
  id: number;
  customer_name: string;
  industry: string;
- website: string;
+ website?: string | null;
  status: string;
+ email?: string | null;
+ customer_image?: string | null;
+}
+
+function getCustomerImageUrl(path?: string | null) {
+ if (!path) return null;
+ if (path.startsWith("http://") || path.startsWith("https://")) return path;
+ const cleanPath = path.startsWith("/") ? path : `/${path}`;
+ if (cleanPath.startsWith("/media/")) {
+ return `https://doing-great-shit.onrender.com${cleanPath}`;
+ }
+ return `https://doing-great-shit.onrender.com/media${cleanPath}`;
+}
+
+function CustomerAvatar({ 
+  name, 
+  image, 
+  size = "card" 
+}: { 
+  name: string; 
+  image?: string | null; 
+  size?: "card" | "list";
+}) {
+  const [imgError, setImgError] = useState(false);
+  const imageUrl = getCustomerImageUrl(image);
+  const showImage = Boolean(imageUrl && !imgError);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [image]);
+
+  if (size === "list") {
+    return (
+      <div className="w-[52px] h-[52px] rounded-xl bg-white border border-slate-200/90 shadow-xs p-1 flex items-center justify-center shrink-0 overflow-hidden">
+        {showImage ? (
+          <img
+            src={imageUrl!}
+            alt={name}
+            className="w-full h-full object-cover rounded-lg"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full rounded-lg bg-slate-100 flex items-center justify-center">
+            <span className="font-anthropic-serif text-2xl font-semibold text-slate-800">
+              {name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Card view size: prominent, beautifully proportioned, crisp
+  return (
+    <div className="w-[76px] h-[76px] sm:w-[84px] sm:h-[84px] rounded-2xl bg-white border-2 border-slate-200/90 shadow-sm p-1.5 flex items-center justify-center shrink-0 overflow-hidden">
+      {showImage ? (
+        <img
+          src={imageUrl!}
+          alt={name}
+          className="w-full h-full object-cover rounded-xl"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-full rounded-xl bg-slate-100 flex items-center justify-center">
+          <span className="font-anthropic-serif text-3xl sm:text-4xl font-semibold text-slate-800">
+            {name.charAt(0).toUpperCase()}
+          </span>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function getToken() {
@@ -34,6 +105,15 @@ export default function CustomersPage() {
  
  const [searchQuery, setSearchQuery] = useState("");
  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+ const [copiedId, setCopiedId] = useState<number | null>(null);
+
+ const handleCopyEmail = (e: React.MouseEvent, email: string, id: number) => {
+ e.preventDefault();
+ e.stopPropagation();
+ navigator.clipboard.writeText(email);
+ setCopiedId(id);
+ setTimeout(() => setCopiedId(null), 2000);
+ };
 
  useEffect(() => {
  const fetchCustomers = async () => {
@@ -75,7 +155,9 @@ export default function CustomersPage() {
  setFilteredCustomers(
  customers.filter(c => 
  c.customer_name.toLowerCase().includes(q) || 
- (c.industry && c.industry.toLowerCase().includes(q))
+ (c.industry && c.industry.toLowerCase().includes(q)) ||
+ (c.email && c.email.toLowerCase().includes(q)) ||
+ (c.website && c.website.toLowerCase().includes(q))
  )
  );
  }
@@ -208,12 +290,8 @@ export default function CustomersPage() {
  href={`/dashboard/customers/${c.id}`}
  className="group relative block bg-[#fdfdfc] border border-slate-200 rounded-2xl p-7 shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col"
  >
- <div className="flex items-start justify-between mb-8">
- <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center">
- <span className="font-anthropic-serif text-2xl font-medium text-slate-800">
- {c.customer_name.charAt(0)}
- </span>
- </div>
+ <div className="flex items-start justify-between mb-[48px] sm:mb-[56px]">
+ <CustomerAvatar name={c.customer_name} image={c.customer_image} size="card" />
  
  <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full ${
  c.status === "Active" ? "bg-green-50 text-green-700" :
@@ -233,20 +311,68 @@ export default function CustomersPage() {
  {c.customer_name}
  </h2>
  
- <div className="font-anthropic-sans text-base text-slate-500 flex items-center gap-3 mb-10">
- <svg className="w-5 h-5 opacity-60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+ <div className="flex flex-col gap-3 mb-8">
+ <div className="font-anthropic-sans text-[15px] text-slate-600 flex items-center gap-3">
+ <svg className="w-5 h-5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
  </svg>
  <span className="truncate">{c.industry || "General"}</span>
+ </div>
+
+ {c.email && (
+ <button
+ type="button"
+ onClick={(e) => handleCopyEmail(e, c.email!, c.id)}
+ title="Click to copy email address"
+ className="font-anthropic-sans text-[15px] text-slate-600 hover:text-slate-950 flex items-center justify-between gap-3 group/email text-left transition-colors py-0.5 rounded-lg"
+ >
+ <div className="flex items-center gap-3 min-w-0">
+ <svg className="w-5 h-5 text-slate-500 group-hover/email:text-slate-900 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+ </svg>
+ <span className="truncate group-hover/email:underline">{c.email}</span>
+ </div>
+ <span className="shrink-0 font-anthropic-mono text-[10px] uppercase tracking-wider text-slate-400 group-hover/email:text-slate-800 bg-slate-100 px-2 py-0.5 rounded transition-all">
+ {copiedId === c.id ? "✓ Copied" : "Copy"}
+ </span>
+ </button>
+ )}
+
+ {c.website && (
+ <a
+ href={c.website.startsWith("http://") || c.website.startsWith("https://") ? c.website : `https://${c.website}`}
+ target="_blank"
+ rel="noopener noreferrer"
+ onClick={(e) => e.stopPropagation()}
+ title={`Open ${c.website} in new tab`}
+ className="font-anthropic-sans text-[15px] text-slate-600 hover:text-slate-950 flex items-center justify-between gap-3 group/web transition-colors py-0.5 rounded-lg"
+ >
+ <div className="flex items-center gap-3 min-w-0">
+ <svg className="w-5 h-5 text-slate-500 group-hover/web:text-slate-900 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+ </svg>
+ <span className="truncate group-hover/web:underline">
+ {c.website.replace(/^https?:\/\//i, "")}
+ </span>
+ </div>
+ <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover/web:bg-slate-200/90 flex items-center justify-center shrink-0 transition-colors">
+ <svg className="w-5 h-5 text-slate-600 group-hover/web:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+ </svg>
+ </div>
+ </a>
+ )}
  </div>
 
  <div className="pt-5 border-t border-slate-100 flex items-center justify-between text-slate-900 font-medium group-hover:text-black transition-colors mt-auto">
  <span className="font-anthropic-sans text-base">
  Open Profile
  </span>
- <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+ <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+ <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
  </svg>
+ </div>
  </div>
  </Link>
  </motion.div>
@@ -263,10 +389,11 @@ export default function CustomersPage() {
  >
  <div className="w-full text-left">
  <div className="grid grid-cols-12 gap-4 px-6 py-5 border-b border-slate-200 bg-slate-50">
- <div className="col-span-5 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Customer Name</div>
- <div className="col-span-3 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Industry</div>
- <div className="col-span-3 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Status</div>
- <div className="col-span-1 text-right font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Action</div>
+ <div className="col-span-4 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Customer</div>
+ <div className="col-span-2 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Industry</div>
+ <div className="col-span-3 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Contact Email</div>
+ <div className="col-span-2 font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Website</div>
+ <div className="col-span-1 text-right font-anthropic-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold">Status</div>
  </div>
  
  <div className="flex flex-col divide-y divide-slate-100">
@@ -276,20 +403,58 @@ export default function CustomersPage() {
  href={`/dashboard/customers/${c.id}`}
  className="grid grid-cols-12 gap-4 px-6 py-5 items-center hover:bg-slate-50 transition-colors group"
  >
- <div className="col-span-5 flex items-center gap-4">
- <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
- <span className="font-anthropic-serif text-lg text-slate-800">{c.customer_name.charAt(0)}</span>
- </div>
- <span className="font-anthropic-sans text-[15px] font-medium text-slate-900 group-hover:text-black transition-colors">
+ <div className="col-span-4 flex items-center gap-6 sm:gap-7 min-w-0">
+ <CustomerAvatar name={c.customer_name} image={c.customer_image} size="list" />
+ <span className="font-anthropic-sans text-[15px] font-medium text-slate-900 group-hover:text-black transition-colors truncate">
  {c.customer_name}
  </span>
  </div>
  
- <div className="col-span-3 font-anthropic-sans text-sm text-slate-500 truncate">
+ <div className="col-span-2 font-anthropic-sans text-sm text-slate-500 truncate">
  {c.industry || "—"}
  </div>
 
- <div className="col-span-3">
+ <div className="col-span-3 font-anthropic-sans text-sm text-slate-600 truncate">
+ {c.email ? (
+ <button
+ type="button"
+ onClick={(e) => handleCopyEmail(e, c.email!, c.id)}
+ title="Click to copy email"
+ className="hover:text-slate-900 transition-colors inline-flex items-center gap-1.5 group/listemail text-left truncate max-w-full"
+ >
+ <span className="truncate group-hover/listemail:underline">{c.email}</span>
+ {copiedId === c.id ? (
+ <span className="font-anthropic-mono text-[9px] uppercase tracking-wider text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
+ ✓ Copied
+ </span>
+ ) : (
+ <span className="opacity-0 group-hover/listemail:opacity-100 font-anthropic-mono text-[9px] uppercase tracking-wider text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0 transition-opacity">
+ Copy
+ </span>
+ )}
+ </button>
+ ) : "—"}
+ </div>
+
+ <div className="col-span-2 font-anthropic-sans text-sm text-slate-600 truncate">
+ {c.website ? (
+ <a
+ href={c.website.startsWith("http://") || c.website.startsWith("https://") ? c.website : `https://${c.website}`}
+ target="_blank"
+ rel="noopener noreferrer"
+ onClick={(e) => e.stopPropagation()}
+ title={`Open ${c.website}`}
+ className="hover:text-slate-900 hover:underline transition-colors inline-flex items-center gap-1.5 truncate max-w-full"
+ >
+ <span className="truncate">{c.website.replace(/^https?:\/\//i, "")}</span>
+ <svg className="w-4.5 h-4.5 text-slate-500 group-hover:text-slate-900 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+ </svg>
+ </a>
+ ) : "—"}
+ </div>
+
+ <div className="col-span-1 flex justify-end">
  <span className={`inline-flex items-center gap-1.5 font-anthropic-mono text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full ${
  c.status === "Active" ? "bg-green-50 text-green-700" :
  c.status === "Closed" ? "bg-slate-100 text-slate-600" :
@@ -302,14 +467,6 @@ export default function CustomersPage() {
  }`} />
  {c.status || "Lead"}
  </span>
- </div>
-
- <div className="col-span-1 flex justify-end">
- <div className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 group-hover:text-slate-900 transition-all">
- <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
- </svg>
- </div>
  </div>
  </Link>
  ))}

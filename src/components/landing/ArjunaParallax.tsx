@@ -23,7 +23,7 @@ export function ArjunaParallax() {
       {/* The Parallax Image */}
       <motion.div style={{ y }} className="absolute inset-0 w-full h-[140%] -top-[20%] z-0">
         <Image
-          src="/images/arjuna.png"
+          src="/images/arjuna.webp"
           alt="Arjuna's Focus"
           fill
           className="object-cover opacity-40 dark:opacity-30 grayscale mix-blend-luminosity"

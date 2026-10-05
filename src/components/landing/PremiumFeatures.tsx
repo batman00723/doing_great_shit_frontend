@@ -66,11 +66,11 @@ function HorizontalStackCard({
 
 export function PremiumFeatures() {
   const features = [
-    { src: "/images/feature-1.png", num: "01", category: "Workflow", title: "Email Automation" },
-    { src: "/images/feature-2.png", num: "02", category: "Security", title: "Enterprise Grade" },
-    { src: "/images/feature-3.png", num: "03", category: "Ingestion", title: "Bring Your Own Data" },
-    { src: "/images/feature-4.png", num: "04", category: "Intelligence", title: "Beyond Transcripts" },
-    { src: "/images/feature-5.png", num: "05", category: "Memory", title: "Global Knowledge Base" },
+    { src: "/images/feature-1.webp", num: "01", category: "Workflow", title: "Email Automation" },
+    { src: "/images/feature-2.webp", num: "02", category: "Security", title: "Enterprise Grade" },
+    { src: "/images/feature-3.webp", num: "03", category: "Ingestion", title: "Bring Your Own Data" },
+    { src: "/images/feature-4.webp", num: "04", category: "Intelligence", title: "Beyond Transcripts" },
+    { src: "/images/feature-5.webp", num: "05", category: "Memory", title: "Global Knowledge Base" },
   ];
 
   const containerRef = useRef<HTMLDivElement>(null);

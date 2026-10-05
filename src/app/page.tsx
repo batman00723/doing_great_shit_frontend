@@ -64,7 +64,7 @@ export default function Home() {
         {/* Arjuna Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/arjuna.png"
+            src="/images/arjuna.webp"
             alt="Arjuna"
             fill
             className="object-cover object-top opacity-30 dark:opacity-[0.25] saturate-50 mix-blend-lighten"

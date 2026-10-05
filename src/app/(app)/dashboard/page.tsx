@@ -34,6 +34,8 @@ interface Customer {
   industry: string;
   website: string;
   status: string;
+  email?: string | null;
+  customer_image?: string | null;
 }
 
 type MeetingModalTab = "bot" | "transcript" | "audio";
@@ -78,6 +80,9 @@ export default function DashboardPage() {
 
   // Add Customer form
   const [custForm, setCustForm] = useState({ customer_name: "", email: "", industry: "", website: "", status: "Lead" });
+  const [custPhoto, setCustPhoto] = useState<File | null>(null);
+  const [custPhotoPreview, setCustPhotoPreview] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [custLoading, setCustLoading] = useState(false);
   const [custSuccess, setCustSuccess] = useState("");
   const [custError, setCustError] = useState("");
@@ -151,6 +156,31 @@ export default function DashboardPage() {
     init();
   }, [router]);
 
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 500 * 1024) {
+      setCustError("Photo exceeds the 500 KB limit. Please choose a smaller image.");
+      if (photoInputRef.current) photoInputRef.current.value = "";
+      return;
+    }
+
+    setCustError("");
+    setCustPhoto(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCustPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    setCustPhoto(null);
+    setCustPhotoPreview(null);
+    if (photoInputRef.current) photoInputRef.current.value = "";
+  };
+
   const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     setCustError(""); setCustSuccess(""); setCustLoading(true);
@@ -162,11 +192,27 @@ export default function DashboardPage() {
       return;
     }
 
+    if (custPhoto && custPhoto.size > 500 * 1024) {
+      setCustError("Photo exceeds the 500 KB limit.");
+      setCustLoading(false);
+      return;
+    }
+
     try {
+      const formData = new FormData();
+      formData.append("customer_name", custForm.customer_name);
+      formData.append("email", custForm.email);
+      formData.append("industry", custForm.industry || "");
+      formData.append("website", custForm.website || "");
+      formData.append("status", custForm.status || "Lead");
+      if (custPhoto) {
+        formData.append("photo", custPhoto);
+      }
+
       const res = await fetch(`${BASE}/customers/create`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(custForm),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) {
@@ -177,6 +223,7 @@ export default function DashboardPage() {
       }
       setCustSuccess(`${custForm.customer_name} added successfully!`);
       setCustForm({ customer_name: "", email: "", industry: "", website: "", status: "Lead" });
+      handleRemovePhoto();
       setCustomers((prev) => [...prev, data]);
     } catch (err) {
       setCustError("Network error.");
@@ -379,7 +426,57 @@ export default function DashboardPage() {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleAddCustomer} className="flex flex-col gap-5">
+          <form onSubmit={handleAddCustomer} className="flex flex-col gap-6">
+            {/* Photo / Logo Upload (Optional) */}
+            <div className="p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="relative w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                  {custPhotoPreview ? (
+                    <img src={custPhotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className="font-anthropic-sans text-[14px] font-medium text-slate-800">
+                    Company Logo / Photo <span className="text-slate-400 font-normal">(Optional)</span>
+                  </p>
+                  <p className="font-anthropic-mono text-[11px] text-slate-400 mt-0.5">
+                    PNG, JPG, or WebP up to 500 KB
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={photoInputRef}
+                  accept="image/png,image/jpeg,image/webp,image/jpg"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+                {custPhoto ? (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="font-anthropic-sans text-[12px] font-medium text-red-600 hover:text-red-700 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+                  >
+                    Remove Photo
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    className="font-anthropic-sans text-[12px] font-medium text-slate-700 bg-white border border-slate-200 px-3.5 py-1.5 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
+                  >
+                    Choose Photo
+                  </button>
+                )}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div className="flex flex-col gap-2.5">
                 <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Company Name</label>
@@ -390,10 +487,16 @@ export default function DashboardPage() {
                 <input required type="email" placeholder="contact@acme.com" value={custForm.email} onChange={e => setCustForm({ ...custForm, email: e.target.value })} className={inputCls} />
               </div>
               <div className="flex flex-col gap-2.5">
+                <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">
+                  Website <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                </label>
+                <input type="url" placeholder="https://acme.com" value={custForm.website} onChange={e => setCustForm({ ...custForm, website: e.target.value })} className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-2.5">
                 <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Industry</label>
                 <input placeholder="e.g. Software" value={custForm.industry} onChange={e => setCustForm({ ...custForm, industry: e.target.value })} className={inputCls} />
               </div>
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-2.5 md:col-span-2">
                 <label className="font-anthropic-mono text-[11px] uppercase tracking-widest text-slate-500">Status</label>
                 <select value={custForm.status} onChange={e => setCustForm({ ...custForm, status: e.target.value })} className={selectCls}>
                   <option value="Lead">Lead</option>

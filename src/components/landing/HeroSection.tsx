@@ -236,7 +236,7 @@ function StickyNewspaperStack() {
             style={{ scale: p4Scale, rotate: p4BaseRotate, zIndex: 10 }}
             className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.08)] transform-gpu overflow-hidden bg-transparent"
           >
-            <Image src="/images/hero-img-4.png" alt="Dashboard 4" fill className="object-cover" />
+            <Image src="/images/hero-img-4.webp" alt="Dashboard 4" fill className="object-cover" />
           </motion.div>
 
           {/* Paper 3 */}
@@ -246,7 +246,7 @@ function StickyNewspaperStack() {
           >
              <motion.div style={{ rotate: p3BaseRotate, width: "100%", height: "100%" }}>
                <motion.div style={{ rotate: p3Rotate, width: "100%", height: "100%" }}>
-                 <Image src="/images/hero-img-3.png" alt="Dashboard 3" fill className="object-cover" />
+                 <Image src="/images/hero-img-3.webp" alt="Dashboard 3" fill className="object-cover" />
                </motion.div>
              </motion.div>
           </motion.div>
@@ -258,7 +258,7 @@ function StickyNewspaperStack() {
           >
              <motion.div style={{ rotate: p2BaseRotate, width: "100%", height: "100%" }}>
                <motion.div style={{ rotate: p2Rotate, width: "100%", height: "100%" }}>
-                 <Image src="/images/hero-img-1.png" alt="Dashboard 2" fill className="object-cover" />
+                 <Image src="/images/hero-img-1.webp" alt="Dashboard 2" fill className="object-cover" />
                </motion.div>
              </motion.div>
           </motion.div>
@@ -268,7 +268,7 @@ function StickyNewspaperStack() {
             style={{ y: p1Y, rotate: p1Rotate, opacity: p1Opacity, zIndex: 40 }}
             className="absolute w-full h-full rounded-[24px] border border-stone/20 dark:border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.15)] transform-gpu origin-bottom overflow-hidden bg-transparent"
           >
-             <Image src="/images/hero-img-2.png" alt="Dashboard 1" fill className="object-cover" />
+             <Image src="/images/hero-img-2.webp" alt="Dashboard 1" fill className="object-cover" />
           </motion.div>
 
         </div>
