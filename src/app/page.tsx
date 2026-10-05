@@ -23,7 +23,7 @@ export default function Home() {
       
       {/* 1. Top Navbar */}
       <NavReveal className="w-full sticky top-0 z-50 bg-ivory-medium/90 dark:bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-stone/30 dark:border-white/10 transition-colors duration-500">
-        <div className="max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-6 py-2 flex items-center justify-between">
           <div className="font-anthropic-sans font-bold text-[13px] uppercase tracking-[0.2em] text-slate-dark dark:text-white">
             Smriti
           </div>
@@ -37,7 +37,7 @@ export default function Home() {
             <AnimatedButton>
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-slate-dark dark:bg-white text-white dark:text-slate-dark px-6 py-2.5 rounded-full hover:bg-black dark:hover:bg-slate-200 transition-all"
+                className="inline-flex items-center justify-center font-anthropic-sans font-medium text-[13px] bg-slate-dark dark:bg-white text-white dark:text-slate-dark px-6 py-1 rounded-full hover:bg-black dark:hover:bg-slate-200 transition-all"
               >
                 Try Smriti
               </Link>
@@ -112,9 +112,6 @@ export default function Home() {
           <div className="md:col-span-2 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                 <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
-                   <div className="w-4 h-4 rounded-full bg-slate-dark" />
-                 </div>
                  <div className="font-anthropic-sans font-black text-[24px] uppercase tracking-[0.2em] text-white">
                    SMRITI
                  </div>

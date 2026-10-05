@@ -13,7 +13,7 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="w-[75px] h-9" />;
+    return <div className="w-[75px] h-7" />;
   }
 
   const isDark = resolvedTheme === "dark";
@@ -21,7 +21,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="font-anthropic-sans font-medium text-[13px] text-slate-dark/70 dark:text-white/70 hover:text-slate-dark dark:hover:text-white transition-colors relative flex items-center justify-center w-[75px] h-9 overflow-hidden"
+      className="font-anthropic-sans font-medium text-[13px] text-slate-dark/70 dark:text-white/70 hover:text-slate-dark dark:hover:text-white transition-colors relative flex items-center justify-center w-[75px] h-7 overflow-hidden"
       aria-label="Toggle theme"
     >
       <AnimatePresence mode="wait">

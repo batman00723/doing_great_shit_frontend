@@ -114,7 +114,7 @@ export function HeroSection() {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-stone-100 dark:bg-white/5 border border-stone-200 dark:border-white/10 mb-10 w-fit transition-colors duration-500"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-stone-100 dark:bg-white/5 border border-stone-200 dark:border-white/10 mb-8 w-fit transition-colors duration-500"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white transition-colors duration-500" />
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-white/60 transition-colors duration-500">
@@ -129,14 +129,14 @@ export function HeroSection() {
           variants={{
             visible: { transition: { staggerChildren: 0.04 } }
           }}
-          className="font-anthropic-serif text-[72px] sm:text-[88px] md:text-[110px] leading-[1] tracking-tight text-slate-dark dark:text-white transition-colors duration-500 mb-10 flex flex-col items-center"
+          className="font-anthropic-serif text-[72px] sm:text-[88px] md:text-[110px] leading-[0.95] tracking-tight text-slate-dark dark:text-white transition-colors duration-500 mb-8 flex flex-col items-center"
         >
-          <span className="flex overflow-hidden pb-4">
+          <span className="flex overflow-hidden pb-3">
             {splitText("Unfair advantage")}
           </span>
-          <span className="flex overflow-hidden pb-6">
+          <span className="flex overflow-hidden pb-6 -mt-1 sm:-mt-2">
             <span className="mr-4">{splitText("on")}</span>
-            <em className="italic font-normal relative">
+            <span className="font-normal relative">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-clay-deep via-clay to-clay-deep bg-300% animate-gradient">
                 {splitText("every call.")}
               </span>
@@ -146,7 +146,7 @@ export function HeroSection() {
                 transition={{ duration: 1, delay: 1, ease: "easeInOut" }}
                 className="absolute -bottom-2 left-0 w-full h-[2px] bg-clay/30 origin-left"
               />
-            </em>
+            </span>
           </span>
         </motion.h1>
 
@@ -155,7 +155,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="font-anthropic-sans text-[18px] md:text-[22px] leading-[1.6] text-slate-dark/70 dark:text-white/70 transition-colors duration-500 max-w-[640px] mb-14"
+          className="font-anthropic-sans text-[18px] md:text-[22px] leading-[1.6] text-slate-dark/70 dark:text-white/70 transition-colors duration-500 max-w-[640px] mb-12"
         >
           We listen to your meetings so you don't have to. Never drop the ball on a client promise again.
         </motion.p>
@@ -226,7 +226,7 @@ function StickyNewspaperStack() {
   const p4BaseRotate = useTransform(scrollYProgress, [0.66, 0.91], [-2, 0]);
 
   return (
-    <div ref={containerRef} className="w-full h-[400vh] relative z-20 mt-12 sm:mt-24">
+    <div ref={containerRef} className="w-full h-[400vh] relative z-20 mt-4 sm:mt-8 lg:mt-10">
       <div className="sticky top-0 w-full h-screen flex justify-center items-center overflow-hidden px-6 perspective-[2000px]">
         
         <div className="relative w-full max-w-[1000px] aspect-[16/9.9] max-h-[80vh] flex justify-center items-center">

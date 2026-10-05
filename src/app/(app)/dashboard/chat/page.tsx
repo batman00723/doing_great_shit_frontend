@@ -10,6 +10,8 @@ import {
  hoverScale,
  tapScale,
 } from "@/lib/animations";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const BASE = "https://doing-great-shit.onrender.com/api_v1";
 
@@ -237,7 +239,15 @@ export default function ChatPage() {
  return (
  <div className="bg-[#f0f4f8] rounded-[24px] rounded-tl-md px-6 py-4">
  <div className="font-anthropic-sans text-[16px] text-slate-800 leading-relaxed whitespace-pre-wrap">
+ <ReactMarkdown 
+ remarkPlugins={[remarkGfm]}
+ components={{
+ strong: ({node, ...props}) => <strong className="font-semibold text-slate-900" {...props} />,
+ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />
+ }}
+ >
  {content}
+ </ReactMarkdown>
  </div>
  </div>
  );
@@ -254,7 +264,17 @@ export default function ChatPage() {
  <div className="flex flex-col gap-4">
  {preamble && (
  <div className="bg-[#f0f4f8] rounded-[24px] rounded-tl-md px-6 py-4">
- <p className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed">{preamble}</p>
+ <div className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed whitespace-pre-wrap">
+ <ReactMarkdown 
+ remarkPlugins={[remarkGfm]}
+ components={{
+ strong: ({node, ...props}) => <strong className="font-semibold text-slate-900" {...props} />,
+ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />
+ }}
+ >
+ {preamble}
+ </ReactMarkdown>
+ </div>
  </div>
  )}
  
@@ -290,7 +310,17 @@ export default function ChatPage() {
 
  {postamble && (
  <div className="bg-[#f0f4f8] rounded-[24px] px-6 py-4">
- <p className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed">{postamble}</p>
+ <div className="font-anthropic-sans text-[15px] text-slate-800 leading-relaxed whitespace-pre-wrap">
+ <ReactMarkdown 
+ remarkPlugins={[remarkGfm]}
+ components={{
+ strong: ({node, ...props}) => <strong className="font-semibold text-slate-900" {...props} />,
+ p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />
+ }}
+ >
+ {postamble}
+ </ReactMarkdown>
+ </div>
  </div>
  )}
  
